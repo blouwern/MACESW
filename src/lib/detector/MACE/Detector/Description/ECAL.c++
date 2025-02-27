@@ -157,8 +157,8 @@ using namespace Mustard::PhysicalConstant;
 ECAL::ECAL() : // clang-format off
     DescriptionBase{"ECAL"}, // clang-format on
     fNSubdivision{3},
-    fInnerRadius{20_cm},
-    fCrystalHypotenuse{10_cm},
+    fInnerRadius{24_cm},
+    fCrystalHypotenuse{14_cm},
     fUpstreamWindowRadius{50_mm},
     fDownstreamWindowRadius{5_mm},
     // BGO optical param.s
@@ -263,7 +263,11 @@ ECAL::ECAL() : // clang-format off
                     0.217013978, 0.206721701, 0.200096265, 0.191250653, 0.181575856, 0.168947005, 0.159534377, 0.149674853, 0.139503115,
                     0.129670093, 0.120230653, 0.108280609, 0.091831406, 0.098424138, 0.083937488, 0.073056832, 0.060399447, 0.047887957,
                     0.034501313},
-    fWaveformIntegralTime{100_ns} {}
+    fWaveformIntegralTime{100_ns},
+    fEnergyFraming{},
+    fEnergyResolutionFWHM{},
+    fTimeResolutionFWHM{},
+    fSpatialResolutionFWHM{} {}
 
 auto ECAL::ComputeMesh() const -> MeshInformation {
     auto pmpMesh{ECALMesh{fNSubdivision}.Generate()};
@@ -439,6 +443,10 @@ auto ECAL::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fMPPCEfficiency, "MPPCEfficiency");
     ImportValue(node, fModuleSelection, "ModuleSelection");
     ImportValue(node, fWaveformIntegralTime, "WaveformIntegralTime");
+    ImportValue(node, fEnergyFraming, "EnergyFraming");
+    ImportValue(node, fEnergyResolutionFWHM, "EnergyResolutionFWHM");
+    ImportValue(node, fTimeResolutionFWHM, "TimeResolutionFWHM");
+    ImportValue(node, fSpatialResolutionFWHM, "SpatialResolutionFWHM");
 
     SetGeometryOutdated();
 }
@@ -471,6 +479,10 @@ auto ECAL::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fMPPCEfficiency, "MPPCEfficiency");
     ExportValue(node, fModuleSelection, "ModuleSelection");
     ExportValue(node, fWaveformIntegralTime, "WaveformIntegralTime");
+    ExportValue(node, fEnergyFraming, "EnergyFraming");
+    ExportValue(node, fEnergyResolutionFWHM, "EnergyResolutionFWHM");
+    ExportValue(node, fTimeResolutionFWHM, "TimeResolutionFWHM");
+    ExportValue(node, fSpatialResolutionFWHM, "SpatialResolutionFWHM");
 }
 
 } // namespace MACE::Detector::Description

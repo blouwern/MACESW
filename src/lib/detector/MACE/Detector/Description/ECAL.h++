@@ -55,6 +55,10 @@ public:
 
     auto ModuleSelection() const -> const auto& { return fModuleSelection; }
     auto WaveformIntegralTime() const -> auto { return fWaveformIntegralTime; }
+    auto EnergyFraming() const -> auto& { return fEnergyFraming; }
+    auto EnergyResolutionFWHM() const -> auto { return fEnergyResolutionFWHM; }
+    auto TimeResolutionFWHM() const -> auto { return fTimeResolutionFWHM; }
+    auto SpatialResolutionFWHM() const -> auto { return fSpatialResolutionFWHM; }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,6 +93,10 @@ public:
 
     auto ModuleSelection(std::vector<int> val) { fModuleSelection = std::move(val); }
     auto WaveformIntegralTime(double val) { fWaveformIntegralTime = val; }
+    auto EnergyFraming(muc::array2d val) { fEnergyFraming = std::move(val); }
+    auto EnergyResolutionFWHM(double val) { fEnergyResolutionFWHM = val; }
+    auto TimeResolutionFWHM(double val) { fTimeResolutionFWHM = val; }
+    auto SpatialResolutionFWHM(double val) { fSpatialResolutionFWHM = val; }
 
     struct MeshInformation {
     private:
@@ -156,6 +164,10 @@ private:
 
     std::vector<int> fModuleSelection;
     double fWaveformIntegralTime;
+    muc::array2d fEnergyFraming;
+    double fEnergyResolutionFWHM;
+    double fTimeResolutionFWHM;
+    double fSpatialResolutionFWHM;
 };
 
 } // namespace MACE::Detector::Description
