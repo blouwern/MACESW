@@ -1,6 +1,7 @@
 #include "MACE/Detector/Definition/ECALCrystal.h++"
 #include "MACE/Detector/Definition/ECALPhotoSensor.h++"
 #include "MACE/Detector/Description/ECAL.h++"
+#include "MACE/Detector/Description/Vacuum.h++"
 
 #include "Mustard/Detector/Definition/DefinitionBase.h++"
 #include "Mustard/Env/BasicEnv.h++"
@@ -177,8 +178,8 @@ auto ECALPhotoSensor::ConstructMPPC(G4bool checkOverlaps) -> void {
                 checkOverlaps);
             const auto ecalCrystal{FindSibling<ECALCrystal>()};
             if (ecalCrystal) {
-                const auto couplerSurface{new G4OpticalSurface("coupler", unified, polished, dielectric_dielectric)};
-                new G4LogicalBorderSurface{"couplerSurface",
+                const auto couplerSurface{new G4OpticalSurface("Coupler", unified, polished, dielectric_dielectric)};
+                new G4LogicalBorderSurface{"CouplerSurface",
                                            ecalCrystal->PhysicalVolume(name + fmt::format("Crystal_{}", moduleID)),
                                            physicalCoupler,
                                            couplerSurface};
@@ -191,13 +192,14 @@ auto ECALPhotoSensor::ConstructMPPC(G4bool checkOverlaps) -> void {
         /////////////////////////////////////////////
 
         const auto cathodeSurface{new G4OpticalSurface("Cathode", unified, polished, dielectric_metal)};
-        new G4LogicalSkinSurface{"cathodeSkinSurface", logicPixel, cathodeSurface};
+        new G4LogicalSkinSurface{"CathodeSkinSurface", logicPixel, cathodeSurface};
         cathodeSurface->SetMaterialPropertiesTable(cathodeSurfacePropertiesTable);
     }
 }
 
 auto ECALPhotoSensor::ConstructPMT(G4bool checkOverlaps) -> void {
     const auto& ecal{Description::ECAL::Instance()};
+    const auto& vacuum{Description::Vacuum::Instance()};
     const auto name{ecal.Name()};
 
     const auto pmtCouplerThickness{ecal.PMTCouplerThickness()};
@@ -219,6 +221,11 @@ auto ECALPhotoSensor::ConstructPMT(G4bool checkOverlaps) -> void {
     const auto potassiumElement{nist->FindOrBuildElement("K")};
     const auto antimonyElement{nist->FindOrBuildElement("Sb")};
     const auto cesiumElement{nist->FindOrBuildElement("Cs")};
+
+    auto vacuumMaterial{nist->FindMaterial(vacuum.Name())};
+    if (not vacuumMaterial) {
+        vacuumMaterial = nist->BuildMaterialWithNewDensity(vacuum.Name(), "G4_AIR", vacuum.Density(), 293.15_K, vacuum.Pressure());
+    }
 
     const auto siliconeGrease{new G4Material("siliconeGrease", 1.06_g_cm3, 4, kStateLiquid)};
     siliconeGrease->AddElement(carbonElement, 2);
@@ -288,7 +295,7 @@ auto ECALPhotoSensor::ConstructPMT(G4bool checkOverlaps) -> void {
         const auto logicPMTShell{Make<G4LogicalVolume>(solidPMTShell, glass, name + "PMTShell")};
 
         const auto solidPMTVacuum{Make<G4Tubs>("temp", 0, pmtDiameter / 2 - pmtWindowThickness, pmtLength / 2 - pmtWindowThickness - pmtCathodeThickness / 2, 0, 2 * pi)};
-        const auto logicPMTVacuum{Make<G4LogicalVolume>(solidPMTVacuum, nist->FindOrBuildMaterial("G4_Galactic"), name + "PMTVacuum")};
+        const auto logicPMTVacuum{Make<G4LogicalVolume>(solidPMTVacuum, vacuumMaterial, name + "PMTVacuum")};
 
         const auto solidCathode{Make<G4Tubs>("temp", 0, cathodeDiameter / 2, pmtCathodeThickness / 2, 0, 2 * pi)};
         const auto logicCathode{Make<G4LogicalVolume>(solidCathode, bialkali, name + "PMCathode")};
@@ -323,8 +330,8 @@ auto ECALPhotoSensor::ConstructPMT(G4bool checkOverlaps) -> void {
                 checkOverlaps);
             const auto ecalCrystal{FindSibling<ECALCrystal>()};
             if (ecalCrystal) {
-                const auto couplerSurface{new G4OpticalSurface("coupler", unified, polished, dielectric_dielectric)};
-                new G4LogicalBorderSurface{"couplerSurface",
+                const auto couplerSurface{new G4OpticalSurface("Coupler", unified, polished, dielectric_dielectric)};
+                new G4LogicalBorderSurface{"CouplerSurface",
                                            ecalCrystal->PhysicalVolume(name + fmt::format("Crystal_{}", moduleID)),
                                            physicalCoupler,
                                            couplerSurface};
@@ -350,7 +357,7 @@ auto ECALPhotoSensor::ConstructPMT(G4bool checkOverlaps) -> void {
             checkOverlaps);
 
         const auto cathodeSurface{new G4OpticalSurface("Cathode", unified, polished, dielectric_metal)};
-        new G4LogicalSkinSurface{"cathodeSkinSurface", logicCathode, cathodeSurface};
+        new G4LogicalSkinSurface{"CathodeSkinSurface", logicCathode, cathodeSurface};
         cathodeSurface->SetMaterialPropertiesTable(cathodeSurfacePropertiesTable);
     }
 }
