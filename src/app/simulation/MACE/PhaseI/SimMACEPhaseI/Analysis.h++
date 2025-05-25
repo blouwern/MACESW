@@ -31,8 +31,8 @@ class SciFiSiPMRawHit;
 } // namespace MACE::PhaseI::inline Simulation::inline Hit
 
 namespace MACE::inline Simulation::inline Hit {
-class ECALHit;
-class ECALPMHit;
+class ScintillatorDigi;
+class PMDigi;
 } // namespace MACE::inline Simulation::inline Hit
 
 namespace MACE::PhaseI::SimMACEPhaseI {

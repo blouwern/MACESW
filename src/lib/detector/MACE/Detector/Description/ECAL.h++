@@ -31,6 +31,7 @@ public:
     auto ScintillationTimeConstant1() const -> auto { return fScintillationTimeConstant1; }
     auto ResolutionScale() const -> auto { return fResolutionScale; }
 
+    auto UsePhaseICrystal() const -> auto { return fUsePhaseICrystal; }
     auto UseMPPC() const -> auto { return fUseMPPC; }
 
     auto PMTDimensions() const -> const auto& { return fPMTDimensions; }
@@ -73,6 +74,7 @@ public:
     auto ScintillationTimeConstant1(double val) -> void { fScintillationTimeConstant1 = val; }
     auto ResolutionScale(double val) -> void { fResolutionScale = val; }
 
+    auto UsePhaseICrystal(bool val) -> void { fUsePhaseICrystal = val; }
     auto UseMPPC(bool val) -> void { fUseMPPC = val; }
 
     auto PMTDimensions(std::vector<muc::array3d> val) -> void { fPMTDimensions = std::move(val); }
@@ -142,6 +144,7 @@ private:
     double fScintillationTimeConstant1;
     double fResolutionScale;
 
+    bool fUsePhaseICrystal;
     bool fUseMPPC;
 
     std::vector<muc::array3d> fPMTDimensions;

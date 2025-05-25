@@ -162,49 +162,8 @@ ECAL::ECAL() : // clang-format off
     fCrystalHypotenuse{10_cm},
     fUpstreamWindowRadius{50_mm},
     fDownstreamWindowRadius{5_mm},
-    // CsI(pure) optical param.s
-    // fScintillationEnergyBin{3.300891_eV, 3.394291_eV, 3.459551_eV, 3.515883_eV, 3.557591_eV, 3.591915_eV,
-    //                         3.622042_eV, 3.644458_eV, 3.678815_eV, 3.690132_eV, 3.715531_eV, 3.728362_eV,
-    //                         3.747776_eV, 3.768708_eV, 3.787216_eV, 3.80725_eV, 3.820723_eV, 3.847958_eV,
-    //                         3.871416_eV, 3.9022_eV, 3.932045_eV, 4.042466_eV, 4.157667_eV, 4.193192_eV,
-    //                         4.224366_eV, 4.24096_eV, 4.257685_eV, 4.274542_eV, 4.291534_eV, 4.306942_eV,
-    //                         4.343328_eV, 4.359111_eV, 4.396388_eV, 4.437953_eV, 4.471035_eV, 4.511202_eV,
-    //                         4.546346_eV, 4.602552_eV, 4.662178_eV, 4.733725_eV, 4.883613_eV, 5.114986_eV},
-    // fScintillationComponent1{0.152652, 0.190301, 0.233538, 0.282997, 0.328661, 0.379536,
-    //                          0.430119, 0.47672, 0.531663, 0.57447, 0.617499, 0.656175,
-    //                          0.695466, 0.729048, 0.768509, 0.803861, 0.841795, 0.88913,
-    //                          0.937399, 0.977291, 1.0, 0.972946, 0.880537, 0.821459,
-    //                          0.754517, 0.691979, 0.640116, 0.591668, 0.540922, 0.501151,
-    //                          0.452269, 0.413595, 0.35813, 0.307095, 0.264469, 0.218419,
-    //                          0.182053, 0.129528, 0.081253, 0.047185, 0.017148, 0.0},
-    // fScintillationYield{3500},
-    // fScintillationTimeConstant1{30_ns},
-    // BGO optical param.s
-    // fScintillationEnergyBin{1.945507481_eV, 1.956691365_eV, 1.974526166_eV, 1.992686315_eV, 2.011182111_eV,
-    //                         2.030023135_eV, 2.049218172_eV, 2.068776498_eV, 2.088712977_eV, 2.109036_eV,
-    //                         2.12975713_eV, 2.150887751_eV, 2.171451222_eV, 2.190391881_eV, 2.209663573_eV,
-    //                         2.229274743_eV, 2.247116958_eV, 2.265244608_eV, 2.283666187_eV, 2.301276603_eV,
-    //                         2.318032238_eV, 2.333890214_eV, 2.349966255_eV, 2.368619281_eV, 2.389971082_eV,
-    //                         2.412936123_eV, 2.437596391_eV, 2.464039018_eV, 2.492373025_eV, 2.521380095_eV,
-    //                         2.551089015_eV, 2.581526478_eV, 2.612727511_eV, 2.644717279_eV, 2.677523383_eV,
-    //                         2.708082211_eV, 2.733054836_eV, 2.75369941_eV, 2.773041191_eV, 2.792667214_eV,
-    //                         2.810903696_eV, 2.827691812_eV, 2.844122034_eV, 2.861882767_eV, 2.877806421_eV,
-    //                         2.894720751_eV, 2.911600212_eV, 2.929633378_eV, 2.947486552_eV, 2.965972235_eV,
-    //                         2.984688528_eV, 3.003641613_eV, 3.024116133_eV, 3.04551166_eV, 3.067869957_eV,
-    //                         3.091903493_eV, 3.118356404_eV, 3.147344518_eV, 3.178997019_eV, 3.215638088_eV,
-    //                         3.253129005_eV, 3.281477983_eV, 3.302608153_eV},
-    // fScintillationComponent1{0.195254826, 0.214876564, 0.247266504, 0.281705118, 0.316502611, 0.351368412, 0.387289114,
-    //                          0.424968103, 0.459795422, 0.494441782, 0.528656318, 0.562776635, 0.595129123, 0.628156693,
-    //                          0.66160206, 0.695627571, 0.726322943, 0.757562051, 0.788164087, 0.818063582, 0.846719321,
-    //                          0.873933468, 0.900421966, 0.925228448, 0.945965637, 0.963539434, 0.978127738, 0.991670468,
-    //                          0.999665211, 1, 0.991116414, 0.973225812, 0.943719198, 0.904954051, 0.858628733, 0.81043525,
-    //                          0.766603628, 0.72769847, 0.690508334, 0.650827878, 0.615158969, 0.582925251, 0.549468551,
-    //                          0.518706558, 0.485613932, 0.454237279, 0.422103766, 0.389336957, 0.357120837, 0.324825964,
-    //                          0.293908848, 0.263908054, 0.234764495, 0.208390636, 0.1828993, 0.156768192, 0.13171465,
-    //                          0.107656381, 0.084704457, 0.061552239, 0.040184081, 0.024471847, 0.012727081},
-    // fScintillationYield{8000},
-    // fScintillationTimeConstant1{300_ns},
-    // CsI(Tl) optical param.s
+    // CsI(pure) default for MACE Phase-I (in UsePhaseIDefault.c++)
+    // CsI(Tl) default for MACE Phase-II
     fScintillationEnergyBin{1.75799786_eV, 1.77994996_eV, 1.798603934_eV, 1.814143751_eV, 1.834661538_eV,
                             1.854466567_eV, 1.871980063_eV, 1.882407862_eV, 1.891871096_eV, 1.9032009_eV,
                             1.912954443_eV, 1.919168532_eV, 1.929448247_eV, 1.942512233_eV, 1.957597106_eV,
@@ -234,6 +193,7 @@ ECAL::ECAL() : // clang-format off
     fScintillationYield{54000},
     fScintillationTimeConstant1{1000_ns},
     fResolutionScale{1.},
+    fUsePhaseICrystal{false},
     fUseMPPC{true},
     fPMTDimensions{{29.3_mm, 25_mm, 87_mm},    // 9442B Type-HEX01
                    {29.3_mm, 25_mm, 87_mm},    // 9442B Type-PEN
@@ -495,6 +455,7 @@ auto ECAL::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fScintillationYield, "ScintillationYield");
     ImportValue(node, fScintillationTimeConstant1, "ScintillationTimeConstant1");
     ImportValue(node, fResolutionScale, "ResolutionScale");
+    ImportValue(node, fUsePhaseICrystal, "UsePhaseICrystal");
     ImportValue(node, fUseMPPC, "UseMPPC");
     ImportValue(node, fPMTDimensions, "PMTDimensions");
     ImportValue(node, fPMTCouplerThickness, "PMTCouplerThickness");
@@ -531,6 +492,7 @@ auto ECAL::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fScintillationYield, "ScintillationYield");
     ExportValue(node, fScintillationTimeConstant1, "ScintillationTimeConstant1");
     ExportValue(node, fResolutionScale, "ResolutionScale");
+    ExportValue(node, fUsePhaseICrystal, "UsePhaseICrystal");
     ExportValue(node, fUseMPPC, "UseMPPC");
     ExportValue(node, fPMTDimensions, "PMTDimensions");
     ExportValue(node, fPMTCouplerThickness, "PMTCouplerThickness");

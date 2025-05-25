@@ -45,7 +45,9 @@ auto UsePhaseIDefault() -> void {
                                       0.182053, 0.129528, 0.081253, 0.047185, 0.017148, 0.0});
         ecal.ScintillationYield(3500);
         ecal.ScintillationTimeConstant1(30_ns);
+        ecal.UsePhaseICrystal(true);
         ecal.MPPCNPixelRows({8, 8, 8, 8, 8, 8, 8, 8, 8, 8});
+        ecal.WaveformIntegralTime(200_ns);
     }
 }
 
