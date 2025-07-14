@@ -24,9 +24,8 @@
 /GPSX/NVertex             1
 /GPSX/PulseWidth          0 ns
 
-/Mustard/Physics/MuoniumDecay/DoubleRadiativeDecay/BR 0
-/Mustard/Physics/MuoniumDecay/ElectronPairDecay/BR 0
-/Mustard/Physics/MuoniumDecay/UpdateDecayBR
+/Mustard/Physics/MuonDecay/Biasing/EnergyCut 45 MeV
+/Mustard/Physics/MuonDecay/Biasing/MaxTheta 4 deg
 
 #############################################################################
 # Run
