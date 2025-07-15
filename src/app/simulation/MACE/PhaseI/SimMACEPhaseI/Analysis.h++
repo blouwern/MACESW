@@ -25,7 +25,6 @@
 class TFile;
 
 namespace MACE::PhaseI::inline Simulation::inline Hit {
-class MRPCHit;
 class SciFiHit;
 class SciFiSiPMRawHit;
 } // namespace MACE::PhaseI::inline Simulation::inline Hit
@@ -41,7 +40,6 @@ class Analysis final : public Mustard::Simulation::AnalysisBase<Analysis, "SimMA
 public:
     Analysis();
 
-    auto CoincidenceWithMRPC(G4bool val) -> void { fCoincidenceWithMRPC = val; }
     auto CoincidenceWithECAL(G4bool val) -> void { fCoincidenceWithECAL = val; }
 
     auto SubmitPrimaryVertexData(const muc::unique_ptrvec<Mustard::Data::Tuple<MACE::Data::SimPrimaryVertex>>& data) -> void { fPrimaryVertex = &data; }
@@ -57,7 +55,6 @@ public:
     auto RunEndUserAction(int) -> void override;
 
 private:
-    G4bool fCoincidenceWithMRPC;
     G4bool fCoincidenceWithECAL;
 
     std::optional<Mustard::Data::Output<MACE::Data::SimPrimaryVertex>> fPrimaryVertexOutput;

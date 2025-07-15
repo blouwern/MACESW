@@ -34,7 +34,6 @@
 /Mustard/Physics/MuoniumDecay/ElectronPairDecay/BR 0
 /Mustard/Physics/MuoniumDecay/UpdateDecayBR
 
-/MACE/Analysis/CoincidenceWithMRPC    no
 /MACE/Analysis/CoincidenceWithECAL    no
 
 #############################################################################

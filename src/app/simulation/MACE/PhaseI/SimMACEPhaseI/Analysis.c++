@@ -1,7 +1,6 @@
 #include "MACE/PhaseI/SimMACEPhaseI/Action/PrimaryGeneratorAction.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/Action/TrackingAction.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/Analysis.h++"
-#include "MACE/PhaseI/Simulation/Hit/MRPCHit.h++"
 #include "MACE/PhaseI/Simulation/Hit/SciFiHit.h++"
 #include "MACE/PhaseI/Simulation/Hit/SciFiSiPMRawHit.h++"
 #include "MACE/Simulation/Hit/ECALHit.h++"
@@ -22,11 +21,9 @@ namespace MACE::PhaseI::SimMACEPhaseI {
 
 Analysis::Analysis() :
     AnalysisBase{this},
-    fCoincidenceWithMRPC{true},
     fCoincidenceWithECAL{true},
     fPrimaryVertexOutput{},
     fDecayVertexOutput{},
-    fMRPCSimHitOutput{},
     fECALSimHitOutput{},
     fECALPMHitOutput{},
     fPrimaryVertex{},
@@ -103,7 +100,6 @@ auto Analysis::RunEndUserAction(int) -> void {
     // reset output
     fPrimaryVertexOutput.reset();
     fDecayVertexOutput.reset();
-    fMRPCSimHitOutput.reset();
     fECALSimHitOutput.reset();
     fECALPMHitOutput.reset();
     fSciFiHitOutput.reset();
