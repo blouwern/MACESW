@@ -9,7 +9,6 @@
 #include "MACE/PhaseI/SimMACEPhaseI/Region.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/SD/ECALPMSD.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/SD/ECALSD.h++"
-#include "MACE/PhaseI/SimMACEPhaseI/SD/MRPCSD.h++"
 
 #include "Mustard/Env/Memory/PassiveSingleton.h++"
 

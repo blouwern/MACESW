@@ -25,7 +25,6 @@
 #include "TTree.h"
 
 #include "muc/algorithm"
-#include "muc/array"
 
 #include "fmt/format.h"
 
@@ -84,7 +83,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
         i++;
     }
 
-    TFile outputFile{Mustard::MPIX::ParallelizePath(cli->get("--output").c_str()).generic_string().c_str(), cli->get("--output-mode").c_str()};
+    TFile outputFile{Mustard::Parallel::ProcessSpecificPath(cli->get("--output").c_str()).generic_string().c_str(), cli->get("--output-mode").c_str()};
 
     if (reconstructCalibration) {
         using ECALEnergy = Mustard::Data::TupleModel<
@@ -95,7 +94,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
         Mustard::Data::Output<ECALEnergy> reconEnergy{"G4Run0/ReconECAL"};
 
         Mustard::Data::Processor processor;
-        processor.Process<Data::ScintillatorSimHit>(
+        processor.Process<Data::ECALSimHit>(
             ROOT::RDataFrame{cli->get("--input-tree"), cli->get<std::vector<std::string>>("input")}, int{}, "EvtID",
             [&](bool byPass, auto&& event) {
                 if (byPass) {
@@ -106,7 +105,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                  return Get<"Edep">(*hit1) > Get<"Edep">(*hit2);
                              });
 
-                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ScintillatorSimHit>>> hitDict;
+                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ECALHit>>> hitDict;
                 std::vector<short> potentialSeedModule;
                 muc::array3f truthHitMomentum{};
 
@@ -196,7 +195,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
         Mustard::Data::Output<ECALEnergy> reconEnergy{"G4Run0/ReconECAL"};
 
         Mustard::Data::Processor processor;
-        processor.Process<Data::ScintillatorSimHit>(
+        processor.Process<Data::ECALSimHit>(
             ROOT::RDataFrame{cli->get("--input-tree"), cli->get<std::vector<std::string>>("input")}, int{}, "EvtID",
             [&](bool byPass, auto&& event) {
                 if (byPass) {
@@ -207,7 +206,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                  return Get<"Edep">(*hit1) > Get<"Edep">(*hit2);
                              });
 
-                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ScintillatorSimHit>>> hitDict;
+                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
                 std::vector<short> potentialSeedModule;
 
                 for (auto&& hit : event) {

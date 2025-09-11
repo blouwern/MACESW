@@ -28,7 +28,6 @@ Analysis::Analysis() :
     fECALPMHitOutput{},
     fPrimaryVertex{},
     fDecayVertex{},
-    fMRPCHit{},
     fECALHit{},
     fECALPMHit{},
     fSciFiHit{},
@@ -42,7 +41,6 @@ auto Analysis::RunBeginUserAction(int runID) -> void {
     if (TrackingAction::Instance().SaveDecayVertexData()) {
         fDecayVertexOutput.emplace(fmt::format("G4Run{}/SimDecayVertex", runID));
     }
-    fMRPCSimHitOutput.emplace(fmt::format("G4Run{}/MRPCSimHit", runID));
     fECALSimHitOutput.emplace(fmt::format("G4Run{}/ECALSimHit", runID));
     fECALPMHitOutput.emplace(fmt::format("G4Run{}/ECALPMHit", runID));
     fSciFiHitOutput.emplace(fmt::format("G4Run{}/SciFiHit", runID));
@@ -50,18 +48,15 @@ auto Analysis::RunBeginUserAction(int runID) -> void {
 }
 
 auto Analysis::EventEndUserAction() -> void {
-    const auto mrpcPassed{not fCoincidenceWithMRPC or fMRPCHit == nullptr or fMRPCHit->size() > 0};
     const auto ecalPassed{not fCoincidenceWithECAL or fECALHit == nullptr or fECALHit->size() > 0};
-    if (mrpcPassed and ecalPassed) {
+    if (ecalPassed) {
         if (fPrimaryVertex and fPrimaryVertexOutput) {
             fPrimaryVertexOutput->Fill(*fPrimaryVertex);
         }
         if (fDecayVertex and fDecayVertexOutput) {
             fDecayVertexOutput->Fill(*fDecayVertex);
         }
-        if (fMRPCHit) {
-            fMRPCSimHitOutput->Fill(*fMRPCHit);
-        }
+
         if (fECALHit) {
             fECALSimHitOutput->Fill(*fECALHit);
         }
@@ -77,7 +72,6 @@ auto Analysis::EventEndUserAction() -> void {
     }
     fPrimaryVertex = {};
     fDecayVertex = {};
-    fMRPCHit = {};
     fECALHit = {};
     fECALPMHit = {};
     fSciFiHit = {};
@@ -92,7 +86,6 @@ auto Analysis::RunEndUserAction(int) -> void {
     if (fDecayVertexOutput) {
         fDecayVertexOutput->Write();
     }
-    fMRPCSimHitOutput->Write();
     fECALSimHitOutput->Write();
     fECALPMHitOutput->Write();
     fSciFiHitOutput->Write();
