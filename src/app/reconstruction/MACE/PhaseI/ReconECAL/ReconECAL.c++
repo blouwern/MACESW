@@ -105,7 +105,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                  return Get<"Edep">(*hit1) > Get<"Edep">(*hit2);
                              });
 
-                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ECALHit>>> hitDict;
+                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
                 std::vector<short> potentialSeedModule;
                 muc::array3f truthHitMomentum{};
 
@@ -155,12 +155,12 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                         }
 
                         auto energy = Get<"Edep">(*hitIt->second);
-                        std::vector<int> pe = Get<"nOptPho">(*hitIt->second);
+                        auto pe = Get<"nOptPho">(*hitIt->second);
 
-                        if (not pe.empty() and pe.at(0) > 3) {
+                        if (pe > 3) {
                             weightedCentroid += energy * centroidMap.at(module);
                             totalEnergy += energy;
-                            totalPE += pe.at(0);
+                            totalPE += pe;
                         }
                     }
                     c = weightedCentroid / totalEnergy;
