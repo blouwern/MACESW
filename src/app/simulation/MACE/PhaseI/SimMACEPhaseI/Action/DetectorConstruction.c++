@@ -1,9 +1,10 @@
 #include "MACE/Detector/Definition/ECALCrystal.h++"
 #include "MACE/Detector/Definition/ECALPhotoSensor.h++"
-#include "MACE/Detector/Definition/Target.h++"
 #include "MACE/Detector/Description/ECAL.h++"
 #include "MACE/PhaseI/Detector/Definition/CentralBeamPipe.h++"
+#include "MACE/PhaseI/Detector/Definition/Degrader.h++"
 #include "MACE/PhaseI/Detector/Definition/SciFiTracker.h++"
+#include "MACE/PhaseI/Detector/Definition/Target.h++"
 #include "MACE/PhaseI/Detector/Definition/World.h++"
 #include "MACE/PhaseI/Detector/Description/UsePhaseIDefault.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/Action/DetectorConstruction.h++"
@@ -46,8 +47,8 @@ auto DetectorConstruction::Construct() -> G4VPhysicalVolume* {
     auto& ecalCrystal{fWorld->NewDaughter<ECALCrystal>(fCheckOverlap)};
     auto& ecalPhotoSensor{fWorld->NewDaughter<ECALPhotoSensor>(fCheckOverlap)};
     auto& centralBeamPipe{fWorld->NewDaughter<PhaseI::CentralBeamPipe>(fCheckOverlap)};
-    centralBeamPipe.NewDaughter<Target>(fCheckOverlap);
-    auto& sciFiTracker{fWorld->NewDaughter<PhaseI::SciFiTracker>(fCheckOverlap)};
+    centralBeamPipe.NewDaughter<PhaseI::Target>(fCheckOverlap);
+    centralBeamPipe.NewDaughter<PhaseI::Degrader>(fCheckOverlap);
 
     centralBeamPipe.NewDaughter<Target>(fCheckOverlap);
 
