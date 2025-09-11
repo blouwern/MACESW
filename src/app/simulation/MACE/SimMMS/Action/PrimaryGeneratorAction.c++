@@ -8,7 +8,7 @@
 namespace MACE::SimMMS::inline Action {
 
 PrimaryGeneratorAction::PrimaryGeneratorAction() :
-    PassiveSingleton{},
+    PassiveSingleton{this},
     G4VUserPrimaryGeneratorAction{},
     fAvailableGenerator{.gpsx{}, .ecoMug{Mustard::Geant4X::EcoMugCosmicRayMuon::Coordinate::Beam}},
     fGenerator{&fAvailableGenerator.gpsx},
@@ -18,7 +18,9 @@ PrimaryGeneratorAction::PrimaryGeneratorAction() :
 
 auto PrimaryGeneratorAction::GeneratePrimaries(G4Event* event) -> void {
     fGenerator->GeneratePrimaryVertex(event);
-    if (fSavePrimaryVertexData) { UpdatePrimaryVertexData(*event); }
+    if (fSavePrimaryVertexData) {
+        UpdatePrimaryVertexData(*event);
+    }
 }
 
 auto PrimaryGeneratorAction::UpdatePrimaryVertexData(const G4Event& event) -> void {

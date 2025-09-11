@@ -25,13 +25,13 @@
 
 # Muon beam properties
 /MACE/Generator/SwitchToFromDataPrimaryGenerator
-/Mustard/Generator/FromDataPrimaryGenerator/EventData R_line.root R_line
+/Mustard/Generator/DataReaderPrimaryGenerator/EventData R_line.root R_line
 
 # Set physics
 /Mustard/Physics/MuoniumPhysics/Formation/ConversionProbability    0
 
 # kill secondaries
-/MACE/Action/KillIrrelevants    yes
+/MACE/Action/KillIrrelevance    yes
 
 #############################################################################
 # Run

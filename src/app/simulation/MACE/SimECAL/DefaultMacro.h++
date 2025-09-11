@@ -50,7 +50,6 @@ constexpr auto defaultMacro = {
     "",
     "# Colors",
     "/vis/geometry/set/colour ECALCrystal                   0     1     1     1     0.1",
-
     "/vis/geometry/set/colour ECALPMCathode                0     1     1     1     0.3",
     "/vis/geometry/set/colour ECALPMTCoupler                0     1     1     1     0.1",
     "/vis/geometry/set/colour ECALPMTShell                  0     1     1     1     0.1",
