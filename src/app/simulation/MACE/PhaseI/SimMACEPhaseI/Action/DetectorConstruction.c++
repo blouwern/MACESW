@@ -4,8 +4,10 @@
 #include "MACE/PhaseI/Detector/Definition/CentralBeamPipe.h++"
 #include "MACE/PhaseI/Detector/Definition/Degrader.h++"
 #include "MACE/PhaseI/Detector/Definition/SciFiTracker.h++"
+#include "MACE/PhaseI/Detector/Definition/TTC.h++"
 #include "MACE/PhaseI/Detector/Definition/Target.h++"
 #include "MACE/PhaseI/Detector/Definition/World.h++"
+#include "MACE/PhaseI/Detector/Description/TTC.h++"
 #include "MACE/PhaseI/Detector/Description/UsePhaseIDefault.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/Action/DetectorConstruction.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/Messenger/DetectorMessenger.h++"
@@ -13,6 +15,8 @@
 #include "MACE/PhaseI/SimMACEPhaseI/SD/ECALSD.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/SD/SciFiSD.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/SD/SciFiSiPMSD.h++"
+#include "MACE/PhaseI/SimMACEPhaseI/SD/TTCSD.h++"
+#include "MACE/PhaseI/SimMACEPhaseI/SD/TTCSiPMSD.h++"
 
 #include "Mustard/Detector/Definition/DefinitionBase.h++"
 #include "Mustard/Detector/Description/DescriptionIO.h++"
@@ -48,6 +52,7 @@ auto DetectorConstruction::Construct() -> G4VPhysicalVolume* {
     auto& ecalPhotoSensor{fWorld->NewDaughter<ECALPhotoSensor>(fCheckOverlap)};
     auto& centralBeamPipe{fWorld->NewDaughter<PhaseI::CentralBeamPipe>(fCheckOverlap)};
     auto& sciFiTracker{fWorld->NewDaughter<PhaseI::SciFiTracker>(fCheckOverlap)};
+    auto& ttc{fWorld->NewDaughter<PhaseI::TTC>(fCheckOverlap)};
 
     centralBeamPipe.NewDaughter<PhaseI::Target>(fCheckOverlap);
     centralBeamPipe.NewDaughter<PhaseI::Degrader>(fCheckOverlap);
@@ -67,6 +72,10 @@ auto DetectorConstruction::Construct() -> G4VPhysicalVolume* {
 
     const auto sciFiSiPMSD{new SD::SciFiSiPMSD{scifiName + "SiPM"}};
     sciFiTracker.RegisterSD(scifiName + "SiPM", sciFiSiPMSD);
+
+    const auto ttcSiPM(new SD::TTCSiPMSD{MACE::PhaseI::Detector::Description::TTC::Instance().Name() + "SiPM", TTCSiPMSD::Type::MACEPhaseI});
+    ttc.RegisterSD("TTCScintillator", new SD::TTCSD{MACE::PhaseI::Detector::Description::TTC::Instance().Name(), TTCSD::Type::MACEPhaseI});
+    ttc.RegisterSD("TTCSilicone", ttcSiPM);
 
     return fWorld->PhysicalVolume();
 }

@@ -123,9 +123,9 @@ auto ECALPhotoSensor::ConstructMPPC(G4bool checkOverlaps) -> void {
             continue;
         }
 
-        const auto mppcNPixelRow{mppcNPixelRows.at(type)};
+        const auto MPPCNPixelRows{mppcNPixelRows.at(type)};
         const auto mppcPixelSize{mppcPixelSizeSet.at(type)};
-        const auto mppcWidth{mppcNPixelRow * (mppcPixelSize + mppcPitch) + mppcPitch};
+        const auto mppcWidth{MPPCNPixelRows * (mppcPixelSize + mppcPitch) + mppcPitch};
 
         const auto solidCoupler{Make<G4Box>("temp", mppcWidth / 2, mppcWidth / 2, mppcCouplerThickness / 2)};
         const auto logicCoupler{Make<G4LogicalVolume>(solidCoupler, siliconeGrease, name + "MPPCCoupler")};
@@ -135,11 +135,11 @@ auto ECALPhotoSensor::ConstructMPPC(G4bool checkOverlaps) -> void {
 
         const auto solidPixel{Make<G4Box>("temp", mppcPixelSize / 2, mppcPixelSize / 2, mppcThickness / 2)};
         const auto logicPixel{Make<G4LogicalVolume>(solidPixel, silicon, name + "PMCathode")};
-        for (int copyNo{}; copyNo < mppcNPixelRow * mppcNPixelRow; copyNo++) {
-            const auto rowNum{copyNo / mppcNPixelRow};
-            const auto colNum{copyNo % mppcNPixelRow};
-            const auto xOffSet{(2 * rowNum + 1 - mppcNPixelRow) * ((mppcPixelSize + mppcPitch) / 2)};
-            const auto yOffset{(2 * colNum + 1 - mppcNPixelRow) * ((mppcPixelSize + mppcPitch) / 2)};
+        for (int copyNo{}; copyNo < MPPCNPixelRows * MPPCNPixelRows; copyNo++) {
+            const auto rowNum{copyNo / MPPCNPixelRows};
+            const auto colNum{copyNo % MPPCNPixelRows};
+            const auto xOffSet{(2 * rowNum + 1 - MPPCNPixelRows) * ((mppcPixelSize + mppcPitch) / 2)};
+            const auto yOffset{(2 * colNum + 1 - MPPCNPixelRows) * ((mppcPixelSize + mppcPitch) / 2)};
             const auto zOffset{(mppcWindowThickness - mppcThickness) / 2};
             Make<G4PVPlacement>(
                 G4Transform3D({}, {xOffSet, yOffset, zOffset}),

@@ -4,6 +4,7 @@
 #include "MACE/PhaseI/Detector/Description/CentralBeamPipe.h++"
 #include "MACE/PhaseI/Detector/Description/Degrader.h++"
 #include "MACE/PhaseI/Detector/Description/SciFiTracker.h++"
+#include "MACE/PhaseI/Detector/Description/TTC.h++"
 #include "MACE/PhaseI/Detector/Description/Target.h++"
 #include "MACE/PhaseI/Detector/Description/World.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/Region.h++"
@@ -35,12 +36,13 @@ public:
     auto SetCheckOverlaps(G4bool checkOverlaps) -> void { fCheckOverlap = checkOverlaps; }
 
 public:
-    using DescriptionInUse = std::tuple<MACE::Detector::Description::ECAL,
-                                        PhaseI::Detector::Description::CentralBeamPipe,
-                                        PhaseI::Detector::Description::Target,
-                                        PhaseI::Detector::Description::Degrader,
-                                        PhaseI::Detector::Description::SciFiTracker,
-                                        PhaseI::Detector::Description::World>;
+    using ProminentDescription = std::tuple<MACE::Detector::Description::ECAL,
+                                            PhaseI::Detector::Description::CentralBeamPipe,
+                                            PhaseI::Detector::Description::Target,
+                                            PhaseI::Detector::Description::Degrader,
+                                            PhaseI::Detector::Description::TTC,
+                                            PhaseI::Detector::Description::SciFiTracker,
+                                            PhaseI::Detector::Description::World>;
 
 private:
     G4bool fCheckOverlap;

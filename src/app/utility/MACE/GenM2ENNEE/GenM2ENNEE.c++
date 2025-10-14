@@ -105,19 +105,22 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
                          branchingRatio.value, branchingRatio.uncertainty,
                          branchingRatio.uncertainty / branchingRatio.value * 100, nEff);
 
-    // Initialize generator and write ACF
-    Mustard::File<TFile> file{cli->get("--output"), cli->get("--output-mode")};
-    auto& rng{*CLHEP::HepRandom::getTheEngine()};
-    const auto autocorrelationFunction{generator.MCMCInitialize(rng)};
-    WriteAutocorrelationFunction(autocorrelationFunction);
-
     // Return if nothing to be generated
     const auto nEvent{cli.GenerateOrExit()};
     if (not nEvent.has_value()) {
         return EXIT_SUCCESS;
     }
 
+    // Initialize generator and write ACF
+    Mustard::ProcessSpecificFile<TFile> file{cli->get("--output"), cli->get("--output-mode")};
+    auto& rng{*CLHEP::HepRandom::getTheEngine()};
+    const auto autocorrelationFunction{generator.MCMCInitialize(rng)};
+    WriteAutocorrelationFunction(autocorrelationFunction);
+
     // Generate events
+    if (*nEvent == 0) {
+        return EXIT_SUCCESS;
+    }
     Mustard::Data::Output<Mustard::Data::GeneratedKinematics> writer{cli->get("--output-tree")};
     executor(*nEvent, [&](auto) {
         const auto [weight, pdgID, p]{generator(rng)};

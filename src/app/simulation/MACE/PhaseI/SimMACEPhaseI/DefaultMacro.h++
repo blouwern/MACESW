@@ -40,7 +40,7 @@ constexpr auto defaultMacro = {
     "/Mustard/Physics/MuoniumDecay/ElectronPairDecay/BR 1",
     "/Mustard/Physics/MuoniumDecay/UpdateDecayBR",
     "",
-    "/MACE/Analysis/FilePath SimMACEPhaseI_vis",
+    "/MACE/Analysis/FilePath SimMACEPhaseI_vis.root",
     "/MACE/Analysis/FileMode RECREATE",
     "",
 
@@ -69,6 +69,8 @@ constexpr auto defaultMacro = {
     "",
     "# Visibility",
     "/vis/geometry/set/visibility CentralBeamPipeVacuum     0 no",
+    "/vis/geometry/set/visibility TTCVirtualBox             -1 no",
+    "/vis/geometry/set/visibility TTCScintillator           0 yes",
     "/vis/geometry/set/visibility World                     0 no",
 
     "# Colors",
@@ -92,7 +94,14 @@ constexpr auto defaultMacro = {
     "/vis/geometry/set/colour SciFiTrackerTransverseLightGuideCore   0     1     1     1     0.05",
     "/vis/geometry/set/colour SciFiTrackerBraket                     0     1     1     1     0.05",
     "",
-    "/vis/geometry/set/colour Target                             0     1     1     1     0.1",
+    "/vis/geometry/set/colour TTCVirtualBox                          0     1     1     1     0.05",
+    "/vis/geometry/set/colour TTCPCB                                 0     1     1     1     0.05",
+    "/vis/geometry/set/colour TTCWindow                              0     1     1     1     0.05",
+    "/vis/geometry/set/colour TTCSilicone                            0     1     1     1     0.05",
+    "/vis/geometry/set/colour TTCLightCoupler                        0     1     1     1     0.05",
+    "/vis/geometry/set/colour TTCScintillator                        0     1     1     1     0.1",
+    "",
+    "/vis/geometry/set/colour Target                                 0     1     1     1     0.1",
 
     "",
     "/vis/scene/add/date",
