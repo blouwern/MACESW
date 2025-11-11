@@ -53,13 +53,13 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     cli->add_argument("-d", "--description").help("Description YAML file path.").nargs(1);
     cli->add_argument("-cali", "--recon-calibration").help("Reconstruction of calibration events.").flag();
     cli->add_argument("-two", "--recon-two-body").help("Reconstruction of two body decay events.").flag();
-    cli->add_argument("-three", "--recon-three-body").help("Reconstruction of three body decay events.").flag();
+    cli->add_argument("-inv", "--recon-invisible").help("Reconstruction of invisible decay events.").flag();
     Mustard::Env::MPIEnv env{argc, argv, cli};
 
     const auto reconstructCalibration{cli["--recon-calibration"] == true};
     const auto reconstructTwoBody{cli["--recon-two-body"] == true};
-    const auto reconstructThreeBody{cli["--recon-three-body"] == true};
-    std::vector<bool> reconstructionFlags{reconstructCalibration, reconstructTwoBody, reconstructThreeBody};
+    const auto reconstructInvisible{cli["--recon-invisible"] == true};
+    std::vector<bool> reconstructionFlags{reconstructCalibration, reconstructTwoBody, reconstructInvisible};
 
     if (std::ranges::count(reconstructionFlags, true) != 1) {
         Mustard::PrintError("One and only one reconstruction mode must be enabled.");
@@ -286,6 +286,91 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                 Get<"dE">(energyTuple) = std::abs(firstClusterSignal - secondClusterSignal);
                 Get<"dt">(energyTuple) = std::abs(*Get<"t">(*hitDict.at(*firstSeedModule)) - *Get<"t">(*hitDict.at(*secondSeedModule)));
                 Get<"cosTheta">(energyTuple) = firstClusterCentroid.cosTheta(secondClusterCentroid);
+
+                reconEnergy.Fill(std::move(energyTuple));
+            });
+
+        reconEnergy.Write();
+    }
+
+    if (reconstructInvisible) {
+        using ECALEnergy = Mustard::Data::TupleModel<
+            Mustard::Data::Value<float, "Edep", "Energy deposition in total">,
+            Mustard::Data::Value<muc::array3f, "Centroid", "Centroid of the cluster">,
+            Mustard::Data::Value<float, "t", "Time of the reconstructed tracks">,
+            Mustard::Data::Value<double, "theta", "Angle between inital momentum direction">>;
+        Mustard::Data::Output<ECALEnergy> reconEnergy{"G4Run0/ReconECAL"};
+
+        Mustard::Data::Processor processor;
+        processor.Process<Data::ECALSimHit>(
+            ROOT::RDataFrame{cli->get("--input-tree"), cli->get<std::vector<std::string>>("input")}, int{}, "EvtID",
+            [&](bool byPass, auto&& event) {
+                if (byPass) {
+                    return;
+                }
+                muc::timsort(event,
+                             [](auto&& hit1, auto&& hit2) {
+                                 return Get<"Edep">(*hit1) > Get<"Edep">(*hit2);
+                             });
+
+                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
+                std::vector<short> potentialSeedModule;
+
+                for (auto&& hit : event) {
+                    hitDict.try_emplace(Get<"ModID">(*hit), hit);
+                    if (Get<"Edep">(*hit) < 1_MeV) {
+                        continue;
+                    }
+                    potentialSeedModule.emplace_back(Get<"ModID">(*hit));
+                }
+
+                if (std::ssize(potentialSeedModule) < 1) {
+                    return;
+                }
+
+                std::unordered_set<short> cluster;
+                CLHEP::Hep3Vector clusterCentroid{};
+                auto seedModule = potentialSeedModule.begin();
+
+                const auto Clustering = [&](std::unordered_set<short>& set,
+                                            CLHEP::Hep3Vector& c,
+                                            std::vector<short>::iterator seedIt) -> float {
+                    const auto addClusterLayers = [&](short module) {
+                        set.insert(module);
+                        for (auto&& neighbor : clusterMap.at(module)) {
+                            set.insert(neighbor);
+                            for (auto&& secondNeighbor : clusterMap.at(neighbor)) {
+                                set.insert(secondNeighbor);
+                            }
+                        }
+                    };
+                    addClusterLayers(*seedIt);
+
+                    float totalEnergy{};
+                    CLHEP::Hep3Vector weightedCentroid{};
+
+                    for (const auto& module : set) {
+                        auto hitIt = hitDict.find(module);
+                        if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
+                            continue;
+                        }
+
+                        auto energy = Get<"Edep">(*hitIt->second);
+                        weightedCentroid += energy * centroidMap.at(module);
+                        totalEnergy += energy;
+                    }
+                    c = weightedCentroid / totalEnergy;
+                    return totalEnergy;
+                };
+
+                auto clusterSignal = Clustering(cluster, clusterCentroid, seedModule);
+
+                Mustard::Data::Tuple<ECALEnergy> energyTuple;
+                // total signal
+                Get<"Edep">(energyTuple) = clusterSignal;
+                Get<"Centroid">(energyTuple) = clusterCentroid;
+                Get<"t">(energyTuple) = *Get<"t">(*hitDict.at(*seedModule));
+                Get<"theta">(energyTuple) = clusterCentroid.theta(CLHEP::Hep3Vector{0, 0, 1});
 
                 reconEnergy.Fill(std::move(energyTuple));
             });
