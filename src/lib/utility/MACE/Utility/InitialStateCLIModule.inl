@@ -48,17 +48,19 @@ InitialStateCLIModule<P, Ms...>::InitialStateCLIModule(gsl::not_null<Mustard::CL
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
 auto InitialStateCLIModule<P, Ms...>::Momentum() const -> CLHEP::Hep3Vector
-    requires(sizeof...(Ms) == 1) {
+    requires(sizeof...(Ms) == 1)
+{
     return To3Vector("--momentum");
 }
 
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
 auto InitialStateCLIModule<P, Ms...>::Momentum() const -> std::array<CLHEP::Hep3Vector, sizeof...(Ms)>
-    requires(sizeof...(Ms) >= 2) {
+    requires(sizeof...(Ms) >= 2)
+{
     std::array<CLHEP::Hep3Vector, sizeof...(Ms)> p;
     for (auto i{1}; i <= sizeof...(Ms); ++i) {
-        p[i] = To3Vector(fmt::format("--momentum-{}"));
+        p[i] = To3Vector(fmt::format("--momentum-{}", i));
     }
     return p;
 }
@@ -66,17 +68,19 @@ auto InitialStateCLIModule<P, Ms...>::Momentum() const -> std::array<CLHEP::Hep3
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
 auto InitialStateCLIModule<P, Ms...>::Polarization() const -> CLHEP::Hep3Vector
-    requires(P == "polarized" and sizeof...(Ms) == 1) {
+    requires(P == "polarized" and sizeof...(Ms) == 1)
+{
     return To3Vector("--polarization");
 }
 
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
 auto InitialStateCLIModule<P, Ms...>::Polarization() const -> std::array<CLHEP::Hep3Vector, sizeof...(Ms)>
-    requires(P == "polarized" and sizeof...(Ms) >= 2) {
+    requires(P == "polarized" and sizeof...(Ms) >= 2)
+{
     std::array<CLHEP::Hep3Vector, sizeof...(Ms)> p;
     for (auto i{1}; i <= sizeof...(Ms); ++i) {
-        p[i] = To3Vector(fmt::format("--polarization-{}"));
+        p[i] = To3Vector(fmt::format("--polarization-{}", i));
     }
     return p;
 }
@@ -84,7 +88,7 @@ auto InitialStateCLIModule<P, Ms...>::Polarization() const -> std::array<CLHEP::
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
 auto InitialStateCLIModule<P, Ms...>::To3Vector(std::string_view option) const -> CLHEP::Hep3Vector {
-    const auto vector{TheCLI()->get<std::vector<double>>(option)};
+    const auto vector{TheCLI()->template get<std::vector<double>>(option)};
     return {vector[0], vector[1], vector[2]};
 }
 
