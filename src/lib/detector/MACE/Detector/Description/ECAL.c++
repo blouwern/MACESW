@@ -166,7 +166,7 @@ ECAL::ECAL() :
     fCrystalPackageThickness{this, 200_um},
     fUpstreamWindowRadius{this, 50_mm},
     fDownstreamWindowRadius{this, 5_mm},
-    fMesh{this, [this] { return CalculateMeshInformation(); }},
+    fArray{this, [this] { return CalculateArrayInformation(); }},
     fModuleSelection{this, {}},
     // crystal param.s
     fScintillationEnergyBin{this, {}},
@@ -277,17 +277,21 @@ ECAL::ECAL() :
                        0.083937488, 0.073056832, 0.060399447, 0.047887957, 0.034501313};
 }
 
-auto ECAL::CalculateMeshInformation() const -> MeshInformation {
+auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
     auto pmpMesh{ECALMesh{fNSubdivision}.Generate()};
-    MeshInformation outputMeshInfo;
-    auto& [vertexList, faceList]{outputMeshInfo};
+    ArrayInformation outputArrayInfo;
+    auto& [vertexList, moduleList]{outputArrayInfo};
     const auto point{pmpMesh.vertex_property<pmp::Point>("v:point")};
     // construct vertexList
     for (auto&& v : pmpMesh.vertices()) {
         vertexList.emplace_back(Mustard::VectorCast<CLHEP::Hep3Vector>(point[v]));
     }
-    // construct faceList
-    for (auto&& pmpFace : pmpMesh.faces()) {
+
+    // map from pmp face index to moduleID
+    using ModuleID = int;
+    muc::flat_hash_map<pmp::IndexType, ModuleID> indexMap;
+    for (int moduleID{};
+         auto&& pmpFace : pmpMesh.faces()) {
         const auto centroid{Mustard::VectorCast<CLHEP::Hep3Vector>(pmp::centroid(pmpMesh, pmpFace))};
         if (const auto rXY{fInnerRadius * centroid.perp()};
             centroid.z() < 0) {
@@ -309,14 +313,23 @@ auto ECAL::CalculateMeshInformation() const -> MeshInformation {
                                 })) {
             continue;
         }
+        indexMap[pmpFace.idx()] = moduleID++;
+    }
 
-        auto& face{faceList.emplace_back()};
-        face.centroid = centroid;
+    // construct moduleList
+    for (auto&& pmpFace : pmpMesh.faces()) {
+        if (not indexMap.contains(pmpFace.idx())) {
+            continue;
+        }
+
+        auto& face{moduleList.emplace_back()};
+        face.moduleID = indexMap.at(pmpFace.idx());
+        face.centroid = Mustard::VectorCast<CLHEP::Hep3Vector>(pmp::centroid(pmpMesh, pmpFace));
         face.normal = Mustard::VectorCast<CLHEP::Hep3Vector>(pmp::face_normal(pmpMesh, pmpFace));
         for (auto&& pmpFaceVertex : pmpMesh.vertices(pmpFace)) {
             for (auto&& pmpVertexFace : pmpMesh.faces(pmpFaceVertex)) {
-                if (pmpVertexFace != pmpFace) {
-                    face.neighborModuleID.insert(pmpVertexFace.idx());
+                if (pmpVertexFace != pmpFace and indexMap.contains(pmpVertexFace.idx())) {
+                    face.neighborModuleID.insert(indexMap.at(pmpVertexFace.idx()));
                 }
             }
         }
@@ -340,12 +353,10 @@ auto ECAL::CalculateMeshInformation() const -> MeshInformation {
     }
 
     // construct type mapping
-    using UnitID = int;
     using PolygonEdges = std::vector<double>;
-    std::multimap<PolygonEdges, UnitID> edgeLengthsMap;
+    std::multimap<PolygonEdges, ModuleID> edgeLengthsMap;
 
-    for (int moduleID{};
-         auto&& [centroid, _1, vertexIndex, _2, _3] : std::as_const(faceList)) {
+    for (auto&& [moduleID, _1, _2, centroid, _3, vertexIndex] : std::as_const(moduleList)) {
         // edge lengths for type identifying
         std::vector<G4ThreeVector> vertexCoordinates{vertexIndex.size()};
         std::ranges::transform(vertexIndex, vertexCoordinates.begin(),
@@ -360,45 +371,60 @@ auto ECAL::CalculateMeshInformation() const -> MeshInformation {
         }
         std::ranges::sort(edges);
         edgeLengthsMap.insert({edges, moduleID});
-        ++moduleID;
+    }
 
+    int typeID{};
+    for (auto it{edgeLengthsMap.begin()}; it != edgeLengthsMap.end();) {
+        auto range{edgeLengthsMap.equal_range(it->first)};
+        for (auto aPolygon{range.first}; aPolygon != range.second; aPolygon = std::next(aPolygon)) {
+            moduleList[aPolygon->second].typeID = typeID;
+        }
+        ++typeID;
+        it = range.second;
+    }
+
+    if (Mustard::Env::VerboseLevelReach<'V'>()) {
         int typeID{};
-        for (auto it{edgeLengthsMap.begin()}; it != edgeLengthsMap.end();) {
-            auto range{edgeLengthsMap.equal_range(it->first)};
-            for (auto aPolygon{range.first}; aPolygon != range.second; aPolygon = std::next(aPolygon)) {
-                faceList[aPolygon->second].typeID = typeID;
+        Mustard::MasterPrintLn(">>--->>edgeLengthsMap");
+        auto it{edgeLengthsMap.begin()};
+
+        while (it != edgeLengthsMap.end()) {
+            auto currentEdgeLengths{it->first};
+            const auto range{edgeLengthsMap.equal_range(currentEdgeLengths)};
+            const std::ranges::subrange equalRange{range.first, range.second};
+            Mustard::MasterPrintLn("--->>type {}:", typeID);
+            Mustard::MasterPrintLn("\t >>lengths:");
+            Mustard::MasterPrintLn("{}, ", currentEdgeLengths);
+            Mustard::MasterPrintLn("\t>>modules({} in total):", std::ranges::distance(equalRange));
+
+            for (auto&& [_, moduleID] : equalRange) {
+                Mustard::MasterPrint("{}, ", moduleID);
+            }
+            Mustard::MasterPrintLn("======================================================\n");
+
+            if (not fModuleSelection->empty()) {
+                Mustard::MasterPrintLn("\n>>> Selected Module Clustering of ECAL ");
+                for (auto&& m : *fModuleSelection) {
+                    Mustard::MasterPrintLn("\n- Module {}", m);
+                    Mustard::MasterPrint("{},", m);
+                    for (auto&& n : moduleList.at(m).neighborModuleID) {
+                        Mustard::MasterPrint("{},", n);
+                    }
+                    Mustard::MasterPrint("\n");
+                }
+                Mustard::MasterPrintLn("===========================");
+                Mustard::MasterPrint("\n");
             }
             ++typeID;
             it = range.second;
         }
-
-        if (Mustard::Env::VerboseLevelReach<'V'>()) {
-            int typeID{};
-            Mustard::MasterPrintLn(">>--->>edgeLengthsMap");
-            auto it{edgeLengthsMap.begin()};
-            while (it != edgeLengthsMap.end()) {
-                auto currentEdgeLengths{it->first};
-                const auto range{edgeLengthsMap.equal_range(currentEdgeLengths)};
-                const std::ranges::subrange equalRange{range.first, range.second};
-                Mustard::MasterPrintLn("--->>type {}:", typeID);
-                Mustard::MasterPrintLn("\t >>lengths:");
-                Mustard::MasterPrintLn("{}, ", currentEdgeLengths);
-                Mustard::MasterPrintLn("\t>>modules({} in total):", std::ranges::distance(equalRange));
-                for (auto&& [_, moduleID] : equalRange) {
-                    Mustard::MasterPrint("{}, ", moduleID);
-                }
-                Mustard::MasterPrintLn("======================================================\n");
-                ++typeID;
-                it = range.second;
-            }
-        }
-        return outputMeshInfo;
     }
+    return outputArrayInfo;
 }
 
 auto ECAL::ComputeTransformToOuterSurfaceWithOffset(int moduleID, double offsetInNormalDirection) const -> HepGeom::Transform3D {
-    const auto& faceList{Mesh().faceList};
-    auto&& [centroid, normal, vertexIndex, _1, _2]{faceList[moduleID]};
+    const auto& moduleList{Array().moduleList};
+    auto&& [_1, _2, _3, centroid, normal, vertexIndex]{moduleList[moduleID]};
 
     const auto centroidMagnitude{centroid.mag()};
     const auto crystalOuterRadius{(fInnerRadius + fCrystalHypotenuse) * centroidMagnitude};
@@ -416,6 +442,7 @@ auto ECAL::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fCrystalPackageThickness, "CrystalPackageThickness");
     ImportValue(node, fUpstreamWindowRadius, "UpstreamWindowRadius");
     ImportValue(node, fDownstreamWindowRadius, "DownstreamWindowRadius");
+    ImportValue(node, fModuleSelection, "ModuleSelection");
     ImportValue(node, fScintillationEnergyBin, "ScintillationEnergyBin");
     ImportValue(node, fScintillationComponent1, "ScintillationComponent1");
     ImportValue(node, fScintillationYield, "ScintillationYield");
@@ -437,7 +464,6 @@ auto ECAL::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fMPPCWindowThickness, "MPPCWindowThickness");
     ImportValue(node, fMPPCEnergyBin, "MPPCEnergyBin");
     ImportValue(node, fMPPCEfficiency, "MPPCEfficiency");
-    ImportValue(node, fModuleSelection, "ModuleSelection");
     ImportValue(node, fWaveformIntegralTime, "WaveformIntegralTime");
 }
 
@@ -448,6 +474,7 @@ auto ECAL::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fCrystalPackageThickness, "CrystalPackageThickness");
     ExportValue(node, fUpstreamWindowRadius, "UpstreamWindowRadius");
     ExportValue(node, fDownstreamWindowRadius, "DownstreamWindowRadius");
+    ExportValue(node, fModuleSelection, "ModuleSelection");
     ExportValue(node, fScintillationEnergyBin, "ScintillationEnergyBin");
     ExportValue(node, fScintillationComponent1, "ScintillationComponent1");
     ExportValue(node, fScintillationYield, "ScintillationYield");
@@ -469,7 +496,6 @@ auto ECAL::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fMPPCWindowThickness, "MPPCWindowThickness");
     ExportValue(node, fMPPCEnergyBin, "MPPCEnergyBin");
     ExportValue(node, fMPPCEfficiency, "MPPCEfficiency");
-    ExportValue(node, fModuleSelection, "ModuleSelection");
     ExportValue(node, fWaveformIntegralTime, "WaveformIntegralTime");
 }
 

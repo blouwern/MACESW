@@ -104,17 +104,17 @@ auto ECALPhotoSensor::ConstructMPPC(G4bool checkOverlaps) -> void {
     /////////////////////////////////////////////
     // Construct Volumes
     /////////////////////////////////////////////
-    const auto& faceList{ecal.Mesh().faceList};
+    const auto& moduleList{ecal.Array().moduleList};
     const auto& moduleSelection{ecal.ModuleSelection()};
     std::map<int, std::vector<int>> idListOfType;
-    for (int moduleID{}; moduleID < std::ssize(faceList); ++moduleID) {
-        idListOfType[faceList.at(moduleID).typeID].emplace_back(moduleID);
+    for (auto&& module : std::as_const(moduleList)) {
+        idListOfType[module.typeID].emplace_back(module.moduleID);
     }
 
     std::vector<int> chosenType;
     chosenType.reserve(moduleSelection.size());
     for (auto&& chosen : moduleSelection) {
-        chosenType.emplace_back(faceList.at(chosen).typeID);
+        chosenType.emplace_back(moduleList.at(chosen).typeID);
     }
     for (auto&& [type, moduleIDList] : idListOfType) { // loop over type(10 total)
         if (not chosenType.empty() and std::ranges::find(chosenType, type) == chosenType.end()) {
@@ -267,17 +267,17 @@ auto ECALPhotoSensor::ConstructPMT(G4bool checkOverlaps) -> void {
     // Construct Volumes
     /////////////////////////////////////////////
 
-    const auto& faceList{ecal.Mesh().faceList};
+    const auto& moduleList{ecal.Array().moduleList};
     const auto& moduleSelection{ecal.ModuleSelection()};
     std::map<int, std::vector<int>> idListOfType;
-    for (auto moduleID{0}; moduleID < std::ssize(faceList); ++moduleID) {
-        idListOfType[faceList.at(moduleID).typeID].emplace_back(moduleID);
+    for (auto&& module : std::as_const(moduleList)) {
+        idListOfType[module.typeID].emplace_back(module.moduleID);
     }
 
     std::vector<int> chosenType;
     chosenType.reserve(moduleSelection.size());
     for (auto&& chosen : moduleSelection) {
-        chosenType.emplace_back(faceList.at(chosen).typeID);
+        chosenType.emplace_back(moduleList.at(chosen).typeID);
     }
     const auto& pmtDimensions{ecal.PMTDimensions()};
     for (auto&& [typeID, moduleIDList] : std::as_const(idListOfType)) {

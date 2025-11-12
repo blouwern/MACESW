@@ -68,25 +68,17 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     if (const auto descriptionPath{cli->present("--description")}) {
         Mustard::Detector::Description::DescriptionIO::Import<MACE::Detector::Description::ECAL>(*descriptionPath);
     } else {
-        Mustard::Detector::Description::DescriptionIO::
-            Import<MACE::Detector::Description::ECAL>("./SimMACEPhaseI_geom.yaml");
+        Detector::Description::UsePhaseIDefault();
     }
 
     const auto& ecal{MACE::Detector::Description::ECAL::Instance()};
-    const auto& faceList{ecal.Mesh().faceList};
-
-    std::map<int, CLHEP::Hep3Vector> centroidMap;
-
-    for (int i{}; auto&& [centroid, _1, _2, _3, _4] : std::as_const(faceList)) {
-        centroidMap[i] = centroid;
-        i++;
-    }
+    const auto& moduleList{ecal.Array().moduleList};
 
     TFile outputFile{Mustard::Parallel::ProcessSpecificPath(cli->get("--output").c_str()).generic_string().c_str(), cli->get("--output-mode").c_str()};
 
     if (reconstructCalibration) {
         using ECALEnergy = Mustard::Data::TupleModel<
-            Mustard::Data::Value<float, "Edep", "Energy deposition in total">,
+            Mustard::Data::Value<double, "Edep", "Energy deposition in total">,
             Mustard::Data::Value<int, "PE", "Photoelectron counts in total">,
             Mustard::Data::Value<muc::array3f, "Centroid", "Centroid of the first cluster">,
             Mustard::Data::Value<double, "cosTheta", "Angle between truth and reconstructed tracks">>;
@@ -104,8 +96,8 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                  return Get<"Edep">(*hit1) > Get<"Edep">(*hit2);
                              });
 
-                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
-                std::vector<short> potentialSeedModule;
+                std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
+                std::vector<int> potentialSeedModule;
                 muc::array3f truthHitMomentum{};
 
                 for (auto&& hit : event) {
@@ -122,29 +114,27 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                     truthHitMomentum.at(1),
                     truthHitMomentum.at(2)};
 
-                std::unordered_set<short> firstCluster;
-
+                std::unordered_set<int> firstCluster;
                 CLHEP::Hep3Vector firstClusterCentroid{};
-
                 auto firstSeedModule = potentialSeedModule.begin();
 
-                const auto Clustering = [&](std::unordered_set<short>& set,
+                const auto Clustering = [&](std::unordered_set<int>& set,
                                             CLHEP::Hep3Vector& c,
-                                            std::vector<short>::iterator seedIt) -> std::pair<float, int> {
-                    const auto addClusterLayers = [&](short module) {
+                                            std::vector<int>::iterator seedIt) {
+                    const auto addClusterLayers = [&](int module) {
                         set.insert(module);
-                        for (auto&& neighbor : faceList[module].neighborModuleID) {
+                        for (auto&& neighbor : moduleList[module].neighborModuleID) {
                             set.insert(neighbor);
-                            for (auto&& secondNeighbor : faceList[neighbor].neighborModuleID) {
+                            for (auto&& secondNeighbor : moduleList[neighbor].neighborModuleID) {
                                 set.insert(secondNeighbor);
-                                set.insert(faceList[secondNeighbor].neighborModuleID.begin(), faceList[secondNeighbor].neighborModuleID.end());
+                                set.insert(moduleList[secondNeighbor].neighborModuleID.begin(), moduleList[secondNeighbor].neighborModuleID.end());
                             }
                         }
                     };
 
                     addClusterLayers(*seedIt);
 
-                    float totalEnergy{};
+                    double totalEnergy{};
                     int totalPE{};
                     CLHEP::Hep3Vector weightedCentroid{};
 
@@ -158,11 +148,12 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                         auto pe = Get<"nOptPho">(*hitIt->second);
 
                         if (pe > 3) {
-                            weightedCentroid += energy * centroidMap.at(module);
+                            weightedCentroid += energy * moduleList.at(module).centroid;
                             totalEnergy += energy;
                             totalPE += pe;
                         }
                     }
+
                     c = weightedCentroid / totalEnergy;
 
                     return std::make_pair(totalEnergy, totalPE);
@@ -184,13 +175,13 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
 
     if (reconstructTwoBody) {
         using ECALEnergy = Mustard::Data::TupleModel<
-            Mustard::Data::Value<float, "Edep", "Energy deposition in total">,
-            Mustard::Data::Value<float, "Edep1", "Energy deposition of the 1st cluster">,
+            Mustard::Data::Value<double, "Edep", "Energy deposition in total">,
+            Mustard::Data::Value<double, "Edep1", "Energy deposition of the 1st cluster">,
             Mustard::Data::Value<muc::array3f, "Centroid1", "Centroid of the 1st cluster">,
-            Mustard::Data::Value<float, "Edep2", "Energy deposition of the 2nd cluster">,
+            Mustard::Data::Value<double, "Edep2", "Energy deposition of the 2nd cluster">,
             Mustard::Data::Value<muc::array3f, "Centroid2", "Centroid of the 2nd cluster">,
-            Mustard::Data::Value<float, "dE", "Energy difference of two reconstructed tracks">,
-            Mustard::Data::Value<float, "dt", "Time difference of two reconstructed tracks">,
+            Mustard::Data::Value<double, "dE", "Energy difference of two reconstructed tracks">,
+            Mustard::Data::Value<double, "dt", "Time difference of two reconstructed tracks">,
             Mustard::Data::Value<double, "cosTheta", "Angle between two reconstructed tracks">>;
         Mustard::Data::Output<ECALEnergy> reconEnergy{"G4Run0/ReconECAL"};
 
@@ -206,14 +197,16 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                  return Get<"Edep">(*hit1) > Get<"Edep">(*hit2);
                              });
 
-                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
-                std::vector<short> potentialSeedModule;
+                std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
+                std::vector<int> potentialSeedModule;
 
                 for (auto&& hit : event) {
                     hitDict.try_emplace(Get<"ModID">(*hit), hit);
+
                     if (Get<"Edep">(*hit) < 15_MeV) {
                         continue;
                     }
+
                     potentialSeedModule.emplace_back(Get<"ModID">(*hit));
                 }
 
@@ -221,49 +214,53 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                     return;
                 }
 
-                std::unordered_set<short> firstCluster;
-                std::unordered_set<short> secondCluster;
-
+                std::unordered_set<int> firstCluster;
+                std::unordered_set<int> secondCluster;
                 CLHEP::Hep3Vector firstClusterCentroid{};
                 CLHEP::Hep3Vector secondClusterCentroid{};
 
                 auto firstSeedModule = potentialSeedModule.begin();
                 auto secondSeedModule = std::ranges::find_if(
                     potentialSeedModule,
-                    [&](short m) { return centroidMap.at(*firstSeedModule).angle(centroidMap.at(m)) > 0.8_pi; });
+                    [&](int m) {
+                        const auto& c1{moduleList.at(*firstSeedModule).centroid};
+                        const auto& c2{moduleList.at(m).centroid};
+                        return c1.angle(c2) > 0.8 * pi;
+                    });
 
                 if (secondSeedModule == potentialSeedModule.end()) {
                     return;
                 }
 
-                const auto Clustering = [&](std::unordered_set<short>& set,
+                const auto Clustering = [&](std::unordered_set<int>& set,
                                             CLHEP::Hep3Vector& c,
-                                            std::vector<short>::iterator seedIt) -> float {
-                    const auto addClusterLayers = [&](short module) {
+                                            std::vector<int>::iterator seedIt) -> double {
+                    const auto addClusterLayers = [&](int module) {
                         set.insert(module);
-                        for (auto&& neighbor : faceList[module].neighborModuleID) {
+                        for (auto&& neighbor : moduleList[module].neighborModuleID) {
                             set.insert(neighbor);
-                            for (auto&& secondNeighbor : faceList[neighbor].neighborModuleID) {
+                            for (auto&& secondNeighbor : moduleList[neighbor].neighborModuleID) {
                                 set.insert(secondNeighbor);
-                                set.insert(faceList[secondNeighbor].neighborModuleID.begin(), faceList[secondNeighbor].neighborModuleID.end());
+                                set.insert(moduleList[secondNeighbor].neighborModuleID.begin(), moduleList[secondNeighbor].neighborModuleID.end());
                             }
                         }
                     };
 
                     addClusterLayers(*seedIt);
 
-                    float totalEnergy{};
+                    double totalEnergy{};
                     CLHEP::Hep3Vector weightedCentroid{};
 
                     for (const auto& module : set) {
                         auto hitIt = hitDict.find(module);
+
                         if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
                             continue;
                         }
 
                         auto energy = Get<"Edep">(*hitIt->second);
 
-                        weightedCentroid += energy * centroidMap.at(module);
+                        weightedCentroid += energy * moduleList.at(module).centroid;
                         totalEnergy += energy;
                     }
                     c = weightedCentroid / totalEnergy;
@@ -296,9 +293,9 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
 
     if (reconstructInvisible) {
         using ECALEnergy = Mustard::Data::TupleModel<
-            Mustard::Data::Value<float, "Edep", "Energy deposition in total">,
+            Mustard::Data::Value<double, "Edep", "Energy deposition in total">,
             Mustard::Data::Value<muc::array3f, "Centroid", "Centroid of the cluster">,
-            Mustard::Data::Value<float, "t", "Time of the reconstructed tracks">,
+            Mustard::Data::Value<double, "t", "Time of the reconstructed tracks">,
             Mustard::Data::Value<double, "theta", "Angle between inital momentum direction">>;
         Mustard::Data::Output<ECALEnergy> reconEnergy{"G4Run0/ReconECAL"};
 
@@ -314,14 +311,16 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                  return Get<"Edep">(*hit1) > Get<"Edep">(*hit2);
                              });
 
-                std::unordered_map<short, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
-                std::vector<short> potentialSeedModule;
+                std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
+                std::vector<int> potentialSeedModule;
 
                 for (auto&& hit : event) {
                     hitDict.try_emplace(Get<"ModID">(*hit), hit);
+
                     if (Get<"Edep">(*hit) < 1_MeV) {
                         continue;
                     }
+
                     potentialSeedModule.emplace_back(Get<"ModID">(*hit));
                 }
 
@@ -329,39 +328,41 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                     return;
                 }
 
-                std::unordered_set<short> cluster;
+                std::unordered_set<int> cluster;
                 CLHEP::Hep3Vector clusterCentroid{};
                 auto seedModule = potentialSeedModule.begin();
 
-                const auto Clustering = [&](std::unordered_set<short>& set,
+                const auto Clustering = [&](std::unordered_set<int>& set,
                                             CLHEP::Hep3Vector& c,
-                                            std::vector<short>::iterator seedIt) -> float {
-                    const auto addClusterLayers = [&](short module) {
+                                            std::vector<int>::iterator seedIt) -> double {
+                    const auto addClusterLayers = [&](int module) {
                         set.insert(module);
-                        for (auto&& neighbor : faceList[module].neighborModuleID) {
+                        for (auto&& neighbor : moduleList[module].neighborModuleID) {
                             set.insert(neighbor);
-                            for (auto&& secondNeighbor : faceList[neighbor].neighborModuleID) {
+                            for (auto&& secondNeighbor : moduleList[neighbor].neighborModuleID) {
                                 set.insert(secondNeighbor);
-                                set.insert(faceList[secondNeighbor].neighborModuleID.begin(), faceList[secondNeighbor].neighborModuleID.end());
+                                set.insert(moduleList[secondNeighbor].neighborModuleID.begin(), moduleList[secondNeighbor].neighborModuleID.end());
                             }
                         }
                     };
                     addClusterLayers(*seedIt);
 
-                    float totalEnergy{};
+                    double totalEnergy{};
                     CLHEP::Hep3Vector weightedCentroid{};
 
                     for (const auto& module : set) {
                         auto hitIt = hitDict.find(module);
+
                         if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
                             continue;
                         }
 
                         auto energy = Get<"Edep">(*hitIt->second);
-                        weightedCentroid += energy * centroidMap.at(module);
+                        weightedCentroid += energy * moduleList.at(module).centroid;
                         totalEnergy += energy;
                     }
                     c = weightedCentroid / totalEnergy;
+
                     return totalEnergy;
                 };
 

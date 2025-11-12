@@ -31,8 +31,8 @@ public:
     auto UpstreamWindowRadius() const -> auto { return *fUpstreamWindowRadius; }
     auto DownstreamWindowRadius() const -> auto { return *fDownstreamWindowRadius; }
 
-    auto Mesh() const -> const auto& { return *fMesh; }
-    auto NUnit() const -> auto { return Mesh().faceList.size(); }
+    auto Array() const -> const auto& { return *fArray; }
+    auto NUnit() const -> auto { return Array().moduleList.size(); }
     auto ComputeTransformToOuterSurfaceWithOffset(int moduleID, double offsetInNormalDirection) const -> HepGeom::Transform3D;
     auto ModuleSelection() const -> const auto& { return *fModuleSelection; }
 
@@ -100,20 +100,21 @@ public:
 
     auto WaveformIntegralTime(double val) { fWaveformIntegralTime = val; }
 
-    struct MeshInformation {
+    struct ArrayInformation {
         struct Module {
+            int moduleID{};
+            std::unordered_set<int> neighborModuleID{};
+            int typeID{};
             CLHEP::Hep3Vector centroid{};
             CLHEP::Hep3Vector normal{};
             std::vector<gsl::index> vertexIndex{};
-            int typeID{};
-            std::unordered_set<int> neighborModuleID{};
         };
         std::vector<HepGeom::Point3D<double>> vertexList{};
-        std::vector<Module> faceList{};
+        std::vector<Module> moduleList{};
     };
 
 private:
-    auto CalculateMeshInformation() const -> MeshInformation;
+    auto CalculateArrayInformation() const -> ArrayInformation;
 
     auto ImportAllValue(const YAML::Node& node) -> void override;
     auto ExportAllValue(YAML::Node& node) const -> void override;
@@ -125,7 +126,7 @@ private:
     Simple<double> fCrystalPackageThickness;
     Simple<double> fUpstreamWindowRadius;
     Simple<double> fDownstreamWindowRadius;
-    Cached<MeshInformation> fMesh;
+    Cached<ArrayInformation> fArray;
     Simple<std::vector<int>> fModuleSelection;
 
     Simple<std::vector<double>> fScintillationEnergyBin;
