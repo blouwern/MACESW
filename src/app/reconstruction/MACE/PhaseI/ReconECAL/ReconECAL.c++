@@ -123,11 +123,10 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                             std::vector<int>::iterator seedIt) {
                     const auto addClusterLayers = [&](int module) {
                         set.insert(module);
-                        for (auto&& neighbor : moduleList[module].neighborModuleID) {
+                        for (auto&& neighbor : moduleList.at(module).neighborModuleID) {
                             set.insert(neighbor);
-                            for (auto&& secondNeighbor : moduleList[neighbor].neighborModuleID) {
+                            for (auto&& secondNeighbor : moduleList.at(neighbor).neighborModuleID) {
                                 set.insert(secondNeighbor);
-                                set.insert(moduleList[secondNeighbor].neighborModuleID.begin(), moduleList[secondNeighbor].neighborModuleID.end());
                             }
                         }
                     };
@@ -140,20 +139,18 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
 
                     for (const auto& module : set) {
                         auto hitIt = hitDict.find(module);
-                        if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
-                            continue;
-                        }
-
                         auto energy = Get<"Edep">(*hitIt->second);
                         auto pe = Get<"nOptPho">(*hitIt->second);
 
+                        if (hitIt == hitDict.end() or energy < 50_keV) {
+                            continue;
+                        }
                         if (pe > 3) {
                             weightedCentroid += energy * moduleList.at(module).centroid;
                             totalEnergy += energy;
                             totalPE += pe;
                         }
                     }
-
                     c = weightedCentroid / totalEnergy;
 
                     return std::make_pair(totalEnergy, totalPE);
@@ -237,11 +234,10 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                             std::vector<int>::iterator seedIt) -> double {
                     const auto addClusterLayers = [&](int module) {
                         set.insert(module);
-                        for (auto&& neighbor : moduleList[module].neighborModuleID) {
+                        for (auto&& neighbor : moduleList.at(module).neighborModuleID) {
                             set.insert(neighbor);
-                            for (auto&& secondNeighbor : moduleList[neighbor].neighborModuleID) {
+                            for (auto&& secondNeighbor : moduleList.at(neighbor).neighborModuleID) {
                                 set.insert(secondNeighbor);
-                                set.insert(moduleList[secondNeighbor].neighborModuleID.begin(), moduleList[secondNeighbor].neighborModuleID.end());
                             }
                         }
                     };
@@ -253,12 +249,11 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
 
                     for (const auto& module : set) {
                         auto hitIt = hitDict.find(module);
+                        auto energy = Get<"Edep">(*hitIt->second);
 
-                        if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
+                        if (hitIt == hitDict.end() or energy < 50_keV) {
                             continue;
                         }
-
-                        auto energy = Get<"Edep">(*hitIt->second);
 
                         weightedCentroid += energy * moduleList.at(module).centroid;
                         totalEnergy += energy;
@@ -337,11 +332,10 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                                             std::vector<int>::iterator seedIt) -> double {
                     const auto addClusterLayers = [&](int module) {
                         set.insert(module);
-                        for (auto&& neighbor : moduleList[module].neighborModuleID) {
+                        for (auto&& neighbor : moduleList.at(module).neighborModuleID) {
                             set.insert(neighbor);
-                            for (auto&& secondNeighbor : moduleList[neighbor].neighborModuleID) {
+                            for (auto&& secondNeighbor : moduleList.at(neighbor).neighborModuleID) {
                                 set.insert(secondNeighbor);
-                                set.insert(moduleList[secondNeighbor].neighborModuleID.begin(), moduleList[secondNeighbor].neighborModuleID.end());
                             }
                         }
                     };
@@ -352,12 +346,12 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
 
                     for (const auto& module : set) {
                         auto hitIt = hitDict.find(module);
+                        auto energy = Get<"Edep">(*hitIt->second);
 
-                        if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
+                        if (hitIt == hitDict.end() or energy < 50_keV) {
                             continue;
                         }
 
-                        auto energy = Get<"Edep">(*hitIt->second);
                         weightedCentroid += energy * moduleList.at(module).centroid;
                         totalEnergy += energy;
                     }

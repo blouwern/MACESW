@@ -3,6 +3,7 @@
 #include "MACE/Detector/Description/Target.h++"
 #include "MACE/PhaseI/Detector/Description/UsePhaseIDefault.h++"
 
+#include "Mustard/IO/Print.h++"
 #include "Mustard/Utility/LiteralUnit.h++"
 
 namespace MACE::PhaseI::Detector::Description {
@@ -12,6 +13,9 @@ auto UsePhaseIDefault() -> void {
     using namespace Mustard::LiteralUnit::Time;
     using namespace Mustard::LiteralUnit::Energy;
     namespace MACE = MACE::Detector::Description;
+
+    Mustard::MasterPrintLn("Applying PhaseI default detector description settings...");
+
     { // set accelerator up/downstream length to a random equal value
         auto& accelerator{MACE::Accelerator::Instance()};
         accelerator.MaxPotentialPosition(0);
@@ -26,9 +30,9 @@ auto UsePhaseIDefault() -> void {
     { // bigger windows for ECAL
         auto& ecal{MACE::ECAL::Instance()};
         ecal.InnerRadius(260_mm);
-        ecal.CrystalHypotenuse(260_mm);
-        ecal.UpstreamWindowRadius(104_mm);
-        ecal.DownstreamWindowRadius(104_mm);
+        ecal.CrystalHypotenuse(280_mm);
+        ecal.UpstreamWindowRadius(50_mm);
+        ecal.DownstreamWindowRadius(50_mm);
         ecal.ScintillationEnergyBin({3.300891_eV, 3.394291_eV, 3.459551_eV, 3.515883_eV, 3.557591_eV, 3.591915_eV,
                                      3.622042_eV, 3.644458_eV, 3.678815_eV, 3.690132_eV, 3.715531_eV, 3.728362_eV,
                                      3.747776_eV, 3.768708_eV, 3.787216_eV, 3.80725_eV, 3.820723_eV, 3.847958_eV,

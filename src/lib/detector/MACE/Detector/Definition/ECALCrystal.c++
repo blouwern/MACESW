@@ -93,11 +93,12 @@ auto ECALCrystal::Construct(G4bool checkOverlaps) -> void {
         if ((not moduleSelection.empty()) and std::ranges::find(moduleSelection, moduleID) == moduleSelection.end()) {
             continue;
         }
-        if (not moduleSelection.empty() and moduleID == moduleSelection.front()) {
-            Mustard::PrintLn<'I'>("\n===========================");
-            Mustard::PrintLn<'I'>("Centroid of Selected Seed Module:");
-            Mustard::PrintLn<'I'>("{} {} {}", centroid.x(), centroid.y(), centroid.z());
-            Mustard::PrintLn<'I'>("===========================\n");
+        if (not moduleSelection.empty() and
+            moduleID == moduleSelection.front() and Mustard::Env::VerboseLevelReach<'I'>()) {
+            Mustard::MasterPrint("\n===========================");
+            Mustard::MasterPrint("Centroid of Selected Seed Module:");
+            Mustard::MasterPrint("{} {} {}", centroid.x(), centroid.y(), centroid.z());
+            Mustard::MasterPrint("===========================\n");
         }
 
         const auto solidCrystal{

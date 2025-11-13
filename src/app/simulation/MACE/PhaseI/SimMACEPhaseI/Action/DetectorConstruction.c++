@@ -55,7 +55,7 @@ auto DetectorConstruction::Construct() -> G4VPhysicalVolume* {
     // auto& ttc{fWorld->NewDaughter<PhaseI::TTC>(fCheckOverlap)};
 
     centralBeamPipe.NewDaughter<PhaseI::Target>(fCheckOverlap);
-    centralBeamPipe.NewDaughter<PhaseI::Degrader>(fCheckOverlap);
+    // centralBeamPipe.NewDaughter<PhaseI::Degrader>(fCheckOverlap);
 
     const auto& ecalName{MACE::Detector::Description::ECAL::Instance().Name()};
     const auto& scifiName{MACE::PhaseI::Detector::Description::SciFiTracker::Instance().Name()};

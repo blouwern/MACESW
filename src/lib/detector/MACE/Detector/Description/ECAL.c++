@@ -158,7 +158,9 @@ using namespace Mustard::LiteralUnit::Energy;
 using namespace Mustard::PhysicalConstant;
 
 ECAL::ECAL() :
-    DescriptionWithCacheBase{"ECAL"},
+    DescriptionWithCacheBase{
+        "ECAL"
+},
     // geometry param.s
     fNSubdivision{this, 3},
     fInnerRadius{this, 20_cm},
@@ -167,7 +169,7 @@ ECAL::ECAL() :
     fUpstreamWindowRadius{this, 50_mm},
     fDownstreamWindowRadius{this, 5_mm},
     fArray{this, [this] { return CalculateArrayInformation(); }},
-    fModuleSelection{this, {}},
+    fModuleSelection{this, {339, 280, 468, 108, 394, 224, 18}},
     // crystal param.s
     fScintillationEnergyBin{this, {}},
     fScintillationComponent1{this, {}},
@@ -247,7 +249,7 @@ ECAL::ECAL() :
                              0.25279, 0.24266, 0.23367, 0.22357, 0.2143, 0.20344, 0.19319,
                              0.18363, 0.17294, 0.16265, 0.15232, 0.14053, 0.12759, 0.11486,
                              0.10345, 0.09229, 0.08193, 0.07198, 0.06108, 0.05136, 0.04241,
-                             0.0337, 0.02403, 0.01447, 0.00466}; // ET 9269B
+                             0.0337, 0.02403, 0.01447, 0.00466};
     // SiPM Hamamatsu S14161
     fMPPCNPixelRows = {4, 4, 8, 8, 8, 8, 8, 8, 8, 8};
     fMPPCPixelSizeSet = {3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm};
@@ -383,42 +385,44 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
         it = range.second;
     }
 
-    if (Mustard::Env::VerboseLevelReach<'V'>()) {
+    if (Mustard::Env::VerboseLevelReach<'I'>()) {
+        Mustard::MasterPrintLn("\n======================================================");
+        Mustard::MasterPrintLn("Information for ECAL\n");
+        Mustard::MasterPrintLn(">>> Module Sorting of ECAL");
+
         int typeID{};
-        Mustard::MasterPrintLn(">>--->>edgeLengthsMap");
         auto it{edgeLengthsMap.begin()};
 
         while (it != edgeLengthsMap.end()) {
             auto currentEdgeLengths{it->first};
             const auto range{edgeLengthsMap.equal_range(currentEdgeLengths)};
             const std::ranges::subrange equalRange{range.first, range.second};
-            Mustard::MasterPrintLn("--->>type {}:", typeID);
-            Mustard::MasterPrintLn("\t >>lengths:");
+            Mustard::MasterPrintLn("--- Type {}: \n", typeID);
+            Mustard::MasterPrintLn("- lengths: ");
             Mustard::MasterPrintLn("{}, ", currentEdgeLengths);
-            Mustard::MasterPrintLn("\t>>modules({} in total):", std::ranges::distance(equalRange));
+            Mustard::MasterPrintLn("\n- modules({} in total):", std::ranges::distance(equalRange));
 
             for (auto&& [_, moduleID] : equalRange) {
                 Mustard::MasterPrint("{}, ", moduleID);
             }
-            Mustard::MasterPrintLn("======================================================\n");
+            Mustard::MasterPrintLn("\n===========================");
 
-            if (not fModuleSelection->empty()) {
-                Mustard::MasterPrintLn("\n>>> Selected Module Clustering of ECAL ");
-                for (auto&& m : *fModuleSelection) {
-                    Mustard::MasterPrintLn("\n- Module {}", m);
-                    Mustard::MasterPrint("{},", m);
-                    for (auto&& n : moduleList.at(m).neighborModuleID) {
-                        Mustard::MasterPrint("{},", n);
-                    }
-                    Mustard::MasterPrint("\n");
-                }
-                Mustard::MasterPrintLn("===========================");
-                Mustard::MasterPrint("\n");
-            }
             ++typeID;
             it = range.second;
         }
+        if (not fModuleSelection->empty()) {
+            Mustard::MasterPrintLn("\n>>> Selected Module Clustering of ECAL ");
+            for (auto&& m : *fModuleSelection) {
+                Mustard::MasterPrintLn("\n- Module {}", m);
+                Mustard::MasterPrint("{},", m);
+                for (auto&& n : moduleList.at(m).neighborModuleID) {
+                    Mustard::MasterPrint("{},", n);
+                }
+            }
+            Mustard::MasterPrintLn("\n======================================================\n");
+        }
     }
+
     return outputArrayInfo;
 }
 
