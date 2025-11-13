@@ -158,9 +158,7 @@ using namespace Mustard::LiteralUnit::Energy;
 using namespace Mustard::PhysicalConstant;
 
 ECAL::ECAL() :
-    DescriptionWithCacheBase{
-        "ECAL"
-},
+    DescriptionWithCacheBase{"ECAL"},
     // geometry param.s
     fNSubdivision{this, 3},
     fInnerRadius{this, 20_cm},
@@ -169,7 +167,7 @@ ECAL::ECAL() :
     fUpstreamWindowRadius{this, 50_mm},
     fDownstreamWindowRadius{this, 5_mm},
     fArray{this, [this] { return CalculateArrayInformation(); }},
-    fModuleSelection{this, {339, 280, 468, 108, 394, 224, 18}},
+    fModuleSelection{this, {}},
     // crystal param.s
     fScintillationEnergyBin{this, {}},
     fScintillationComponent1{this, {}},

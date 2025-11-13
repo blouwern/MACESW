@@ -139,12 +139,12 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
 
                     for (const auto& module : set) {
                         auto hitIt = hitDict.find(module);
-                        auto energy = Get<"Edep">(*hitIt->second);
-                        auto pe = Get<"nOptPho">(*hitIt->second);
 
-                        if (hitIt == hitDict.end() or energy < 50_keV) {
+                        if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
                             continue;
                         }
+                        auto energy = Get<"Edep">(*hitIt->second);
+                        auto pe = Get<"nOptPho">(*hitIt->second);
                         if (pe > 3) {
                             weightedCentroid += energy * moduleList.at(module).centroid;
                             totalEnergy += energy;
@@ -249,12 +249,12 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
 
                     for (const auto& module : set) {
                         auto hitIt = hitDict.find(module);
-                        auto energy = Get<"Edep">(*hitIt->second);
 
-                        if (hitIt == hitDict.end() or energy < 50_keV) {
+                        if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
                             continue;
                         }
 
+                        auto energy = Get<"Edep">(*hitIt->second);
                         weightedCentroid += energy * moduleList.at(module).centroid;
                         totalEnergy += energy;
                     }
@@ -346,12 +346,12 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
 
                     for (const auto& module : set) {
                         auto hitIt = hitDict.find(module);
-                        auto energy = Get<"Edep">(*hitIt->second);
 
-                        if (hitIt == hitDict.end() or energy < 50_keV) {
+                        if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
                             continue;
                         }
 
+                        auto energy = Get<"Edep">(*hitIt->second);
                         weightedCentroid += energy * moduleList.at(module).centroid;
                         totalEnergy += energy;
                     }
