@@ -111,7 +111,7 @@ public:
         };
         int firstID{};
         int lastID{};
-        int fiberNumber{};
+        int nfiber{};
         FiberConfiguration fiber;
     };
 

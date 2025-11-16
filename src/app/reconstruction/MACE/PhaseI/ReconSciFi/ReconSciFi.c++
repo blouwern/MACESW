@@ -100,7 +100,7 @@ auto ReconSciFi::Main(int argc, char* argv[]) const -> int {
                              return std::tie(Get<"SiPMID">(*hit1), Get<"t">(*hit1)) < std::tie(Get<"SiPMID">(*hit2), Get<"t">(*hit2));
                          });
 
-            std::vector<std::shared_ptr<Mustard::Data::Tuple<MACE::PhaseI::Data::SciFiSimHit>>> siPMHitData;
+            std::vector<std::shared_ptr<Mustard::Data::Tuple<MACE::PhaseI::Data::SciFiSimHit>>> SciFiSiPMHitData;
             for (std::ranges::subrange siPMHitRange{event.begin(), event.begin()};
                  siPMHitRange.begin() != event.end();
                  siPMHitRange = {siPMHitRange.end(), siPMHitRange.end()}) {
@@ -115,16 +115,16 @@ auto ReconSciFi::Main(int argc, char* argv[]) const -> int {
                         count++;
                         if (count == sciFiTracker.SiPMOpticalPhotonCountThreshold()) {
                             endTime = initialTime + sciFiTracker.TimeWindow();
-                            siPMHitData.emplace_back(std::make_shared<Mustard::Data::Tuple<MACE::PhaseI::Data::SciFiSimHit>>());
-                            *Get<"t">(*siPMHitData.back()) = *Get<"t">(*siPMHitRange[j]);
-                            *Get<"EvtID">(*siPMHitData.back()) = *Get<"EvtID">(*siPMHitRange[j]);
-                            *Get<"SiPMID">(*siPMHitData.back()) = *Get<"SiPMID">(*siPMHitRange[j]);
+                            SciFiSiPMHitData.emplace_back(std::make_shared<Mustard::Data::Tuple<MACE::PhaseI::Data::SciFiSimHit>>());
+                            *Get<"t">(*SciFiSiPMHitData.back()) = *Get<"t">(*siPMHitRange[j]);
+                            *Get<"EvtID">(*SciFiSiPMHitData.back()) = *Get<"EvtID">(*siPMHitRange[j]);
+                            *Get<"SiPMID">(*SciFiSiPMHitData.back()) = *Get<"SiPMID">(*siPMHitRange[j]);
 
                             while (j < std::ssize(siPMHitRange) and *Get<"t">(*siPMHitRange[j]) < endTime) {
                                 count++;
                                 j++;
                             }
-                            *Get<"nOptPho">(*siPMHitData.back()) = count;
+                            *Get<"nOptPho">(*SciFiSiPMHitData.back()) = count;
                             count = 0;
                             if (j < std::ssize(siPMHitRange)) {
                                 initialTime = endTime + sciFiTracker.SiPMDeadTime();

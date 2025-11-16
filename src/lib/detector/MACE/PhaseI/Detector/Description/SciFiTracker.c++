@@ -134,7 +134,7 @@ auto SciFiTracker::CalculateLayerConfiguration() const -> std::vector<LayerConfi
         auto& layer{layerConfig.emplace_back()};
         layer.firstID = fLayerFiberIDRange->at(i).first;
         layer.lastID = fLayerFiberIDRange->at(i).second;
-        layer.fiberNumber = fNFiberALayer->at(i);
+        layer.nfiber = fNFiberALayer->at(i);
         layer.fiber.layerType = fLayerType->at(i);
         layer.fiber.pitch = fLayerPitch->at(i);
         layer.fiber.radius = fLayerRadius->at(i);
