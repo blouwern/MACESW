@@ -1,3 +1,16 @@
+# Daily Pre-release Workflow
+#
+# This workflow runs daily to create pre-release builds from the rc branch.
+# It intelligently skips release creation when:
+# - No new commits exist since the last pre-release (v0.*)
+# - Today's tag (v0.YYYYMMDD) already exists
+#
+# The workflow:
+# 1. Syncs main branch to rc branch (fast-forward only)
+# 2. Checks if there are new commits since the last v0.* tag
+# 3. Creates a new tag and GitHub pre-release only if changes exist
+# 4. Provides clear logging and summaries of all actions taken
+
 name: Daily Pre-release
 
 on:
