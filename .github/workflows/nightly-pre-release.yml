@@ -28,7 +28,7 @@ env:
 jobs:
   nightly-prerelease:
     name: Create nightly pre-release
-    timeout-minutes: 720
+    timeout-minutes: 180
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -53,8 +53,8 @@ jobs:
           MAIN_SHA=$(git rev-parse origin/main)
           echo "Main branch HEAD commit: ${MAIN_SHA}"
 
-          MAX_WAIT_SECONDS=43200  # 720 minutes = 43200 seconds
-          POLL_INTERVAL=60        # Check every 60 seconds
+          MAX_WAIT_SECONDS=10800  # 180 minutes = 10800 seconds
+          POLL_INTERVAL=30        # Check every 30 seconds
           ELAPSED=0
           ALL_PENDING=""  # Initialize outside loop for timeout access
 
