@@ -1,22 +1,18 @@
-# Daily Pre-release Workflow
+# Nightly Pre-release Workflow
 #
-# This workflow runs daily to create pre-release builds from the rc branch.
-# It intelligently skips release creation when:
-# - No new commits exist since the last pre-release (v0.*)
-# - Today's tag (v0.YYYYMMDD) already exists
+# This workflow runs nightly to create pre-release builds from the rc branch.
 #
-# The workflow:
+# The workflow performs the following steps:
 # 1. Syncs main branch to rc branch (fast-forward only)
 # 2. Checks if there are new commits since the last v0.* tag
 # 3. Creates a new tag and GitHub pre-release only if changes exist
-# 4. Provides clear logging and summaries of all actions taken
 
-name: Daily Pre-release
+name: Nightly pre-release
 
 on:
   schedule:
-    # Run daily at 00:00 UTC
-    - cron: '0 0 * * *'
+    # Run nightly at 04:00 UTC+8 (20:00 UTC)
+    - cron: '0 20 * * *'
   workflow_dispatch:
   # Allow manual trigger for testing
 
@@ -24,8 +20,8 @@ permissions:
   contents: write
 
 jobs:
-  daily-prerelease:
-    name: Create Daily Pre-release
+  nightly-prerelease:
+    name: Create nightly pre-release
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -58,7 +54,7 @@ jobs:
           echo "::group::Checking for new commits"
 
           # Generate today's tag name
-          TODAY_TAG="v0.$(date +%Y%m%d)"
+          TODAY_TAG="v0.$(date +%y.%m%d)"
           echo "today_tag=${TODAY_TAG}" >> $GITHUB_OUTPUT
           echo "Today's tag would be: ${TODAY_TAG}"
 
@@ -118,11 +114,11 @@ jobs:
         run: |
           TAG="${{ steps.check_commits.outputs.today_tag }}"
           echo "::group::Creating tag ${TAG}"
-          git tag -a "${TAG}" -m "Daily pre-release ${TAG}"
+          git tag -a "${TAG}" -m "Nightly pre-release ${TAG}"
           git push origin "${TAG}"
           echo "::endgroup::"
 
-      - name: Create GitHub Release
+      - name: Create GitHub release
         if: steps.check_commits.outputs.should_release == 'true'
         uses: actions/github-script@v7
         with:
@@ -131,7 +127,7 @@ jobs:
             const latestTag = '${{ steps.check_commits.outputs.latest_tag }}';
 
             // Generate release notes
-            let releaseBody = `Daily pre-release build for ${tag}\n\n`;
+            let releaseBody = `Nightly pre-release build for ${tag}\n\n`;
             releaseBody += `This is an automated pre-release `;
             releaseBody += `created from the \`rc\` branch.\n\n`;
 
@@ -159,11 +155,11 @@ jobs:
             const msg = `Successfully created pre-release ${tag}`;
             core.notice(msg);
 
-      - name: Job Summary
+      - name: Job summary
         if: always()
         run: |
           SUMMARY=$GITHUB_STEP_SUMMARY
-          echo "## Daily Pre-release Summary" >> "${SUMMARY}"
+          echo "## Nightly Pre-release Summary" >> "${SUMMARY}"
           echo "" >> "${SUMMARY}"
 
           SHOULD_RELEASE="${{ steps.check_commits.outputs.should_release }}"
