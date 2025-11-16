@@ -44,33 +44,33 @@ jobs:
         id: check_main_status
         run: |
           echo "::group::Checking main branch check status"
-          
+
           # Get the latest commit SHA from main branch
           MAIN_SHA=$(git rev-parse origin/main)
           echo "Main branch HEAD commit: ${MAIN_SHA}"
-          
+
           MAX_WAIT_SECONDS=43200  # 720 minutes = 43200 seconds
           POLL_INTERVAL=60        # Check every 60 seconds
           ELAPSED=0
-          
+
           while [ ${ELAPSED} -lt ${MAX_WAIT_SECONDS} ]; do
             echo ""
             echo "Checking status at $(date -u +"%Y-%m-%d %H:%M:%S UTC") (elapsed: ${ELAPSED}s)"
-            
+
             # Get status checks using GitHub API
             STATUS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/${{ github.repository }}/commits/${MAIN_SHA}/status")
-            
+
             # Get check runs using GitHub API
             CHECKS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/${{ github.repository }}/commits/${MAIN_SHA}/check-runs")
-            
+
             # Parse combined status
             COMBINED_STATUS=$(echo "${STATUS_RESPONSE}" | jq -r '.state // "unknown"')
             echo "Combined status state: ${COMBINED_STATUS}"
-            
+
             # Check for any failing status checks
             FAILING_STATUSES=$(echo "${STATUS_RESPONSE}" | jq -r '.statuses[] | select(.state == "failure" or .state == "error") | .context' || true)
             if [ -n "${FAILING_STATUSES}" ]; then
@@ -82,7 +82,7 @@ jobs:
               echo "::endgroup::"
               exit 1
             fi
-            
+
             # Check for any failing, cancelled, or timed out check runs
             FAILING_CHECKS=$(echo "${CHECKS_RESPONSE}" | jq -r '.check_runs[] | select(.status == "completed" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out")) | .name' || true)
             if [ -n "${FAILING_CHECKS}" ]; then
@@ -94,13 +94,13 @@ jobs:
               echo "::endgroup::"
               exit 1
             fi
-            
+
             # Check for pending status checks
             PENDING_STATUSES=$(echo "${STATUS_RESPONSE}" | jq -r '.statuses[] | select(.state == "pending") | .context' || true)
-            
+
             # Check for in-progress or queued check runs
             PENDING_CHECKS=$(echo "${CHECKS_RESPONSE}" | jq -r '.check_runs[] | select(.status == "queued" or .status == "in_progress") | .name' || true)
-            
+
             # Combine pending checks
             ALL_PENDING=""
             if [ -n "${PENDING_STATUSES}" ]; then
@@ -113,7 +113,7 @@ jobs:
                 ALL_PENDING="${PENDING_CHECKS}"
               fi
             fi
-            
+
             if [ -n "${ALL_PENDING}" ]; then
               echo "The following checks are still pending:"
               echo "${ALL_PENDING}" | while read -r check; do
@@ -130,7 +130,7 @@ jobs:
               exit 0
             fi
           done
-          
+
           # Timeout reached
           echo "::error::Timeout reached while waiting for checks to complete"
           echo "::error::The following checks are still pending after ${MAX_WAIT_SECONDS}s:"
@@ -273,7 +273,7 @@ jobs:
           CHECKS_PASSED="${{ steps.check_main_status.outputs.checks_passed }}"
           STEP_OUTCOME="${{ steps.check_commits.outcome }}"
           SHOULD_RELEASE="${{ steps.check_commits.outputs.should_release }}"
-          
+
           # Check if main branch checks failed
           if [ "${CHECKS_OUTCOME}" = "failure" ] || [ "${CHECKS_PASSED}" = "false" ]; then
             echo "❌ **Release Skipped - Checks Failed**" >> "${GITHUB_STEP_SUMMARY}"
