@@ -18,6 +18,8 @@ on:
 permissions:
   contents: write
   pull-requests: read
+  checks: read
+  statuses: read
 
 env:
   TZ: UTC
@@ -25,7 +27,7 @@ env:
 jobs:
   nightly-prerelease:
     name: Create nightly pre-release
-    timeout-minutes: 10
+    timeout-minutes: 720
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -38,7 +40,109 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Check if all required checks passed on main (with wait)
+        id: check_main_status
+        run: |
+          echo "::group::Checking main branch check status"
+          
+          # Get the latest commit SHA from main branch
+          MAIN_SHA=$(git rev-parse origin/main)
+          echo "Main branch HEAD commit: ${MAIN_SHA}"
+          
+          MAX_WAIT_SECONDS=43200  # 720 minutes = 43200 seconds
+          POLL_INTERVAL=60        # Check every 60 seconds
+          ELAPSED=0
+          
+          while [ ${ELAPSED} -lt ${MAX_WAIT_SECONDS} ]; do
+            echo ""
+            echo "Checking status at $(date -u +"%Y-%m-%d %H:%M:%S UTC") (elapsed: ${ELAPSED}s)"
+            
+            # Get status checks using GitHub API
+            STATUS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/commits/${MAIN_SHA}/status")
+            
+            # Get check runs using GitHub API
+            CHECKS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/commits/${MAIN_SHA}/check-runs")
+            
+            # Parse combined status
+            COMBINED_STATUS=$(echo "${STATUS_RESPONSE}" | jq -r '.state // "unknown"')
+            echo "Combined status state: ${COMBINED_STATUS}"
+            
+            # Check for any failing status checks
+            FAILING_STATUSES=$(echo "${STATUS_RESPONSE}" | jq -r '.statuses[] | select(.state == "failure" or .state == "error") | .context' || true)
+            if [ -n "${FAILING_STATUSES}" ]; then
+              echo "::error::The following status checks have failed on main:"
+              echo "${FAILING_STATUSES}" | while read -r context; do
+                echo "::error::  - ${context}"
+              done
+              echo "checks_passed=false" >> $GITHUB_OUTPUT
+              echo "::endgroup::"
+              exit 1
+            fi
+            
+            # Check for any failing, cancelled, or timed out check runs
+            FAILING_CHECKS=$(echo "${CHECKS_RESPONSE}" | jq -r '.check_runs[] | select(.status == "completed" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out")) | .name' || true)
+            if [ -n "${FAILING_CHECKS}" ]; then
+              echo "::error::The following check runs have failed on main:"
+              echo "${FAILING_CHECKS}" | while read -r check; do
+                echo "::error::  - ${check}"
+              done
+              echo "checks_passed=false" >> $GITHUB_OUTPUT
+              echo "::endgroup::"
+              exit 1
+            fi
+            
+            # Check for pending status checks
+            PENDING_STATUSES=$(echo "${STATUS_RESPONSE}" | jq -r '.statuses[] | select(.state == "pending") | .context' || true)
+            
+            # Check for in-progress or queued check runs
+            PENDING_CHECKS=$(echo "${CHECKS_RESPONSE}" | jq -r '.check_runs[] | select(.status == "queued" or .status == "in_progress") | .name' || true)
+            
+            # Combine pending checks
+            ALL_PENDING=""
+            if [ -n "${PENDING_STATUSES}" ]; then
+              ALL_PENDING="${PENDING_STATUSES}"
+            fi
+            if [ -n "${PENDING_CHECKS}" ]; then
+              if [ -n "${ALL_PENDING}" ]; then
+                ALL_PENDING="${ALL_PENDING}"$'\n'"${PENDING_CHECKS}"
+              else
+                ALL_PENDING="${PENDING_CHECKS}"
+              fi
+            fi
+            
+            if [ -n "${ALL_PENDING}" ]; then
+              echo "The following checks are still pending:"
+              echo "${ALL_PENDING}" | while read -r check; do
+                echo "  - ${check}"
+              done
+              echo "Waiting ${POLL_INTERVAL} seconds before next check..."
+              sleep ${POLL_INTERVAL}
+              ELAPSED=$((ELAPSED + POLL_INTERVAL))
+            else
+              # All checks are complete and successful
+              echo "✅ All checks have passed on main branch!"
+              echo "checks_passed=true" >> $GITHUB_OUTPUT
+              echo "::endgroup::"
+              exit 0
+            fi
+          done
+          
+          # Timeout reached
+          echo "::error::Timeout reached while waiting for checks to complete"
+          echo "::error::The following checks are still pending after ${MAX_WAIT_SECONDS}s:"
+          echo "${ALL_PENDING}" | while read -r check; do
+            echo "::error::  - ${check}"
+          done
+          echo "checks_passed=false" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+          exit 1
+
       - name: Sync main to rc branch
+        if: steps.check_main_status.outputs.checks_passed == 'true'
         run: |
           echo "::group::Syncing main to rc branch"
           git fetch origin main:main || git fetch origin main
@@ -52,6 +156,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Check for new commits and determine release necessity
+        if: steps.check_main_status.outputs.checks_passed == 'true'
         id: check_commits
         run: |
           echo "::group::Checking for new commits"
@@ -113,7 +218,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Create tag
-        if: steps.check_commits.outputs.should_release == 'true'
+        if: steps.check_main_status.outputs.checks_passed == 'true' && steps.check_commits.outputs.should_release == 'true'
         run: |
           TAG="${{ steps.check_commits.outputs.today_tag }}"
           echo "::group::Creating tag ${TAG}"
@@ -122,7 +227,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Create GitHub release
-        if: steps.check_commits.outputs.should_release == 'true'
+        if: steps.check_main_status.outputs.checks_passed == 'true' && steps.check_commits.outputs.should_release == 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -164,10 +269,18 @@ jobs:
           echo "## Nightly Pre-release Summary" >> "${GITHUB_STEP_SUMMARY}"
           echo "" >> "${GITHUB_STEP_SUMMARY}"
 
+          CHECKS_OUTCOME="${{ steps.check_main_status.outcome }}"
+          CHECKS_PASSED="${{ steps.check_main_status.outputs.checks_passed }}"
           STEP_OUTCOME="${{ steps.check_commits.outcome }}"
           SHOULD_RELEASE="${{ steps.check_commits.outputs.should_release }}"
           
-          if [ "${STEP_OUTCOME}" != "success" ]; then
+          # Check if main branch checks failed
+          if [ "${CHECKS_OUTCOME}" = "failure" ] || [ "${CHECKS_PASSED}" = "false" ]; then
+            echo "❌ **Release Skipped - Checks Failed**" >> "${GITHUB_STEP_SUMMARY}"
+            echo "- Required checks on main branch have not passed" >> "${GITHUB_STEP_SUMMARY}"
+            echo "- Please review the workflow logs for details" >> "${GITHUB_STEP_SUMMARY}"
+            echo "- The rc branch will not be updated until all checks pass" >> "${GITHUB_STEP_SUMMARY}"
+          elif [ "${STEP_OUTCOME}" != "success" ]; then
             echo "❌ **Failed to determine release status**" >> "${GITHUB_STEP_SUMMARY}"
             echo "- The check for new commits step may have failed" >> "${GITHUB_STEP_SUMMARY}"
             echo "- Please review the workflow logs for errors" >> "${GITHUB_STEP_SUMMARY}"
