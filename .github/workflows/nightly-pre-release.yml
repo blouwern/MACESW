@@ -105,7 +105,6 @@ jobs:
             echo "Found ${NEW_COMMIT_COUNT} new commit(s) since ${LATEST_TAG}"
             echo "skip_reason=" >> $GITHUB_OUTPUT
             echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
           fi
 
           echo "::endgroup::"
