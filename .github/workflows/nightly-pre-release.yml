@@ -3,9 +3,10 @@
 # This workflow runs nightly to create pre-release builds from the rc branch.
 #
 # The workflow performs the following steps:
-# 1. Syncs main branch to rc branch (fast-forward only)
-# 2. Checks if there are new commits since the last v0.* tag
-# 3. Creates a new tag and GitHub pre-release only if changes exist
+# 1. Checks if all required checks passed on main branch (waits for pending checks)
+# 2. Syncs main branch to rc branch (fast-forward only)
+# 3. Checks if there are new commits since the last v0.* tag
+# 4. Creates a new tag and GitHub pre-release only if changes exist
 
 name: Nightly pre-release
 
@@ -44,6 +45,9 @@ jobs:
         id: check_main_status
         run: |
           echo "::group::Checking main branch check status"
+
+          # Define this workflow name to avoid circular dependency
+          THIS_WORKFLOW_NAME="Nightly pre-release"
 
           # Get the latest commit SHA from main branch
           MAIN_SHA=$(git rev-parse origin/main)
@@ -101,7 +105,7 @@ jobs:
             echo "Combined status state: ${COMBINED_STATUS}"
 
             # Check for any failing status checks
-            FAILING_STATUSES=$(echo "${STATUS_RESPONSE}" | jq -r '.statuses[] | select(.state == "failure" or .state == "error") | .context')
+            FAILING_STATUSES=$(echo "${STATUS_RESPONSE}" | jq -r --arg workflow "${THIS_WORKFLOW_NAME}" '.statuses[] | select(.state == "failure" or .state == "error") | select(.context != $workflow) | .context')
             if [ $? -ne 0 ]; then
               echo "::error::Failed to parse STATUS_RESPONSE JSON for failing statuses."
               echo "checks_passed=false" >> $GITHUB_OUTPUT
@@ -121,7 +125,7 @@ jobs:
             fi
 
             # Check for any failing, cancelled, or timed out check runs
-            FAILING_CHECKS=$(echo "${CHECKS_RESPONSE}" | jq -r '.check_runs[] | select(.status == "completed" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out")) | .name')
+            FAILING_CHECKS=$(echo "${CHECKS_RESPONSE}" | jq -r --arg workflow "${THIS_WORKFLOW_NAME}" '.check_runs[] | select(.status == "completed" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out")) | select(.name != $workflow) | .name')
             if [ $? -ne 0 ]; then
               echo "::error::Failed to parse CHECKS_RESPONSE JSON for failing checks."
               echo "checks_passed=false" >> $GITHUB_OUTPUT
@@ -139,7 +143,7 @@ jobs:
             fi
 
             # Check for pending status checks
-            PENDING_STATUSES=$(echo "${STATUS_RESPONSE}" | jq -r '.statuses[] | select(.state == "pending") | .context')
+            PENDING_STATUSES=$(echo "${STATUS_RESPONSE}" | jq -r --arg workflow "${THIS_WORKFLOW_NAME}" '.statuses[] | select(.state == "pending") | select(.context != $workflow) | .context')
             if [ $? -ne 0 ]; then
               echo "::error::Failed to parse STATUS_RESPONSE JSON for pending statuses."
               echo "checks_passed=false" >> $GITHUB_OUTPUT
@@ -148,7 +152,7 @@ jobs:
             fi
 
             # Check for in-progress or queued check runs
-            PENDING_CHECKS=$(echo "${CHECKS_RESPONSE}" | jq -r '.check_runs[] | select(.status == "queued" or .status == "in_progress") | .name')
+            PENDING_CHECKS=$(echo "${CHECKS_RESPONSE}" | jq -r --arg workflow "${THIS_WORKFLOW_NAME}" '.check_runs[] | select(.status == "queued" or .status == "in_progress") | select(.name != $workflow) | .name')
             if [ $? -ne 0 ]; then
               echo "::error::Failed to parse CHECKS_RESPONSE JSON for pending checks."
               echo "checks_passed=false" >> $GITHUB_OUTPUT
