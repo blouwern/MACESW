@@ -3,9 +3,10 @@
 # This workflow runs nightly to create pre-release builds from the rc branch.
 #
 # The workflow performs the following steps:
-# 1. Syncs main branch to rc branch (fast-forward only)
-# 2. Checks if there are new commits since the last v0.* tag
-# 3. Creates a new tag and GitHub pre-release only if changes exist
+# 1. Checks if all required checks passed on main branch (waits for pending checks)
+# 2. Syncs main branch to rc branch (fast-forward only)
+# 3. Checks if there are new commits since the last v0.* tag
+# 4. Creates a new tag and GitHub pre-release only if changes exist
 
 name: Nightly pre-release
 
