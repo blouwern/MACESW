@@ -105,6 +105,7 @@ jobs:
             echo "Found ${NEW_COMMIT_COUNT} new commit(s) since ${LATEST_TAG}"
             echo "skip_reason=" >> $GITHUB_OUTPUT
             echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
           fi
 
           echo "::endgroup::"
@@ -158,24 +159,22 @@ jobs:
       - name: Job summary
         if: always()
         run: |
-          SUMMARY=$GITHUB_STEP_SUMMARY
-          echo "## Nightly Pre-release Summary" >> "${SUMMARY}"
-          echo "" >> "${SUMMARY}"
+          echo "## Nightly Pre-release Summary" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
 
           SHOULD_RELEASE="${{ steps.check_commits.outputs.should_release }}"
           if [ "${SHOULD_RELEASE}" = "true" ]; then
             TAG="${{ steps.check_commits.outputs.today_tag }}"
-            echo "✅ **Release Created**: ${TAG}" >> "${SUMMARY}"
+            echo "✅ **Release Created**: ${TAG}" >> "${GITHUB_STEP_SUMMARY}"
             LATEST="${{ steps.check_commits.outputs.latest_tag }}"
             if [ -n "${LATEST}" ]; then
-              echo "- Previous release: ${LATEST}" >> "${SUMMARY}"
-              echo "- New commits were found" >> "${SUMMARY}"
-              echo "- Release was created" >> "${SUMMARY}"
+              echo "- Previous release: ${LATEST}" >> "${GITHUB_STEP_SUMMARY}"
+              echo "- New commits were found" >> "${GITHUB_STEP_SUMMARY}"
             else
-              echo "- This is the first pre-release" >> "${SUMMARY}"
+              echo "- This is the first pre-release" >> "${GITHUB_STEP_SUMMARY}"
             fi
           else
-            echo "⏭️ **Release Skipped**" >> "${SUMMARY}"
+            echo "⏭️ **Release Skipped**" >> "${GITHUB_STEP_SUMMARY}"
             REASON="${{ steps.check_commits.outputs.skip_reason }}"
-            echo "- Reason: ${REASON}" >> "${SUMMARY}"
+            echo "- Reason: ${REASON}" >> "${GITHUB_STEP_SUMMARY}"
           fi
