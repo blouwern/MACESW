@@ -13,8 +13,7 @@ on:
   schedule:
     # Run nightly at 04:00 UTC+8 (20:00 UTC)
     - cron: '0 20 * * *'
-  workflow_dispatch:
-  # Allow manual trigger for testing
+  workflow_dispatch:  # Allow manual trigger for testing
 
 permissions:
   contents: write
@@ -161,8 +160,10 @@ jobs:
           echo "## Nightly Pre-release Summary" >> "${GITHUB_STEP_SUMMARY}"
           echo "" >> "${GITHUB_STEP_SUMMARY}"
 
+          STEP_OUTCOME="${{ steps.check_commits.outcome }}"
           SHOULD_RELEASE="${{ steps.check_commits.outputs.should_release }}"
-          if [ -z "${SHOULD_RELEASE}" ]; then
+          
+          if [ "${STEP_OUTCOME}" != "success" ]; then
             echo "❌ **Failed to determine release status**" >> "${GITHUB_STEP_SUMMARY}"
             echo "- The check for new commits step may have failed" >> "${GITHUB_STEP_SUMMARY}"
             echo "- Please review the workflow logs for errors" >> "${GITHUB_STEP_SUMMARY}"
