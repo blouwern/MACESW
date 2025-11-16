@@ -27,7 +27,7 @@ env:
 
 jobs:
   nightly-prerelease:
-    name: Create nightly pre-release
+    name: Nightly pre-release
     timeout-minutes: 180
     runs-on: ubuntu-latest
     steps:
