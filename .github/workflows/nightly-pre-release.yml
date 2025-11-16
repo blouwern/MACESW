@@ -163,7 +163,11 @@ jobs:
           echo "" >> "${GITHUB_STEP_SUMMARY}"
 
           SHOULD_RELEASE="${{ steps.check_commits.outputs.should_release }}"
-          if [ "${SHOULD_RELEASE}" = "true" ]; then
+          if [ -z "${SHOULD_RELEASE}" ]; then
+            echo "❌ **Failed to determine release status**" >> "${GITHUB_STEP_SUMMARY}"
+            echo "- The check for new commits step may have failed" >> "${GITHUB_STEP_SUMMARY}"
+            echo "- Please review the workflow logs for errors" >> "${GITHUB_STEP_SUMMARY}"
+          elif [ "${SHOULD_RELEASE}" = "true" ]; then
             TAG="${{ steps.check_commits.outputs.today_tag }}"
             echo "✅ **Release Created**: ${TAG}" >> "${GITHUB_STEP_SUMMARY}"
             LATEST="${{ steps.check_commits.outputs.latest_tag }}"
