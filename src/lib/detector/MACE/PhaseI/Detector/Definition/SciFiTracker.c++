@@ -376,7 +376,7 @@ auto SciFiTracker::Construct(G4bool checkOverlaps) -> void {
                 Make<G4PVPlacement>(
                     G4RotateZ3D{fiberInformation[fiberID].rotationAngle},
                     logicalFiber,
-                    scifiName + "HelicalFiber_" + std::to_string(fiberID),
+                    fmt::format("{}HelicalFiber_{}", scifiName, fiberID),
                     logicalBracket,
                     false,
                     fiberID,
@@ -412,7 +412,7 @@ auto SciFiTracker::Construct(G4bool checkOverlaps) -> void {
                         G4RotateY3D{(3 * 1_pi / 2 + std::abs(pitch)) * std::copysign(1, pitch)} *
                         G4Translate3D{0, 0, (sciFiTracker.SiPMThickness() + sciFiTracker.SiliconeOilThickness() + sciFiTracker.EpoxyThickness()) / 2},
                     logicalSiPM,
-                    scifiName + "SiPM",
+                    fmt::format("{}SiPM_{}", scifiName, sipmID),
                     Mother().LogicalVolume(),
                     false,
                     sipmID,
@@ -442,7 +442,7 @@ auto SciFiTracker::Construct(G4bool checkOverlaps) -> void {
                     G4RotateZ3D{fiberInformation[fiberID].rotationAngle} *
                         G4Transform3D{{}, G4ThreeVector(radius, 0, 0)},
                     logicalFiber,
-                    scifiName + "TransverseFiber_" + std::to_string(fiberID),
+                    fmt::format("{}TransverseFiber_{}", scifiName, fiberID),
                     logicalBracket,
                     false,
                     fiberID,
@@ -480,7 +480,7 @@ auto SciFiTracker::Construct(G4bool checkOverlaps) -> void {
                                                      sciFiTracker.FiberLength()) / 2 + 
                                                      sciFiTracker.TransverseLightGuideLength())}, // clang-format on
                     logicalSiPM,
-                    scifiName + "SiPM",
+                    fmt::format("{}SiPM_{}", scifiName, sipmID),
                     Mother().LogicalVolume(),
                     false,
                     sipmID,
