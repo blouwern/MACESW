@@ -1,0 +1,172 @@
+name: Daily Pre-release
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  # Allow manual trigger for testing
+
+permissions:
+  contents: write
+
+jobs:
+  daily-prerelease:
+    name: Create Daily Pre-release
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper comparison
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync main to rc branch
+        run: |
+          echo "::group::Syncing main to rc branch"
+          git fetch origin main:main || git fetch origin main
+          git checkout rc || git checkout -b rc
+          git merge --ff-only main || {
+            echo "::error::Failed to fast-forward merge main into rc."
+            echo "::error::Manual intervention required."
+            exit 1
+          }
+          git push origin rc
+          echo "::endgroup::"
+
+      - name: Check for new commits and determine release necessity
+        id: check_commits
+        run: |
+          echo "::group::Checking for new commits"
+
+          # Generate today's tag name
+          TODAY_TAG="v0.$(date +%Y%m%d)"
+          echo "today_tag=${TODAY_TAG}" >> $GITHUB_OUTPUT
+          echo "Today's tag would be: ${TODAY_TAG}"
+
+          # Check if today's tag already exists
+          if git rev-parse "${TODAY_TAG}" >/dev/null 2>&1; then
+            REASON="Tag ${TODAY_TAG} already exists for today"
+            echo "skip_reason=${REASON}" >> $GITHUB_OUTPUT
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "::warning::${REASON}. Skipping release creation."
+            echo "::endgroup::"
+            exit 0
+          fi
+
+          # Get the latest pre-release tag (any tag starting with v0.)
+          LATEST_TAG=$(git tag -l "v0.*" --sort=-version:refname \
+            | head -n 1)
+
+          if [ -z "${LATEST_TAG}" ]; then
+            echo "No previous pre-release tags found."
+            echo "This will be the first release."
+            echo "skip_reason=" >> $GITHUB_OUTPUT
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "latest_tag=" >> $GITHUB_OUTPUT
+            echo "::endgroup::"
+            exit 0
+          fi
+
+          echo "Latest pre-release tag: ${LATEST_TAG}"
+          echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+
+          # Get commit SHAs
+          LATEST_TAG_COMMIT=$(git rev-list -n 1 "${LATEST_TAG}")
+          RC_HEAD_COMMIT=$(git rev-parse rc)
+
+          echo "Latest tag commit: ${LATEST_TAG_COMMIT}"
+          echo "RC branch HEAD: ${RC_HEAD_COMMIT}"
+
+          # Compare commits
+          if [ "${LATEST_TAG_COMMIT}" = "${RC_HEAD_COMMIT}" ]; then
+            REASON="No new commits since last release (${LATEST_TAG})"
+            echo "skip_reason=${REASON}" >> $GITHUB_OUTPUT
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "::warning::${REASON}. Skipping release creation."
+          else
+            # Count new commits
+            COMMIT_RANGE="${LATEST_TAG_COMMIT}..${RC_HEAD_COMMIT}"
+            NEW_COMMIT_COUNT=$(git rev-list --count "${COMMIT_RANGE}")
+            echo "Found ${NEW_COMMIT_COUNT} new commit(s) since ${LATEST_TAG}"
+            echo "skip_reason=" >> $GITHUB_OUTPUT
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+
+          echo "::endgroup::"
+
+      - name: Create tag
+        if: steps.check_commits.outputs.should_release == 'true'
+        run: |
+          TAG="${{ steps.check_commits.outputs.today_tag }}"
+          echo "::group::Creating tag ${TAG}"
+          git tag -a "${TAG}" -m "Daily pre-release ${TAG}"
+          git push origin "${TAG}"
+          echo "::endgroup::"
+
+      - name: Create GitHub Release
+        if: steps.check_commits.outputs.should_release == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = '${{ steps.check_commits.outputs.today_tag }}';
+            const latestTag = '${{ steps.check_commits.outputs.latest_tag }}';
+
+            // Generate release notes
+            let releaseBody = `Daily pre-release build for ${tag}\n\n`;
+            releaseBody += `This is an automated pre-release `;
+            releaseBody += `created from the \`rc\` branch.\n\n`;
+
+            if (latestTag) {
+              releaseBody += `### Changes since ${latestTag}\n\n`;
+              const compareUrl = `https://github.com/` +
+                `${context.repo.owner}/${context.repo.repo}/` +
+                `compare/${latestTag}...${tag}`;
+              releaseBody += `See the [comparison view](${compareUrl})`;
+              releaseBody += ` for detailed changes.\n`;
+            } else {
+              releaseBody += `This is the first pre-release.\n`;
+            }
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `Pre-release ${tag}`,
+              body: releaseBody,
+              draft: false,
+              prerelease: true
+            });
+
+            const msg = `Successfully created pre-release ${tag}`;
+            core.notice(msg);
+
+      - name: Job Summary
+        if: always()
+        run: |
+          SUMMARY=$GITHUB_STEP_SUMMARY
+          echo "## Daily Pre-release Summary" >> "${SUMMARY}"
+          echo "" >> "${SUMMARY}"
+
+          SHOULD_RELEASE="${{ steps.check_commits.outputs.should_release }}"
+          if [ "${SHOULD_RELEASE}" = "true" ]; then
+            TAG="${{ steps.check_commits.outputs.today_tag }}"
+            echo "✅ **Release Created**: ${TAG}" >> "${SUMMARY}"
+            LATEST="${{ steps.check_commits.outputs.latest_tag }}"
+            if [ -n "${LATEST}" ]; then
+              echo "- Previous release: ${LATEST}" >> "${SUMMARY}"
+              echo "- New commits were found" >> "${SUMMARY}"
+              echo "- Release was created" >> "${SUMMARY}"
+            else
+              echo "- This is the first pre-release" >> "${SUMMARY}"
+            fi
+          else
+            echo "⏭️ **Release Skipped**" >> "${SUMMARY}"
+            REASON="${{ steps.check_commits.outputs.skip_reason }}"
+            echo "- Reason: ${REASON}" >> "${SUMMARY}"
+          fi
