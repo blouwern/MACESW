@@ -112,7 +112,7 @@ auto ReconSciFi::Main(int argc, char* argv[]) const -> int {
                         count++;
                         if (count == sciFiTracker.SiPMOpticalPhotonCountThreshold()) {
                             endTime = initialTime + sciFiTracker.TimeWindow();
-                            const auto sciFiHit{std::make_shared<Mustard::Data::Tuple<MACE::PhaseI::Data::SciFiSimHit>>()};
+                            auto sciFiHit{std::make_shared<Mustard::Data::Tuple<MACE::PhaseI::Data::SciFiSimHit>>()};
                             *Get<"t">(*sciFiHit) = *Get<"t">(*sciFiHitRange[j]);
                             *Get<"EvtID">(*sciFiHit) = *Get<"EvtID">(*sciFiHitRange[j]);
                             *Get<"FiberID">(*sciFiHit) = *Get<"FiberID">(*sciFiHitRange[j]);
