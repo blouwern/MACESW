@@ -52,6 +52,7 @@ using namespace Mustard::LiteralUnit;
 
 SciFiSD::SciFiSD(const G4String& sdName) :
     G4VSensitiveDetector{sdName},
+    fSciFiSiPMSD{},
     fSplitHit{},
     fHitsCollection{} {
     collectionName.insert(sdName + "HC");
