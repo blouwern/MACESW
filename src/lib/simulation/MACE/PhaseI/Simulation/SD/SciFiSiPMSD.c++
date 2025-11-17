@@ -41,7 +41,7 @@ SciFiSiPMSD::SciFiSiPMSD(const G4String& sdName) :
 auto SciFiSiPMSD::Initialize(G4HCofThisEvent* hitsCollectionOfThisEvent) -> void {
     fHit.clear(); // clear at the begin of event allows TTCSD to get optical photon counts at the end of event
 
-    fHitsCollection = new SciFiSiPMRawHitCollection(SensitiveDetectorName, collectionName[0]);
+    fHitsCollection = new SciFiSiPMHitCollection(SensitiveDetectorName, collectionName[0]);
     auto hitsCollectionID{G4SDManager::GetSDMpointer()->GetCollectionID(fHitsCollection)};
     hitsCollectionOfThisEvent->AddHitsCollection(hitsCollectionID, fHitsCollection);
 }
@@ -59,15 +59,13 @@ auto SciFiSiPMSD::ProcessHits(G4Step* theStep, G4TouchableHistory*) -> G4bool {
 
     const auto postStepPoint{*step.GetPostStepPoint()};
     const auto siPMID{postStepPoint.GetTouchable()->GetReplicaNumber()};
-    const auto epoxyID{postStepPoint.GetTouchable()->GetReplicaNumber(1)};
-    const auto trueSiPMID{siPMID + 64 * epoxyID};
     // new a hit
-    auto hit{std::make_unique_for_overwrite<SciFiSiPMRawHit>()};
+    auto hit{std::make_unique_for_overwrite<SciFiSiPMHit>()};
     Get<"EvtID">(*hit) = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
     Get<"HitID">(*hit) = -1; // to be determined
-    Get<"SiPMID">(*hit) = trueSiPMID;
+    Get<"SiPMID">(*hit) = siPMID;
     Get<"t">(*hit) = postStepPoint.GetGlobalTime();
-    fHit[trueSiPMID].emplace_back(std::move(hit));
+    fHit[siPMID].emplace_back(std::move(hit));
     return true;
 }
 
