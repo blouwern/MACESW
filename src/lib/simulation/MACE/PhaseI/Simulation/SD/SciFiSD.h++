@@ -20,6 +20,7 @@
 #pragma once
 
 #include "MACE/PhaseI/Simulation/Hit/SciFiSimHit.h++"
+#include "MACE/PhaseI/Simulation/SD/SciFiSiPMSD.h++"
 
 #include "G4VSensitiveDetector.hh"
 
@@ -37,6 +38,7 @@ public:
     auto EndOfEvent(G4HCofThisEvent*) -> void override;
 
 protected:
+    const SciFiSiPMSD* fSciFiSiPMSD;
     muc::flat_hash_map<int, muc::unique_ptrvec<SciFiSimHit>> fSplitHit;
     SciFiHitCollection* fHitsCollection;
 };
