@@ -230,7 +230,7 @@ jobs:
           VERSION_PATCH=$(echo "$CMAKELISTS_CONTENT" | grep -E "set\(MACESW_VERSION_PATCH [0-9]+\)" | tail -n 1 | sed -E 's/.*set\(MACESW_VERSION_PATCH ([0-9]+)\).*/\1/')
 
           if [ -z "$VERSION_MAJOR" ] || [ -z "$VERSION_MINOR" ] || [ -z "$VERSION_PATCH" ]; then
-            echo "Error: Failed to extract version from CMakeLists.txt"
+            echo "::error::Failed to extract version from CMakeLists.txt"
             exit 1
           fi
 
