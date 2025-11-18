@@ -18,9 +18,9 @@
 file(GLOB_RECURSE MACESW_UTILITY_SRC ${CMAKE_CURRENT_SOURCE_DIR}/MACE/*.c++)
 
 include(CMakePackageConfigHelpers)
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/MACE/Version.inl.in
-                              ${CMAKE_CURRENT_SOURCE_DIR}/MACE/Version.inl
-                              INSTALL_DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/MACE)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MACE/Version.inl.in
+               ${CMAKE_CURRENT_SOURCE_DIR}/MACE/Version.inl
+               @ONLY)
 
 add_library(MACEUtility STATIC ${MACESW_UTILITY_SRC})
 target_include_directories(MACEUtility PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
