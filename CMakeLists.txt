@@ -30,7 +30,12 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
     cmake_policy(SET CMP0135 NEW)
 endif()
 
-project(MACESW VERSION 0.0.0
+set(MACESW_VERSION_MAJOR 0)
+set(MACESW_VERSION_MINOR 0)
+set(MACESW_VERSION_PATCH 0)
+set(MACESW_VERSION ${MACESW_VERSION_MAJOR}.${MACESW_VERSION_MINOR}.${MACESW_VERSION_PATCH})
+
+project(MACESW VERSION ${MACESW_VERSION}
                LANGUAGES C CXX)
 
 # =============================================================================
