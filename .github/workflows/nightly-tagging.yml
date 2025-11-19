@@ -236,7 +236,7 @@ jobs:
 
           BASE_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
           COMMIT_SHA_SHORT=$(git rev-parse --short=7 rc)
-          TODAY_TAG="v${BASE_VERSION}-nightly~$(date +'%Y%m%d')+git${COMMIT_SHA_SHORT}"
+          TODAY_TAG="v${BASE_VERSION}~nightly$(date +'%Y%m%d')+git${COMMIT_SHA_SHORT}"
           echo "today_tag=${TODAY_TAG}" >> $GITHUB_OUTPUT
           echo "Today's tag would be: ${TODAY_TAG}"
 
