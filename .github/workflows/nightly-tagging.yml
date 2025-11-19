@@ -54,7 +54,7 @@ jobs:
           echo "Main branch HEAD commit: ${MAIN_SHA}"
 
           MAX_WAIT_SECONDS=10800  # 180 minutes = 10800 seconds
-          POLL_INTERVAL=30        # Check every 30 seconds
+          POLL_INTERVAL=10        # Check every 10 seconds
           ELAPSED=0
           ALL_PENDING=""  # Initialize outside loop for timeout access
 
