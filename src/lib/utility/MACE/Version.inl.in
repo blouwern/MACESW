@@ -17,20 +17,21 @@
 // You should have received a copy of the GNU General Public License along with
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-#pragma once
+// ==============================================================================
+// This file is auto generated, any modification to it will be lost. DO NOT EDIT.
+// ==============================================================================
 
-#include "Mustard/Data/TupleModel.h++"
-#include "Mustard/Data/Value.h++"
+namespace MACE {
 
-#include "muc/array"
+enum struct Version : int {
+    Major = @MACESW_VERSION_MAJOR@,
+    Minor = @MACESW_VERSION_MINOR@,
+    Patch = @MACESW_VERSION_PATCH@
+};
 
-namespace MACE::PhaseI::Data {
+constexpr inline const char versionString[]{"@MACESW_VERSION@"};
 
-using Track = Mustard::Data::TupleModel<
-    Mustard::Data::Value<int, "EvtID", "Event ID">,
-    Mustard::Data::Value<muc::array3f, "x", "Hit position">,
-    Mustard::Data::Value<muc::array3f, "p", "Momentum vector">,
-    Mustard::Data::Value<double, "t", "Optical photon hit time">,
-    Mustard::Data::Value<double, "chi2", "Chi2 of fit">>;
+constexpr inline const char compilerIDString[]{"@CMAKE_CXX_COMPILER_ID@"};
+constexpr inline const char compilerVersionString[]{"@CMAKE_CXX_COMPILER_VERSION@"};
 
-} // namespace MACE::PhaseI::Data
+} // namespace MACE

@@ -19,18 +19,20 @@
 
 #pragma once
 
-#include "Mustard/Data/TupleModel.h++"
-#include "Mustard/Data/Value.h++"
+#include "MACE/PhaseI/Data/SensorHit.h++"
 
-#include "muc/array"
+#include "Mustard/Data/Tuple.h++"
+#include "Mustard/Geant4X/Memory/UseG4Allocator.h++"
 
-namespace MACE::PhaseI::Data {
+#include "G4THitsCollection.hh"
+#include "G4VHit.hh"
 
-using Track = Mustard::Data::TupleModel<
-    Mustard::Data::Value<int, "EvtID", "Event ID">,
-    Mustard::Data::Value<muc::array3f, "x", "Hit position">,
-    Mustard::Data::Value<muc::array3f, "p", "Momentum vector">,
-    Mustard::Data::Value<double, "t", "Optical photon hit time">,
-    Mustard::Data::Value<double, "chi2", "Chi2 of fit">>;
+namespace MACE::PhaseI::inline Simulation::inline Hit {
 
-} // namespace MACE::PhaseI::Data
+class SciFiSiPMHit final : public Mustard::Geant4X::UseG4Allocator<SciFiSiPMHit>,
+                           public G4VHit,
+                           public Mustard::Data::Tuple<PhaseI::Data::SciFiSiPMHit> {};
+
+using SciFiSiPMHitCollection = G4THitsCollection<SciFiSiPMHit>;
+
+} // namespace MACE::PhaseI::inline Simulation::inline Hit

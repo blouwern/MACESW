@@ -27,7 +27,7 @@
 namespace MACE::PhaseI::Data {
 
 using SciFiRawHit = Mustard::Data::TupleModel<
-    Mustard::Data::Value<int, "FiberID", "Fiber ID">,
+    Mustard::Data::Value<short, "FiberID", "Fiber ID">,
     Mustard::Data::Value<double, "t", "Hit time">,
     Mustard::Data::Value<float, "Edep", "Energy deposition">>;
 

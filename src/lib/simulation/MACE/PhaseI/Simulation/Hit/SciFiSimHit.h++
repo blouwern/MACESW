@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "MACE/PhaseI/Data/SensorHit.h++"
+#include "MACE/PhaseI/Data/SimHit.h++"
 
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Geant4X/Memory/UseG4Allocator.h++"
@@ -29,10 +29,10 @@
 
 namespace MACE::PhaseI::inline Simulation::inline Hit {
 
-class SciFiSiPMRawHit final : public Mustard::Geant4X::UseG4Allocator<SciFiSiPMRawHit>,
-                              public G4VHit,
-                              public Mustard::Data::Tuple<PhaseI::Data::SciFiSiPMRawHit> {};
+class SciFiSimHit final : public Mustard::Geant4X::UseG4Allocator<SciFiSimHit>,
+                          public G4VHit,
+                          public Mustard::Data::Tuple<PhaseI::Data::SciFiSimHit> {};
 
-using SciFiSiPMRawHitCollection = G4THitsCollection<SciFiSiPMRawHit>;
+using SciFiHitCollection = G4THitsCollection<SciFiSimHit>;
 
 } // namespace MACE::PhaseI::inline Simulation::inline Hit
