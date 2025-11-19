@@ -128,7 +128,7 @@ Important operational details and assumptions you must follow so the test script
 - How histograms and binning are handled (consequences)
   - The `Read*` macros compute histogram ranges and create histograms with fixed bin count (default `nBinsValueType = 100`). 
   - Histogram ranges are computed from the sample and the code adds a small margin. Because bin counts and edges are fixed at golden-creation time, the `Test*` macros reconstruct test histograms with the identical number of bins and exact min/max edges read from the golden histograms. Therefore:
-    - If you change the histogram expressions, column names, bin count or range logic, the golden dataset (`macesw_regression_data.root`) must be regeerated.
+    - If you change the histogram expressions, column names, bin count or range logic, the golden dataset (`macesw_regression_data.root`) must be regenerated.
     - Avoid manually change bin edges in the golden file as possible.
   - The range of each histogram is specified by the distributional characteristics of the data. Generally, for a tested data coloumn $x$ (named "X" for example), there are 3 main range settings:
     - $[min(x), max(x)]$ if the distribution is a broad spectrum.
