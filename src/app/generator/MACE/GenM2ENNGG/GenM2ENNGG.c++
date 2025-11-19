@@ -18,9 +18,9 @@
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
 #include "MACE/GenM2ENNGG/GenM2ENNGG.h++"
-#include "MACE/Utility/InitialStateCLIModule.h++"
-#include "MACE/Utility/MCMCGeneratorCLI.h++"
-#include "MACE/Utility/WriteAutocorrelationFunction.h++"
+#include "MACE/Generator/InitialStateCLIModule.h++"
+#include "MACE/Generator/MCMCGeneratorCLI.h++"
+#include "MACE/Generator/WriteAutocorrelationFunction.h++"
 
 #include "Mustard/CLHEPX/Random/Xoshiro.h++"
 #include "Mustard/Data/GeneratedEvent.h++"
@@ -55,7 +55,7 @@ GenM2ENNGG::GenM2ENNGG() :
     Subprogram{"GenM2ENNGG", "Generate double radiative muon decay (mu+ -> e+ nu nu gamma gamma)."} {}
 
 auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
-    MCMCGeneratorCLI<InitialStateCLIModule<"polarized", "muon">> cli;
+    Generator::MCMCGeneratorCLI<Generator::InitialStateCLIModule<"polarized", "muon">> cli;
     cli.DefaultOutput("m2enngg.root");
     cli.DefaultOutputTree("m2enngg");
     cli->add_argument("--ir-cut").help("IR cut for final-state photons.").default_value(electron_mass_c2).required().nargs(1).scan<'g', double>();
@@ -100,7 +100,7 @@ auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
     Mustard::ProcessSpecificFile<TFile> file{cli->get("--output"), cli->get("--output-mode")};
     auto& rng{*CLHEP::HepRandom::getTheEngine()};
     const auto autocorrelationFunction{generator.MCMCInitialize(rng)};
-    WriteAutocorrelationFunction(autocorrelationFunction);
+    Generator::WriteAutocorrelationFunction(autocorrelationFunction);
 
     // Generate events
     if (*nEvent == 0) {

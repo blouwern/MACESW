@@ -21,9 +21,9 @@
 #include "MACE/Detector/Description/MMSField.h++"
 #include "MACE/Detector/Description/TTC.h++"
 #include "MACE/GenBkgM2ENNE/GenBkgM2ENNE.h++"
-#include "MACE/Utility/InitialStateCLIModule.h++"
-#include "MACE/Utility/MCMCGeneratorCLI.h++"
-#include "MACE/Utility/WriteAutocorrelationFunction.h++"
+#include "MACE/Generator/InitialStateCLIModule.h++"
+#include "MACE/Generator/MCMCGeneratorCLI.h++"
+#include "MACE/Generator/WriteAutocorrelationFunction.h++"
 
 #include "Mustard/Data/GeneratedEvent.h++"
 #include "Mustard/Data/Output.h++"
@@ -53,7 +53,7 @@ GenBkgM2ENNE::GenBkgM2ENNE() :
     Subprogram{"GenBkgM2ENNE", "Generate muonium decay with hard photon exchange (M -> e+ nu nu e-)."} {}
 
 auto GenBkgM2ENNE::Main(int argc, char* argv[]) const -> int {
-    MCMCGeneratorCLI<InitialStateCLIModule<"unpolarized", "muonium">> cli;
+    Generator::MCMCGeneratorCLI<Generator::InitialStateCLIModule<"unpolarized", "muonium">> cli;
     cli.DefaultOutput("m2enne_bkg.root");
     cli.DefaultOutputTree("m2enne");
     auto& biasCLI{cli->add_mutually_exclusive_group()};
@@ -115,7 +115,7 @@ auto GenBkgM2ENNE::Main(int argc, char* argv[]) const -> int {
     Mustard::ProcessSpecificFile<TFile> file{cli->get("--output"), cli->get("--output-mode")};
     auto& rng{*CLHEP::HepRandom::getTheEngine()};
     const auto autocorrelationFunction{generator.MCMCInitialize(rng)};
-    WriteAutocorrelationFunction(autocorrelationFunction);
+    Generator::WriteAutocorrelationFunction(autocorrelationFunction);
 
     // Generate events
     if (*nEvent == 0) {
