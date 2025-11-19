@@ -42,6 +42,8 @@
 #include "muc/numeric"
 #include "muc/utility"
 
+#include <string>
+
 namespace MACE::GenBkgM2ENNE {
 
 using namespace Mustard::LiteralUnit::Energy;
