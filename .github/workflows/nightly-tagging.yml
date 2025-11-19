@@ -161,6 +161,7 @@ jobs:
             fi
 
             # Combine pending checks
+            ALL_PENDING=""
             if [ -n "${PENDING_STATUSES}" ]; then
               ALL_PENDING="${PENDING_STATUSES}"
             fi
