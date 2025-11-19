@@ -1,9 +1,8 @@
 // Usage:
 // 1. Replace <data_tuple_name> with the name of datatuple (e.g. SimDecayVertex).
 // 2. Go to the "==USER DEFINE==" section and modify the dataframe definitions.
-// 3. Remove the ".template" tag of this file.
+// 3. Remove the ".template" file name suffix and assign it a proper file name.
 // 4. Delete this guide text and the section guides, and format the code properly.
-
 
 #include "ROOT/RDataFrame.hxx"
 #include "TCanvas.h"

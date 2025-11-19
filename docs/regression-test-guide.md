@@ -1,8 +1,8 @@
 # MACESW Regression Test Guide
 
-This guide describe how to do regresssion test locally and how to add regression test model in CI step-by-step.
+This guide describes how to do regresssion test locally and how to add regression test model in CI step-by-step.
 
-If you only need a quick start with the regression-test workflow, check **until** the section [Add Regression Test Units in CI](#add-regression-test-units-in-ci) of this guide for the necessary steps and notice.
+If you only need a quick start of using regression-test workflow, check **until** the section [Add Regression Test Units in CI](#add-regression-test-units-in-ci) of this guide for the necessary steps and notice.
 
 ## Table of Contents
 - [MACESW Regression Test Guide](#macesw-regression-test-guide)
@@ -23,7 +23,7 @@ If you only need a quick start with the regression-test workflow, check **until*
 The MACESW program has different simulation/generation/reconstruction units, each of which produce data based on the data model of MACESW.   
 In this guide
 - Each subprogram (or unit) of MACESW (e.g. SimMACE, ReconECAL, GenM2ENNE...) are denoted by the term "model".
-- Each TTree of data (with multiple coloumns of data) in the output `*.root` files (e.g. SimCDCHit, SimDecayVertex, SimMMSTrack...) are called "datatuple".
+- Each TTree of data (with multiple columns of data) in the output `*.root` files (e.g. SimCDCHit, SimDecayVertex, SimMMSTrack...) are called "datatuple".
 
 ## Do Regression Test Locally
 If no new datatuple or module are to be test in your update: 
@@ -33,15 +33,17 @@ If no new datatuple or module are to be test in your update:
 - For more information about regression test, check the file `regression_report.root` in the working directory of regression test. 
 
 If you need to test a new datatuple or a new model, refer to the section [Add Regression Test Units in CI](#add-regression-test-units-in-ci) below.
+
 ## Add Regression Test Units in CI
+
 ### Test a new datatuple
 - First of all, determine:
   - Which models will generate this new data tuple and which of them need to be tested.
-  - Which coloumns in this new datatuple you want to test for those models as described above.(e.g. "d","Edep","unitID"...)
-- Based on the data distribution characteristics of these coloumns, set an appropriate range for regression. Generally there are 3 typical range settings:
+  - Which columns in this new datatuple you want to test for those models as describesd above.(e.g. "d","Edep","unitID"...)
+- Based on the data distribution characteristics of these columns, set an appropriate range for regression. Generally there are 3 typical range settings:
     - $[min(x), max(x)]$ if the distribution is a broad spectrum.
     - $[\bar{x}-a\sigma_x, \bar{x}+a\sigma_x]$ if the distribution is a characteristic peak.
-    - A fixed interger set if the data is limited interger.(e.g. unitID)
+    - A fixed integer set if the data is limited integer.(e.g. unitID)
 - Write a `Read<datatuple_name>.cxx` macro file for generating golden data and a `Test<datatuple_name>.cxx` macro file for testing in directory `src/test/scripts/`, based on the provided template file `ReadSomeDataTuple.cxx.template` and `TestSomeDataTuple.cxx.template` (*copy the template file and modify according to the guide text in it*).
 
 ### Test a new model
@@ -53,10 +55,11 @@ If you need to test a new datatuple or a new model, refer to the section [Add Re
 
 >**Below are the detailed mechanism of regression test of MACESW, provided for those who have ideas about optimizing this workflow.**
 
+
 ## Regression Test Mechanism of MACESW
 <img src="picture/Regression_test_mechanism.svg" alt="Intuitive flowchart showing the MACESW regression test workflow.">
 
-This section explains how MACESW generates "golden" regression data (the left brach shown in the image above) and how it verifies new outputs against those golden data (the right brach shown in the image above). The repository provides two main driver scripts under `src/test/scripts`: `generate_regression_data.bash` (create/update the golden data) and `regression_test.bash` (run a test and compare current outputs to the golden data). The comparison itself is implemented in a set of ROOT macros (`Read*.cxx` to produce golden histograms and `Test*.cxx` to run comparisons and write a report).
+This section explains how MACESW generates "golden" regression data (the left branch shown in the image above) and how it verifies new outputs against those golden data (the right branch shown in the image above). The repository provides two main driver scripts under `src/test/scripts`: `generate_regression_data.bash` (create/update the golden data) and `regression_test.bash` (run a test and compare current outputs to the golden data). The comparison itself is implemented in a set of ROOT macros (`Read*.cxx` to produce golden histograms and `Test*.cxx` to run comparisons and write a report).
 
 ### High-level workflow
 - Data generation (create golden / sample data)  
@@ -66,7 +69,7 @@ This section explains how MACESW generates "golden" regression data (the left br
      - `SimMMS_em_flat_sample.root`
      - `SimTTC_em_flat_sample.root`
      - `SimMACE_signal_sample.root`
-  3. Run the `Read*.cxx` ROOT macros (e.g., ReadCDCSimHit.cxx, `ReadMMSSimTrack.cxx`, `ReaDataTupleTCSimHit.cxx`) to produce histogram summaries from the sample ROOT files. These macros create and append histograms into `macesw_regression_data.root` (the golden data file), placed in the scripts directory. Each macro writes under a TDirectory named after the Module (e.g., `SimMACE_signal/`) and a subdirectory matching the data tuple (e.g.`CDCSimHit/`), which contains the histograms of selected coloumn of data to be tested(e.g. `Edep`,`d`...).
+  3. Run the `Read*.cxx` ROOT macros (e.g., ReadCDCSimHit.cxx, `ReadMMSSimTrack.cxx`, `ReadTTCSimHit.cxx`) to produce histogram summaries from the sample ROOT files. These macros create and append histograms into `macesw_regression_data.root` (the golden data file), placed in the scripts directory. Each macro writes under a TDirectory named after the Module (e.g., `SimMACE_signal/`) and a subdirectory matching the data tuple (e.g.`CDCSimHit/`), which contains the histograms of selected coloumn of data to be tested(e.g. `Edep`,`d`...).
    
 - Regression testing (compare current output to golden)  
   driver script: `regression_test.bash`
@@ -80,6 +83,7 @@ This section explains how MACESW generates "golden" regression data (the left br
      - Perform a statistical comparison using TH1::Chi2Test with the `"P"` option to obtain a p-value.
      - Based on the p-value, evaluate the homogeneity between the tested data and golden data and print per-histogram verdicts to stdout(<font color=green>**PASS**</font>, <font color=orange>**SUSPICIOUS**</font>, <font color=red>**FAIL**</font>, <font color=blue>**IDENTICAL**</font>).
      - Save visual comparisons and a pull histogram into `regression_report.root` (canvases overlaying sample vs test and the pull distribution). 
+
 ### Data and histogram conventions
 - Histogram storage location:
   - Golden histograms are stored in `macesw_regression_data.root` under `/<ModuleName>/<DataTupleName>/` (each histogram named by the column/expression).
@@ -100,7 +104,6 @@ This section explains how MACESW generates "golden" regression data (the left br
   - The scripts create a timestamped working directory for logs and results (e.g., `test_YYYYMMDD-HHMMSS`).
 
 ## Notice About Details
-
 Important operational details and assumptions you must follow so the test scripts run reliably and produce meaningful comparisons.
 
 - Required tools and environment
@@ -130,7 +133,7 @@ Important operational details and assumptions you must follow so the test script
   - The range of each histogram is specified by the distributional characteristics of the data. Generally, for a tested data coloumn $x$ (named "X" for example), there are 3 main range settings:
     - $[min(x), max(x)]$ if the distribution is a broad spectrum.
     - $[\bar{x}-a\sigma_x, \bar{x}+a\sigma_x]$ if the distribution is a characteristic peak.
-    - A fixed interger set if the data is limited interger.(e.g. unitID)
+    - A fixed integer set if the data is limited integer.(e.g. unitID)
   - The `Test*` macros normalize sample and test histograms to unit integral before computing pulls. If a histogram has zero integral, the test macro prints a warning and skips scaling for that histogram to avoid division-by-zero.
 
 - Practical pre-check list before running scripts
@@ -141,10 +144,9 @@ Important operational details and assumptions you must follow so the test script
   - If regenerating golden data, back up existing `macesw_regression_data.root` or follow the script’s `old-regression-data/` move behavior.
   - Do not re-run a `Read*` macro for the same `<Module>/<DataTuple>` inside the same `macesw_regression_data.root` unless you first remove or archive the old entry.
 
-
 ## Edge cases and notes
 - Zero-integral histograms: the test macros handle zero-integral histograms by printing a warning and skipping scaling to avoid division-by-zero errors.
 - Missing golden file: regression_test.bash requires `macesw_regression_data.root` to exist in the script directory; if missing, tests that rely on it will fail when attempting to open the sample directory.
 - Binning/range mismatch: because ranges are computed when creating the golden sample, always regenerate golden data if upstream data schemas or distributions change (e.g., new columns or different units).
-- Determinism: regression_test.bash sets a fixed seed (`--seed 0`) when launching simulations to reduce run-to-run statistical variance; however, some runs may still exhibit statistical fluctuations — watch for `SUSPICIOUS` flags.
+- Determinism: regression_test.bash sets a seed (`--seed 0`, a non-deterministic random seed which differs run-by-run) when launching simulations to reduce run-to-run statistical variance; however, some runs may still exhibit statistical fluctuations — watch for `SUSPICIOUS` flags.
 - Parallel runs: the driver scripts use `mpiexec` and merge outputs with `hadd` — ensure the environment supports MPI and `hadd` (ROOT utility).
