@@ -23,7 +23,7 @@ if(NOT MACESW_BUILTIN_MACESW_TEST_DATA)
     find_package(macesw_test_data ${MACESW_MACESW_TEST_DATA_MINIMUM_REQUIRED})
     if(NOT macesw_test_data_FOUND)
         set(MACESW_BUILTIN_MACESW_TEST_DATA ON)
-        message(NOTICE "***Notice: macesw_test_data not found (minimum required is ${MACESW_MACESW_TEST_DATA_MINIMUM_REQUIRED}). For the time turning on MACESW_BUILTIN_MACESW_TEST_DATA")
+        message(NOTICE "***Notice: macesw_test_data not found (minimum required is ${MACESW_MACESW_TEST_DATA_MINIMUM_REQUIRED}). Temporarily turning on MACESW_BUILTIN_MACESW_TEST_DATA")
     endif()
 endif()
 

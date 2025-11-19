@@ -23,7 +23,7 @@ if(NOT MACESW_BUILTIN_MACESW_OFFLINE_DATA)
     find_package(macesw_offline_data ${MACESW_MACESW_OFFLINE_DATA_MINIMUM_REQUIRED})
     if(NOT macesw_offline_data_FOUND)
         set(MACESW_BUILTIN_MACESW_OFFLINE_DATA ON)
-        message(NOTICE "***Notice: macesw_offline_data not found (minimum required is ${MACESW_MACESW_OFFLINE_DATA_MINIMUM_REQUIRED}). For the time turning on MACESW_BUILTIN_MACESW_OFFLINE_DATA")
+        message(NOTICE "***Notice: macesw_offline_data not found (minimum required is ${MACESW_MACESW_OFFLINE_DATA_MINIMUM_REQUIRED}). Temporarily turning on MACESW_BUILTIN_MACESW_OFFLINE_DATA")
     endif()
 endif()
 
