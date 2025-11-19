@@ -236,7 +236,7 @@ jobs:
 
           BASE_VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
           COMMIT_SHA_SHORT=$(git rev-parse --short=7 rc)
-          TODAY_TAG="v${BASE_VERSION}-nightly.$(date +'%Y%m%d')+${COMMIT_SHA_SHORT}"
+          TODAY_TAG="v${BASE_VERSION}-nightly~$(date +'%Y%m%d')+git${COMMIT_SHA_SHORT}"
           echo "today_tag=${TODAY_TAG}" >> $GITHUB_OUTPUT
           echo "Today's tag would be: ${TODAY_TAG}"
 
@@ -250,8 +250,8 @@ jobs:
             exit 0
           fi
 
-          # Get the latest nightly tag (any tag matching 'v*-nightly.*')
-          LATEST_NIGHTLY_TAG=$(git tag -l 'v*-nightly.*' --sort=-version:refname | head -n 1)
+          # Get the latest nightly tag (any tag matching 'v*~nightly*')
+          LATEST_NIGHTLY_TAG=$(git tag -l 'v*~nightly*' --sort=-version:refname | head -n 1)
 
           if [ -z "${LATEST_NIGHTLY_TAG}" ]; then
             echo "No previous nightly tag found."
