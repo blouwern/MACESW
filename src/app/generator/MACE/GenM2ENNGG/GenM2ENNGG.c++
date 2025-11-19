@@ -59,6 +59,7 @@ auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
     cli.DefaultOutput("m2enngg.root");
     cli.DefaultOutputTree("m2enngg");
     cli->add_argument("--ir-cut").help("IR cut for final-state photons.").default_value(electron_mass_c2).required().nargs(1).scan<'g', double>();
+    cli->add_argument("-d", "--mcmc-step-size").help("Step size in MCMC sampling.").nargs(1).scan<'g', double>();
     auto& biasCLI{cli->add_mutually_exclusive_group()};
     biasCLI.add_argument("--emiss-bias").help("Apply soft upper bound for missing energy.").flag();
     cli->add_argument("--emiss-soft-upper-bound").help("Soft upper bound for missing energy in --emiss-bias.").default_value(0_MeV).required().nargs(1).scan<'g', double>();
@@ -67,7 +68,8 @@ auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
     Mustard::UseXoshiro<256> random{cli};
 
     Mustard::M2ENNGGGenerator generator("mu+", cli.Momentum(), cli.Polarization(), cli->get<double>("--ir-cut"),
-                                        cli->present<double>("--thinning-ratio"), cli->present<unsigned>("--acf-sample-size"));
+                                        cli->present<double>("--thinning-ratio"), cli->present<unsigned>("--acf-sample-size"),
+                                        cli->present<double>("--mcmc-step-size"));
 
     if (cli["--emiss-bias"] == true) {
         generator.Acceptance([eMissCut = cli->get<double>("--emiss-soft-upper-bound"),

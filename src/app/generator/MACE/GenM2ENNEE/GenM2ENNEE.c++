@@ -61,6 +61,7 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     Generator::MCMCGeneratorCLI<Generator::InitialStateCLIModule<"polarized", "muon">> cli;
     cli.DefaultOutput("m2ennee.root");
     cli.DefaultOutputTree("m2ennee");
+    cli->add_argument("-d", "--mcmc-step-size").help("Step size in MCMC sampling.").nargs(1).scan<'g', double>();
     auto& biasCLI{cli->add_mutually_exclusive_group()};
     biasCLI.add_argument("--mace-bias").help("Enable MACE detector signal region importance sampling.").flag();
     biasCLI.add_argument("--ep-ek-bias").help("Apply soft upper bound for positron kinetic energy.").flag();
@@ -75,7 +76,8 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     Mustard::UseXoshiro<256> random{cli};
 
     Mustard::M2ENNEEGenerator generator("mu+", cli.Momentum(), cli.Polarization(),
-                                        cli->present<double>("--thinning-ratio"), cli->present<unsigned>("--acf-sample-size"));
+                                        cli->present<double>("--thinning-ratio"), cli->present<unsigned>("--acf-sample-size"),
+                                        cli->present<double>("--mcmc-step-size"));
 
     if (cli["--mace-bias"] == true) {
         const auto& cdc{Detector::Description::CDC::Instance()};
