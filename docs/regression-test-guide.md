@@ -2,7 +2,7 @@
 
 This guide describes how to do regression test locally and how to add regression test model in CI step-by-step.
 
-If you only need a quick start of using regression-test workflow, check **until** the section [Add Regression Test Units in CI](#add-regression-test-units-in-ci) of this guide for the necessary steps and notice.
+Read only **until** the section [Add Regression Test Units in CI](#add-regression-test-units-in-ci) to use the regression test workflow. Continue reading if you want to understand or improve its mechanics.
 
 ## Table of Contents
 - [MACESW Regression Test Guide](#macesw-regression-test-guide)
@@ -69,7 +69,7 @@ This section explains how MACESW generates "golden" regression data (the left br
      - `SimMMS_em_flat_sample.root`
      - `SimTTC_em_flat_sample.root`
      - `SimMACE_signal_sample.root`
-  3. Run the `Read*.cxx` ROOT macros (e.g., ReadCDCSimHit.cxx, `ReadMMSSimTrack.cxx`, `ReadTTCSimHit.cxx`) to produce histogram summaries from the sample ROOT files. These macros create and append histograms into `macesw_regression_data.root` (the golden data file), placed in the scripts directory. Each macro writes under a TDirectory named after the Module (e.g., `SimMACE_signal/`) and a subdirectory matching the data tuple (e.g.`CDCSimHit/`), which contains the histograms of selected coloumn of data to be tested(e.g. `Edep`,`d`...).
+  3. Run the `Read*.cxx` ROOT macros (e.g., ReadCDCSimHit.cxx, `ReadMMSSimTrack.cxx`, `ReadTTCSimHit.cxx`) to produce histogram summaries from the sample ROOT files. These macros create and append histograms into `macesw_regression_data.root` (the golden data file), placed in the scripts directory. Each macro writes under a TDirectory named after the Module (e.g., `SimMACE_signal/`) and a subdirectory matching the data tuple (e.g.`CDCSimHit/`), which contains the histograms of selected column of data to be tested(e.g. `Edep`,`d`...).
    
 - Regression testing (compare current output to golden)  
   driver script: `regression_test.bash`
@@ -130,7 +130,7 @@ Important operational details and assumptions you must follow so the test script
   - Histogram ranges are computed from the sample and the code adds a small margin. Because bin counts and edges are fixed at golden-creation time, the `Test*` macros reconstruct test histograms with the identical number of bins and exact min/max edges read from the golden histograms. Therefore:
     - If you change the histogram expressions, column names, bin count or range logic, the golden dataset (`macesw_regression_data.root`) must be regenerated.
     - Avoid manually change bin edges in the golden file as possible.
-  - The range of each histogram is specified by the distributional characteristics of the data. Generally, for a tested data coloumn $x$ (named "X" for example), there are 3 main range settings:
+  - The range of each histogram is specified by the distributional characteristics of the data. Generally, for a tested data column $x$ (named "X" for example), there are 3 main range settings:
     - $[min(x), max(x)]$ if the distribution is a broad spectrum.
     - $[\bar{x}-a\sigma_x, \bar{x}+a\sigma_x]$ if the distribution is a characteristic peak.
     - A fixed integer set if the data is limited integer.(e.g. unitID)
