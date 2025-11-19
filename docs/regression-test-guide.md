@@ -1,6 +1,6 @@
 # MACESW Regression Test Guide
 
-This guide describes how to do regresssion test locally and how to add regression test model in CI step-by-step.
+This guide describes how to do regression test locally and how to add regression test model in CI step-by-step.
 
 If you only need a quick start of using regression-test workflow, check **until** the section [Add Regression Test Units in CI](#add-regression-test-units-in-ci) of this guide for the necessary steps and notice.
 
