@@ -56,7 +56,7 @@ auto GenBkgM2ENNE::Main(int argc, char* argv[]) const -> int {
     Generator::MCMCGeneratorCLI<Generator::InitialStateCLIModule<"unpolarized", "muonium">> cli;
     cli.DefaultOutput("m2enne_bkg.root");
     cli.DefaultOutputTree("m2enne");
-    cli->add_argument("-d", "--mcmc-step-size").help("Step size in MCMC sampling.").nargs(1).scan<'g', double>();
+    cli.AddMCMCStepSizeOption();
     auto& biasCLI{cli->add_mutually_exclusive_group()};
     biasCLI.add_argument("--mace-bias").help("Enable MACE detector signal region importance sampling.").flag();
     biasCLI.add_argument("--ep-ek-bias").help("Apply soft upper bound for positron kinetic energy.").flag();

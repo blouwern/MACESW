@@ -28,6 +28,8 @@ namespace MACE::Generator {
 class MCMCGeneratorCLIModule : public Mustard::CLI::ModuleBase {
 public:
     explicit MCMCGeneratorCLIModule(gsl::not_null<Mustard::CLI::CLI<>*> cli);
+
+    auto AddMCMCStepSizeOption() -> void;
 };
 
 template<std::derived_from<Mustard::CLI::ModuleBase>... AExtraModules>

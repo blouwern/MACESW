@@ -38,4 +38,12 @@ MCMCGeneratorCLIModule::MCMCGeneratorCLIModule(gsl::not_null<Mustard::CLI::CLI<>
         .scan<'i', unsigned>();
 }
 
+auto MCMCGeneratorCLIModule::AddMCMCStepSizeOption() -> void {
+    TheCLI()
+        ->add_argument("-d", "--mcmc-step-size")
+        .help("Step size in MCMC sampling.")
+        .nargs(1)
+        .scan<'g', double>();
+}
+
 } // namespace MACE::Generator
