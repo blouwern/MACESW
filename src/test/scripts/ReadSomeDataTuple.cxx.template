@@ -57,7 +57,7 @@ auto Read<data_tuple_name>(auto moduleName, auto srcFileName, auto dstFileName) 
                 .Define("p0_1", "p0[1]")
                 .Define("p0_2", "p0[2]")};
 
-// Specify histogram parameters: expression(coloumn name), xLow, xUp
+// Specify histogram parameters: expression(column name), xLow, xUp
 // The type of xLow and xUp can be double(e.g. 0.0), RResultPtr<double>(e.g. df.Max("x_0")) or a function returning double(e.g. the lambda in the 4th row below)
     std::vector<std::tuple<std::string, std::any, std::any>> histParameterList{
         {"TrkID", 0.,                                                                                   10.                                                                                 },

@@ -15,7 +15,7 @@
 #include <iostream>
 #include <string>
 
-const std::string dataTupleName{"MRPCSimHit"};
+const std::string dataTupleName{"<data_tuple_name>"};
 
 const void Judge(double pValue) {
     const std::string boldInvert{"\x1B[1m\x1B[7m"};
@@ -36,7 +36,7 @@ const void Judge(double pValue) {
     }
 }
 
-auto TestMRPCSimHit(std::string moduleName, std::string testFileName, std::string sampleFileName) {
+auto Test<data_tuple_name>(std::string moduleName, std::string testFileName, std::string sampleFileName) {
     gROOT->SetBatch(kTRUE);
 
     auto SaveRegressionResult{
@@ -75,7 +75,7 @@ auto TestMRPCSimHit(std::string moduleName, std::string testFileName, std::strin
                 pull->SetBinError(i, 1);
             }
             // draw
-            auto canvasName{moduleName + "_MRPCSimHit_" + histName};
+            auto canvasName{moduleName + "_" + dataTupleName + "_" + histName};
             auto pad1Name{"hist"};
             auto pad2Name{"pull"};
             TCanvas* c1 = new TCanvas(canvasName.data(), canvasName.data(), 800, 600);
@@ -127,7 +127,7 @@ auto TestMRPCSimHit(std::string moduleName, std::string testFileName, std::strin
 // =========================================================================
 
 // Define each component of the array-type columns as needed
-// The defined coloumns are one-to-one correspondence with those in the "Read<data_tuple_name>.cxx" of the same datatuple
+// The defined columns are one-to-one correspondence with those in the "Read<data_tuple_name>.cxx" of the same datatuple
     auto df{df0.Define("x_0", "x[0]")
                 .Define("x_1", "x[1]")
                 .Define("x_2", "x[2]")
