@@ -21,11 +21,10 @@
 #include "MACE/Detector/Description/MMSField.h++"
 #include "MACE/Detector/Description/TTC.h++"
 #include "MACE/GenM2ENNEE/GenM2ENNEE.h++"
-#include "MACE/Utility/InitialStateCLIModule.h++"
-#include "MACE/Utility/MCMCGeneratorCLI.h++"
-#include "MACE/Utility/WriteAutocorrelationFunction.h++"
+#include "MACE/Generator/InitialStateCLIModule.h++"
+#include "MACE/Generator/MCMCGeneratorCLI.h++"
+#include "MACE/Generator/WriteAutocorrelationFunction.h++"
 
-#include "Mustard/CLHEPX/Random/Xoshiro.h++"
 #include "Mustard/Data/GeneratedEvent.h++"
 #include "Mustard/Data/Output.h++"
 #include "Mustard/Env/MPIEnv.h++"
@@ -43,9 +42,7 @@
 #include "muc/numeric"
 #include "muc/utility"
 
-#include <cmath>
 #include <string>
-#include <type_traits>
 
 namespace MACE::GenM2ENNEE {
 
@@ -58,9 +55,10 @@ GenM2ENNEE::GenM2ENNEE() :
     Subprogram{"GenM2ENNEE", "Generate internal conversion muon decay (mu+ -> e+ nu nu e- e+)."} {}
 
 auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
-    MCMCGeneratorCLI<InitialStateCLIModule<"polarized", "muon">> cli;
+    Generator::MCMCGeneratorCLI<Generator::InitialStateCLIModule<"polarized", "muon">> cli;
     cli.DefaultOutput("m2ennee.root");
     cli.DefaultOutputTree("m2ennee");
+    cli.AddMCMCStepSizeOption();
     auto& biasCLI{cli->add_mutually_exclusive_group()};
     biasCLI.add_argument("--mace-bias").help("Enable MACE detector signal region importance sampling.").flag();
     biasCLI.add_argument("--ep-ek-bias").help("Apply soft upper bound for positron kinetic energy.").flag();
@@ -75,7 +73,8 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     Mustard::UseXoshiro<256> random{cli};
 
     Mustard::M2ENNEEGenerator generator("mu+", cli.Momentum(), cli.Polarization(),
-                                        cli->present<double>("--thinning-ratio"), cli->present<unsigned>("--acf-sample-size"));
+                                        cli->present<double>("--thinning-ratio"), cli->present<unsigned>("--acf-sample-size"),
+                                        cli->present<double>("--mcmc-step-size"));
 
     if (cli["--mace-bias"] == true) {
         const auto& cdc{Detector::Description::CDC::Instance()};
@@ -134,7 +133,7 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     Mustard::ProcessSpecificFile<TFile> file{cli->get("--output"), cli->get("--output-mode")};
     auto& rng{*CLHEP::HepRandom::getTheEngine()};
     const auto autocorrelationFunction{generator.MCMCInitialize(rng)};
-    WriteAutocorrelationFunction(autocorrelationFunction);
+    Generator::WriteAutocorrelationFunction(autocorrelationFunction);
 
     // Generate events
     if (*nEvent == 0) {

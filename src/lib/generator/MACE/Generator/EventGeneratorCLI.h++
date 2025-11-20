@@ -25,7 +25,7 @@
 #include <optional>
 #include <string>
 
-namespace MACE::inline Utility {
+namespace MACE::Generator {
 
 class EventGeneratorCLIModule : public Mustard::CLI::ModuleBase {
 public:
@@ -41,4 +41,4 @@ template<std::derived_from<Mustard::CLI::ModuleBase>... AExtraModules>
 using EventGeneratorCLI = Mustard::CLI::MonteCarloCLI<EventGeneratorCLIModule,
                                                       AExtraModules...>;
 
-} // namespace MACE::inline Utility
+} // namespace MACE::Generator
