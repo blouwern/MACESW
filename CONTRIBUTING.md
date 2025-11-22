@@ -1,9 +1,9 @@
 # 参与 MACESW 开发 / Contributing to MACESW
 
-感谢您对 MACE 离线软件 (MACESW) 的开发感兴趣——您的帮助将使该项目更进一步，并将为前沿科学研究做出贡献。  
-Thank you for your interest in contributing to MACE offline software (MACESW) — your help makes this project better and contributes to exploring cutting-edge science for everyone.
+感谢您对 MACE 离线软件 (MACESW) 的开发感兴趣。您的帮助将使该项目更进一步，并将为前沿科学研究做出贡献。  
+Thank you for your interest in contributing to MACE offline software (MACESW). Your help makes this project better and contributes to exploring cutting-edge science for everyone.
 
-本文档说明了如何报告问题、提出更改以及准备贡献，以便能够快速审查和合并。  
+本文档说明了如何报告问题、提出更改以及准备贡献，以便它们能够被快速审查和合并。  
 This document explains how to report issues, propose changes, and prepare contributions so they can be reviewed and merged quickly.
 
 - [参与 MACESW 开发 / Contributing to MACESW](#参与-macesw-开发--contributing-to-macesw)

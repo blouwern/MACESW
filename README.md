@@ -21,8 +21,8 @@
 -->
 <img src="docs/picture/MACE_logo_v2.svg" alt="MACE logo" align="right" width=300/>
 
-**正反缪子素转化实验（MACE）** 是下一代粒子物理实验，旨在探索缪子素（$\mathrm{M}$，即$\mu^+$与$e^-$的束缚态）向反缪子素（$\overline{\mathrm{M}}$，即$\mu^-$与$e^+$的束缚态）的自发转化过程——这是一种带电轻子味破坏（cLFV）过程。观测到这种稀有转化现象将为超越标准模型的新物理提供明确证据，对理解中微子质量起源、正反物质不对称性等基本物理现象具有重要意义。  
-The **Muonium-to-Antimuonium Conversion Experiment (MACE)** is a next-generation particle physics experiment designed to search for the spontaneous conversion of muonium ($\mathrm{M}$, a bound state of $\mu^+$ and $e^-$) to antimuonium ($\overline{\mathrm{M}}$, a bound state of $\mu^-$ and $e^+$)—a charged lepton flavor violation (cLFV) process. Observing this rare conversion would provide clear evidence of new physics beyond the Standard Model, with implications for understanding neutrino masses, matter-antimatter asymmetry, and other fundamental phenomena.
+**正反缪子素转化实验（MACE）** 是下一代粒子物理实验，旨在探索缪子素（ $\mathrm{M}$ ，即 $\mu^+$ 与 $e^-$ 的束缚态）向反缪子素（ $\overline{\mathrm{M}}$ ，即 $\mu^-$ 与 $e^+$ 的束缚态）的自发转化过程——这是一种带电轻子味破坏（cLFV）过程。观测到这种稀有转化现象将为超越标准模型的新物理提供明确证据，对理解中微子质量起源、正反物质不对称性等基本物理现象具有重要意义。  
+The **Muonium-to-Antimuonium Conversion Experiment (MACE)** is a next-generation particle physics experiment designed to search for the spontaneous conversion of muonium ($\mathrm{M}$, a bound state of $\mu^+$ and $e^-$) to antimuonium ($\overline{\mathrm{M}}$, a bound state of $\mu^-$ and $e^+$) — a charged lepton flavor violation (cLFV) process. Observing this rare conversion would provide clear evidence of new physics beyond the Standard Model, with implications for understanding neutrino masses, matter-antimatter asymmetry, and other fundamental phenomena.
 
 **MACE离线软件系统（MACESW）** 为实验提供从模拟、重建到数据分析的全周期、全方位支持，助力开展正反缪子素转化、缪子稀有过程及其他相关物理的高精度研究。  
 The **MACE offline software (MACESW)** provides comprehensive support for the experiment's full lifecycle—from simulation and reconstruction to data analysis—enabling high-precision studies of muonium-to-antimuonium conversion, rare muon processes, and other relevant physics.
