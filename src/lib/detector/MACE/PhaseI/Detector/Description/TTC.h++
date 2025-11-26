@@ -207,7 +207,8 @@ private:
     Simple<std::vector<double>> fAirPaintReflectivity;
     Simple<std::vector<double>> fCathodeSurface;
 
-    //Option
+    // Option
+
     Simple<bool> fUseOptics;
 };
 
