@@ -219,7 +219,7 @@ auto TTC::Construct(G4bool checkOverlaps) -> void {
         false,
         checkOverlaps);
 
-    // Optical Process
+    // optical properties
     if (ttc.UseOptics()) {
         // Construct Material Optical Properties Tables
         const auto [minPhotonEnergy, maxPhotonEnergy]{std::ranges::minmax(ttc.ScintillationComponent1EnergyBin())};
