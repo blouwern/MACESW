@@ -1,3 +1,22 @@
+// -*- C++ -*-
+//
+// Copyright (C) 2020-2025  MACESW developers
+//
+// This file is part of MACESW, Muonium-to-Antimuonium Conversion Experiment
+// offline software.
+//
+// MACESW is free software: you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
+//
+// MACESW is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// MACESW. If not, see <https://www.gnu.org/licenses/>.
+
 #include "MACE/PhaseI/Simulation/SD/SciFiSD.h++"
 
 #include "Mustard/Utility/LiteralUnit.h++"
@@ -33,6 +52,7 @@ using namespace Mustard::LiteralUnit;
 
 SciFiSD::SciFiSD(const G4String& sdName) :
     G4VSensitiveDetector{sdName},
+    fSciFiSiPMSD{},
     fSplitHit{},
     fHitsCollection{} {
     collectionName.insert(sdName + "HC");
@@ -73,9 +93,10 @@ auto SciFiSD::ProcessHits(G4Step* theStep, G4TouchableHistory*) -> G4bool {
     const auto vertexMomentum{track.GetVertexMomentumDirection() * std::sqrt(vertexEk * (vertexEk + 2 * particle.GetPDGMass()))};
 
     // new a hit
-    const auto& hit{fSplitHit[fiberID].emplace_back(std::make_unique_for_overwrite<SciFiHit>())};
+    const auto& hit{fSplitHit[fiberID].emplace_back(std::make_unique_for_overwrite<SciFiSimHit>())};
     Get<"EvtID">(*hit) = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
-    Get<"HitID">(*hit) = -1; // to be determined
+    Get<"HitID">(*hit) = -1;   // to be determined
+    Get<"nOptPho">(*hit) = -1; // to be determined
     Get<"TrkID">(*hit) = track.GetTrackID();
     Get<"FiberID">(*hit) = fiberID;
     Get<"x">(*hit) = x;
@@ -95,12 +116,12 @@ auto SciFiSD::ProcessHits(G4Step* theStep, G4TouchableHistory*) -> G4bool {
 auto SciFiSD::EndOfEvent(G4HCofThisEvent*) -> void {
     fHitsCollection->GetVector()->reserve(
         muc::ranges::accumulate(fSplitHit, 0,
-                                [](auto&& count, auto&& cellHit) {
-                                    return count + cellHit.second.size();
+                                [](auto&& count, auto&& sciFiHit) {
+                                    return count + sciFiHit.second.size();
                                 }));
     constexpr auto byTrackID{
         [](const auto& hit1, const auto& hit2) {
-            return Get<"EvtID">(*hit1) < Get<"EvtID">(*hit2);
+            return Get<"TrkID">(*hit1) < Get<"TrkID">(*hit2);
         }};
     for (int hitID{};
          auto&& [trackID, splitHit] : fSplitHit) {
@@ -150,6 +171,13 @@ auto SciFiSD::EndOfEvent(G4HCofThisEvent*) -> void {
         }
     }
     fSplitHit.clear();
+
+    if (fSciFiSiPMSD) {
+        auto nHit{fSciFiSiPMSD->NOpticalPhotonHit()};
+        for (auto&& hit : std::as_const(*fHitsCollection->GetVector())) {
+            Get<"nOptPho">(*hit) = nHit[*Get<"FiberID">(*hit)];
+        }
+    }
 }
 
 } // namespace MACE::PhaseI::inline Simulation::inline SD

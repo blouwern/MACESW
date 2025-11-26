@@ -1,3 +1,20 @@
+# Copyright (C) 2020-2025  MACESW developers
+#
+# This file is part of MACESW, Muonium-to-Antimuonium Conversion Experiment
+# offline software.
+#
+# MACESW is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# MACESW is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# MACESW. If not, see <https://www.gnu.org/licenses/>.
+
 message(STATUS "Looking for GenFit")
 
 set(MACESW_GENFIT_MINIMUM_REQUIRED 2.2.0)
@@ -6,7 +23,7 @@ if(NOT MACESW_BUILTIN_GENFIT)
     find_package(genfit ${MACESW_GENFIT_MINIMUM_REQUIRED})
     if(NOT genfit_FOUND)
         set(MACESW_BUILTIN_GENFIT ON)
-        message(NOTICE "***Notice: GenFit not found (minimum required is ${MACESW_GENFIT_MINIMUM_REQUIRED}). For the time turning on MACESW_BUILTIN_GENFIT")
+        message(NOTICE "***Notice: GenFit not found (minimum required is ${MACESW_GENFIT_MINIMUM_REQUIRED}). Temporarily turning on MACESW_BUILTIN_GENFIT")
     endif()
 endif()
 

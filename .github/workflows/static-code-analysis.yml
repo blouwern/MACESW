@@ -2,7 +2,22 @@ name: Static code analysis
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - main
+      - rc
+    paths:
+      - ".github/workflows/static-code-analysis.yml"
+      - "src/**"
+      - "MACE.c\\+\\+"
+      - "**/CMakeLists.txt"
+      - "**.cmake"
+      - ".clang-format"
+      - ".clang-tidy"
+
+  pull_request:
+    branches:
+      - main
+      - rc
     paths:
       - ".github/workflows/static-code-analysis.yml"
       - "src/**"
@@ -18,7 +33,7 @@ permissions:
 jobs:
   clang-format-tidy:
     name: Clang, ClangFormat, ClangTidy
-    timeout-minutes: 60
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     strategy:
       matrix:
