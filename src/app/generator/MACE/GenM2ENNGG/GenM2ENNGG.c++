@@ -1,9 +1,27 @@
-#include "MACE/GenM2ENNGG/GenM2ENNGG.h++"
-#include "MACE/Utility/InitialStateCLIModule.h++"
-#include "MACE/Utility/MCMCGeneratorCLI.h++"
-#include "MACE/Utility/WriteAutocorrelationFunction.h++"
+// -*- C++ -*-
+//
+// Copyright (C) 2020-2025  MACESW developers
+//
+// This file is part of MACESW, Muonium-to-Antimuonium Conversion Experiment
+// offline software.
+//
+// MACESW is free software: you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
+//
+// MACESW is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-#include "Mustard/CLHEPX/Random/Xoshiro.h++"
+#include "MACE/GenM2ENNGG/GenM2ENNGG.h++"
+#include "MACE/Generator/InitialStateCLIModule.h++"
+#include "MACE/Generator/MCMCGeneratorCLI.h++"
+#include "MACE/Generator/WriteAutocorrelationFunction.h++"
+
 #include "Mustard/Data/GeneratedEvent.h++"
 #include "Mustard/Data/Output.h++"
 #include "Mustard/Env/MPIEnv.h++"
@@ -21,9 +39,7 @@
 #include "muc/numeric"
 #include "muc/utility"
 
-#include <cmath>
 #include <string>
-#include <type_traits>
 
 namespace MACE::GenM2ENNGG {
 
@@ -36,9 +52,10 @@ GenM2ENNGG::GenM2ENNGG() :
     Subprogram{"GenM2ENNGG", "Generate double radiative muon decay (mu+ -> e+ nu nu gamma gamma)."} {}
 
 auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
-    MCMCGeneratorCLI<InitialStateCLIModule<"polarized", "muon">> cli;
+    Generator::MCMCGeneratorCLI<Generator::InitialStateCLIModule<"polarized", "muon">> cli;
     cli.DefaultOutput("m2enngg.root");
     cli.DefaultOutputTree("m2enngg");
+    cli.AddMCMCStepSizeOption();
     cli->add_argument("--ir-cut").help("IR cut for final-state photons.").default_value(electron_mass_c2).required().nargs(1).scan<'g', double>();
     auto& biasCLI{cli->add_mutually_exclusive_group()};
     biasCLI.add_argument("--emiss-bias").help("Apply soft upper bound for missing energy.").flag();
@@ -48,7 +65,8 @@ auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
     Mustard::UseXoshiro<256> random{cli};
 
     Mustard::M2ENNGGGenerator generator("mu+", cli.Momentum(), cli.Polarization(), cli->get<double>("--ir-cut"),
-                                        cli->present<double>("--thinning-ratio"), cli->present<unsigned>("--acf-sample-size"));
+                                        cli->present<double>("--thinning-ratio"), cli->present<unsigned>("--acf-sample-size"),
+                                        cli->present<double>("--mcmc-step-size"));
 
     if (cli["--emiss-bias"] == true) {
         generator.Acceptance([eMissCut = cli->get<double>("--emiss-soft-upper-bound"),
@@ -81,7 +99,7 @@ auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
     Mustard::ProcessSpecificFile<TFile> file{cli->get("--output"), cli->get("--output-mode")};
     auto& rng{*CLHEP::HepRandom::getTheEngine()};
     const auto autocorrelationFunction{generator.MCMCInitialize(rng)};
-    WriteAutocorrelationFunction(autocorrelationFunction);
+    Generator::WriteAutocorrelationFunction(autocorrelationFunction);
 
     // Generate events
     if (*nEvent == 0) {

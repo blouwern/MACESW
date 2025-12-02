@@ -1,3 +1,20 @@
+# Copyright (C) 2020-2025  MACESW developers
+#
+# This file is part of MACESW, Muonium-to-Antimuonium Conversion Experiment
+# offline software.
+#
+# MACESW is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# MACESW is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# MACESW. If not, see <https://www.gnu.org/licenses/>.
+
 cmake_minimum_required(VERSION 3.21)
 
 # Enable MSVC_RUNTIME_LIBRARY target property
@@ -13,7 +30,12 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
     cmake_policy(SET CMP0135 NEW)
 endif()
 
-project(MACESW VERSION 0.0.0
+set(MACESW_VERSION_MAJOR 0)
+set(MACESW_VERSION_MINOR 0)
+set(MACESW_VERSION_PATCH 0)
+set(MACESW_VERSION ${MACESW_VERSION_MAJOR}.${MACESW_VERSION_MINOR}.${MACESW_VERSION_PATCH})
+
+project(MACESW VERSION ${MACESW_VERSION}
                LANGUAGES C CXX)
 
 # =============================================================================
@@ -62,7 +84,7 @@ option(MACESW_WITH_DEBUG_INFO "Always add debugging information" OFF)
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build using shared libraries")
 set(MACESW_BUILTIN_MACESW_OFFLINE_DATA_VERSION 0.25.103013 CACHE STRING "Set built-in offline data version (if required).")
 set(MACESW_BUILTIN_MACESW_TEST_DATA_VERSION 0.25.10301318 CACHE STRING "Set built-in test data version (if required).")
-set(MACESW_BUILTIN_MUSTARD_VERSION 0.25.1103 CACHE STRING "Set built-in Mustard version (if required).")
+set(MACESW_BUILTIN_MUSTARD_VERSION 0.25.1119 CACHE STRING "Set built-in Mustard version (if required).")
 set(MACESW_BUILTIN_PMP_VERSION 3.0.0 CACHE STRING "Set built-in pmp version (if required).")
 
 # =============================================================================

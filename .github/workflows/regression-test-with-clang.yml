@@ -1,8 +1,22 @@
 name: Regression test (AMD64 GNU/Linux Clang)
 
 on:
+  push:
+    branches:
+      - main
+      - rc
+    paths:
+      - ".github/workflows/regression-test-with-clang.yml"
+      - "src/**"
+      - "test/**"
+      - "MACE.c\\+\\+"
+      - "**/CMakeLists.txt"
+      - "**.cmake"
+
   pull_request:
-    branches: ["main", "rc"]
+    branches:
+      - main
+      - rc
     paths:
       - ".github/workflows/regression-test-with-clang.yml"
       - "src/**"
@@ -15,8 +29,8 @@ permissions:
   contents: read
 
 jobs:
-  test-with-clang:
-    name: Test with Clang
+  regression-test-with-clang:
+    name: Regression test (Clang)
     timeout-minutes: 180
     runs-on: ubuntu-latest
     strategy:
@@ -50,7 +64,7 @@ jobs:
       - name: Run regression test
         run: |
           . /environment
-          bash build/test/regression_test.bash
+          bash build/test/regression_test.bash --use-hwthreads
 
       - name: Restore regression report
         uses: actions/upload-artifact@v4

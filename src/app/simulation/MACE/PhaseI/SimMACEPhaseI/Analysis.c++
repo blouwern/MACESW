@@ -1,8 +1,27 @@
+// -*- C++ -*-
+//
+// Copyright (C) 2020-2025  MACESW developers
+//
+// This file is part of MACESW, Muonium-to-Antimuonium Conversion Experiment
+// offline software.
+//
+// MACESW is free software: you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
+//
+// MACESW is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// MACESW. If not, see <https://www.gnu.org/licenses/>.
+
 #include "MACE/PhaseI/SimMACEPhaseI/Action/PrimaryGeneratorAction.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/Action/TrackingAction.h++"
 #include "MACE/PhaseI/SimMACEPhaseI/Analysis.h++"
-#include "MACE/PhaseI/Simulation/Hit/SciFiHit.h++"
-#include "MACE/PhaseI/Simulation/Hit/SciFiSiPMRawHit.h++"
+#include "MACE/PhaseI/Simulation/Hit/SciFiSiPMHit.h++"
+#include "MACE/PhaseI/Simulation/Hit/SciFiSimHit.h++"
 #include "MACE/Simulation/Hit/ECALHit.h++"
 #include "MACE/Simulation/Hit/ECALPMHit.h++"
 #include "MACE/Simulation/Hit/TTCHit.h++"
@@ -30,7 +49,7 @@ Analysis::Analysis() :
     fDecayVertexOutput{},
     fECALSimHitOutput{},
     fECALPMHitOutput{},
-    fSciFiHitOutput{},
+    fSciFiSimHitOutput{},
     fSciFiSiPMHitOutput{},
     fTTCSimHitOutput{},
     fTTCSiPMHitOutput{},
@@ -38,7 +57,7 @@ Analysis::Analysis() :
     fDecayVertex{},
     fECALHit{},
     fECALPMHit{},
-    fSciFiHit{},
+    fSciFiSimHit{},
     fSciFiSiPMHit{},
     fTTCHit{},
     fTTCSiPMHit{},
@@ -59,7 +78,7 @@ auto Analysis::RunBeginUserAction(int runID) -> void {
     }
     fECALSimHitOutput.emplace(fmt::format("G4Run{}/ECALSimHit", runID));
     fECALPMHitOutput.emplace(fmt::format("G4Run{}/ECALPMHit", runID));
-    fSciFiHitOutput.emplace(fmt::format("G4Run{}/SciFiHit", runID));
+    fSciFiSimHitOutput.emplace(fmt::format("G4Run{}/SciFiSimHit", runID));
     fSciFiSiPMHitOutput.emplace(fmt::format("G4Run{}/SciFiSiPMHit", runID));
 }
 
@@ -79,8 +98,8 @@ auto Analysis::EventEndUserAction() -> void {
         if (fECALPMHit) {
             fECALPMHitOutput->Fill(*fECALPMHit);
         }
-        if (fSciFiHit) {
-            fSciFiHitOutput->Fill(*fSciFiHit);
+        if (fSciFiSimHit) {
+            fSciFiSimHitOutput->Fill(*fSciFiSimHit);
         }
         if (fSciFiSiPMHit) {
             fSciFiSiPMHitOutput->Fill(*fSciFiSiPMHit);
@@ -96,7 +115,7 @@ auto Analysis::EventEndUserAction() -> void {
     fDecayVertex = {};
     fECALHit = {};
     fECALPMHit = {};
-    fSciFiHit = {};
+    fSciFiSimHit = {};
     fSciFiSiPMHit = {};
     fTTCHit = {};
     fTTCSiPMHit = {};
@@ -118,14 +137,14 @@ auto Analysis::RunEndUserAction(int) -> void {
     }
     fECALSimHitOutput->Write();
     fECALPMHitOutput->Write();
-    fSciFiHitOutput->Write();
+    fSciFiSimHitOutput->Write();
     fSciFiSiPMHitOutput->Write();
     // reset output
     fPrimaryVertexOutput.reset();
     fDecayVertexOutput.reset();
     fECALSimHitOutput.reset();
     fECALPMHitOutput.reset();
-    fSciFiHitOutput.reset();
+    fSciFiSimHitOutput.reset();
     fSciFiSiPMHitOutput.reset();
     fTTCSimHitOutput.reset();
     fTTCSiPMHitOutput.reset();
