@@ -12,7 +12,7 @@ class Target final : public Mustard::Detector::Description::DescriptionBase<Targ
 
 private:
     Target();
-    ~Target() = default;
+    ~Target() override = default;
 
 public:
     auto MajorAxisLength() const -> auto { return fMajorAxisLength; }

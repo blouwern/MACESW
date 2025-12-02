@@ -2,7 +2,6 @@
 
 #include "MACE/Detector/Description/ECAL.h++"
 #include "MACE/PhaseI/Detector/Description/CentralBeamPipe.h++"
-#include "MACE/PhaseI/Detector/Description/Degrader.h++"
 #include "MACE/PhaseI/Detector/Description/SciFiTracker.h++"
 #include "MACE/PhaseI/Detector/Description/TTC.h++"
 #include "MACE/PhaseI/Detector/Description/Target.h++"
@@ -37,7 +36,6 @@ public:
     using ProminentDescription = std::tuple<MACE::Detector::Description::ECAL,
                                             PhaseI::Detector::Description::CentralBeamPipe,
                                             PhaseI::Detector::Description::Target,
-                                            PhaseI::Detector::Description::Degrader,
                                             PhaseI::Detector::Description::TTC,
                                             PhaseI::Detector::Description::SciFiTracker,
                                             PhaseI::Detector::Description::World>;

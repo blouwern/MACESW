@@ -43,7 +43,7 @@ auto ECALPhotoSensor::ConstructMPPC(G4bool checkOverlaps) -> void {
     const auto& ecal{Description::ECAL::Instance()};
     const auto name{ecal.Name()};
 
-    const auto mppcNPixelRows{ecal.MPPCNPixelRows()};
+    const auto mppcNPixelRowSet{ecal.MPPCNPixelRowSet()};
     const auto mppcPixelSizeSet{ecal.MPPCPixelSizeSet()};
     const auto mppcPitch{ecal.MPPCPitch()};
     const auto mppcThickness{ecal.MPPCThickness()};
@@ -121,9 +121,9 @@ auto ECALPhotoSensor::ConstructMPPC(G4bool checkOverlaps) -> void {
             continue;
         }
 
-        const auto MPPCNPixelRows{mppcNPixelRows.at(type)};
+        const auto mppcNPixelRows{mppcNPixelRowSet.at(type)};
         const auto mppcPixelSize{mppcPixelSizeSet.at(type)};
-        const auto mppcWidth{MPPCNPixelRows * (mppcPixelSize + mppcPitch) + mppcPitch};
+        const auto mppcWidth{mppcNPixelRows * (mppcPixelSize + mppcPitch) + mppcPitch};
 
         const auto solidCoupler{Make<G4Box>("temp", mppcWidth / 2, mppcWidth / 2, mppcCouplerThickness / 2)};
         const auto logicCoupler{Make<G4LogicalVolume>(solidCoupler, siliconeGrease, name + "MPPCCoupler")};
@@ -133,11 +133,11 @@ auto ECALPhotoSensor::ConstructMPPC(G4bool checkOverlaps) -> void {
 
         const auto solidPixel{Make<G4Box>("temp", mppcPixelSize / 2, mppcPixelSize / 2, mppcThickness / 2)};
         const auto logicPixel{Make<G4LogicalVolume>(solidPixel, silicon, name + "PMCathode")};
-        for (int copyNo{}; copyNo < MPPCNPixelRows * MPPCNPixelRows; copyNo++) {
-            const auto rowNum{copyNo / MPPCNPixelRows};
-            const auto colNum{copyNo % MPPCNPixelRows};
-            const auto xOffSet{(2 * rowNum + 1 - MPPCNPixelRows) * ((mppcPixelSize + mppcPitch) / 2)};
-            const auto yOffset{(2 * colNum + 1 - MPPCNPixelRows) * ((mppcPixelSize + mppcPitch) / 2)};
+        for (int copyNo{}; copyNo < mppcNPixelRows * mppcNPixelRows; copyNo++) {
+            const auto rowNum{copyNo / mppcNPixelRows};
+            const auto colNum{copyNo % mppcNPixelRows};
+            const auto xOffSet{(2 * rowNum + 1 - mppcNPixelRows) * ((mppcPixelSize + mppcPitch) / 2)};
+            const auto yOffset{(2 * colNum + 1 - mppcNPixelRows) * ((mppcPixelSize + mppcPitch) / 2)};
             const auto zOffset{(mppcWindowThickness - mppcThickness) / 2};
             Make<G4PVPlacement>(
                 G4Transform3D({}, {xOffSet, yOffset, zOffset}),

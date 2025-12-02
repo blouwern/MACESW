@@ -50,7 +50,7 @@ auto UsePhaseIDefault() -> void {
         ecal.ScintillationYield(3500);
         ecal.ScintillationTimeConstant1(30_ns);
         ecal.UsePhaseICrystal(true);
-        ecal.MPPCNPixelRows({8, 8, 8, 8, 8, 8, 8, 8, 8, 8});
+        ecal.MPPCNPixelRowSet({8, 8, 8, 8, 8, 8, 8, 8, 8, 8});
         ecal.MPPCEnergyBin({1.771068_eV, 2.101763_eV, 2.478823_eV, 2.66882_eV, 2.756137_eV, 2.849362_eV, 2.949113_eV, 3.02425_eV, 3.099632_eV, 3.178868_eV, 3.3981_eV, 3.649811_eV, 3.877416_eV, 4.128759_eV, 4.348776_eV});
         ecal.MPPCEfficiency({0.26319, 0.395706, 0.503681, 0.525767, 0.555215, 0.570552, 0.597546, 0.59816, 0.599387, 0.593252, 0.521472, 0.466258, 0.458896, 0.408589, 0.196933});
         ecal.WaveformIntegralTime(200_ns);

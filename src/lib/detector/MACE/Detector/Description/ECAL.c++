@@ -183,7 +183,7 @@ ECAL::ECAL() :
     fPMTCathodeThickness{this, 20_nm},
     fPMTEnergyBin{this, {}},
     fPMTQuantumEfficiency{this, {}},
-    fMPPCNPixelRows{this, {}},
+    fMPPCNPixelRowSet{this, {}},
     fMPPCPixelSizeSet{this, {}},
     fMPPCPitch{this, 0.2_mm},     // gap between pixels
     fMPPCThickness{this, 0.1_mm}, // cathode
@@ -249,7 +249,7 @@ ECAL::ECAL() :
                              0.10345, 0.09229, 0.08193, 0.07198, 0.06108, 0.05136, 0.04241,
                              0.0337, 0.02403, 0.01447, 0.00466};
     // SiPM Hamamatsu S14161
-    fMPPCNPixelRows = {4, 4, 8, 8, 8, 8, 8, 8, 8, 8};
+    fMPPCNPixelRowSet = {4, 4, 8, 8, 8, 8, 8, 8, 8, 8};
     fMPPCPixelSizeSet = {3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm, 3_mm};
     fMPPCEnergyBin = {1.391655126_eV, 1.413303953_eV, 1.436778788_eV, 1.461046623_eV, 1.486148332_eV, 1.512127645_eV, 1.533451437_eV,
                       1.553243676_eV, 1.579239384_eV, 1.601331725_eV, 1.618380329_eV, 1.644070091_eV, 1.668575932_eV, 1.695332333_eV,
@@ -383,42 +383,40 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
         it = range.second;
     }
 
-    if (Mustard::Env::VerboseLevelReach<'I'>()) {
-        Mustard::MasterPrintLn("\n======================================================");
-        Mustard::MasterPrintLn("Information for ECAL\n");
-        Mustard::MasterPrintLn(">>> Module Sorting of ECAL");
+    Mustard::MasterPrintLn<'I'>("\n======================================================");
+    Mustard::MasterPrintLn<'I'>("Information for ECAL\n");
+    Mustard::MasterPrintLn<'I'>(">>> Module Sorting of ECAL");
 
-        int typeID{};
-        auto it{edgeLengthsMap.begin()};
+    typeID = 0;
+    auto it{edgeLengthsMap.begin()};
 
-        while (it != edgeLengthsMap.end()) {
-            auto currentEdgeLengths{it->first};
-            const auto range{edgeLengthsMap.equal_range(currentEdgeLengths)};
-            const std::ranges::subrange equalRange{range.first, range.second};
-            Mustard::MasterPrintLn("--- Type {}: \n", typeID);
-            Mustard::MasterPrintLn("- lengths: ");
-            Mustard::MasterPrintLn("{}, ", currentEdgeLengths);
-            Mustard::MasterPrintLn("\n- modules({} in total):", std::ranges::distance(equalRange));
+    while (it != edgeLengthsMap.end()) {
+        auto currentEdgeLengths{it->first};
+        const auto range{edgeLengthsMap.equal_range(currentEdgeLengths)};
+        const std::ranges::subrange equalRange{range.first, range.second};
+        Mustard::MasterPrintLn<'I'>("--- Type {}: \n", typeID);
+        Mustard::MasterPrintLn<'I'>("- lengths: ");
+        Mustard::MasterPrintLn<'I'>("{}, ", currentEdgeLengths);
+        Mustard::MasterPrintLn<'I'>("\n- modules({} in total):", std::ranges::distance(equalRange));
 
-            for (auto&& [_, moduleID] : equalRange) {
-                Mustard::MasterPrint("{}, ", moduleID);
-            }
-            Mustard::MasterPrintLn("\n===========================");
-
-            ++typeID;
-            it = range.second;
+        for (auto&& [_, moduleID] : equalRange) {
+            Mustard::MasterPrint<'I'>("{}, ", moduleID);
         }
-        if (not fModuleSelection->empty()) {
-            Mustard::MasterPrintLn("\n>>> Selected Module Clustering of ECAL ");
-            for (auto&& m : *fModuleSelection) {
-                Mustard::MasterPrintLn("\n- Module {}", m);
-                Mustard::MasterPrint("{},", m);
-                for (auto&& n : moduleList.at(m).neighborModuleID) {
-                    Mustard::MasterPrint("{},", n);
-                }
+        Mustard::MasterPrintLn<'I'>("\n===========================");
+
+        ++typeID;
+        it = range.second;
+    }
+    if (not fModuleSelection->empty()) {
+        Mustard::MasterPrintLn<'I'>("\n>>> Selected Module Clustering of ECAL ");
+        for (auto&& m : *fModuleSelection) {
+            Mustard::MasterPrintLn<'I'>("\n- Module {}", m);
+            Mustard::MasterPrint<'I'>("{},", m);
+            for (auto&& n : moduleList.at(m).neighborModuleID) {
+                Mustard::MasterPrint<'I'>("{},", n);
             }
-            Mustard::MasterPrintLn("\n======================================================\n");
         }
+        Mustard::MasterPrintLn<'I'>("\n======================================================\n");
     }
 
     return outputArrayInfo;
@@ -458,7 +456,7 @@ auto ECAL::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fPMTCathodeThickness, "PMTCathodeThickness");
     ImportValue(node, fPMTEnergyBin, "PMTEnergyBin");
     ImportValue(node, fPMTQuantumEfficiency, "PMTQuantumEfficiency");
-    ImportValue(node, fMPPCNPixelRows, "MPPCNPixelRows");
+    ImportValue(node, fMPPCNPixelRowSet, "MPPCNPixelRowSet");
     ImportValue(node, fMPPCPixelSizeSet, "MPPCPixelSizeSet");
     ImportValue(node, fMPPCPitch, "MPPCPitch");
     ImportValue(node, fMPPCThickness, "MPPCThickness");
@@ -490,7 +488,7 @@ auto ECAL::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fPMTCathodeThickness, "PMTCathodeThickness");
     ExportValue(node, fPMTEnergyBin, "PMTEnergyBin");
     ExportValue(node, fPMTQuantumEfficiency, "PMTQuantumEfficiency");
-    ExportValue(node, fMPPCNPixelRows, "MPPCNPixelRows");
+    ExportValue(node, fMPPCNPixelRowSet, "MPPCNPixelRowSet");
     ExportValue(node, fMPPCPixelSizeSet, "MPPCPixelSizeSet");
     ExportValue(node, fMPPCPitch, "MPPCPitch");
     ExportValue(node, fMPPCThickness, "MPPCThickness");
