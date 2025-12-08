@@ -12,7 +12,7 @@ on:
       - "**/CMakeLists.txt"
       - "**.cmake"
       - ".clang-format"
-      - ".clang-tidy"
+      - "tooling/clang-tidy*"
 
   pull_request:
     branches:
