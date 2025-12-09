@@ -127,7 +127,7 @@ auto Test<data_tuple_name>(std::string moduleName, std::string testFileName, std
 // =========================================================================
 
 // Define each component of the array-type columns as needed
-// The defined columns are one-to-one correspondence with those in the "Read<data_tuple_name>.cxx" of the same datatuple
+// The defined columns are in one-to-one correspondence with those in the "Read<data_tuple_name>.cxx" of the same datatuple
     auto df{df0.Define("x_0", "x[0]")
                 .Define("x_1", "x[1]")
                 .Define("x_2", "x[2]")
