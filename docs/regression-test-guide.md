@@ -134,7 +134,7 @@ Important operational details and assumptions you must follow so the test script
   - The range of each histogram is specified by the distributional characteristics of the data. Generally, for a tested data column $x$ (named "X" for example), there are 3 main range settings:
     - $[min(x), max(x)]$ if the distribution is a broad spectrum.
     - $[\bar{x}-a\sigma_x, \bar{x}+a\sigma_x]$ if the distribution is a characteristic peak.
-    - A fixed integer set if the data is limited integer. (e.g. unitID)
+    - A fixed integer set if the data is limited integer (e.g. unitID).
   - The `Test*` macros normalize sample and test histograms to unit integral before computing pulls. If a histogram has zero integral, the test macro prints a warning and skips scaling for that histogram to avoid division-by-zero.
 
 - Practical pre-check list before running scripts
