@@ -2,7 +2,7 @@
 
 This guide describes how to do regression tests locally and how to add regression test models in CI step-by-step.
 
-Read only **until** the section [Add Regression Test Units in CI](#add-regression-test-units-in-ci) to use the regression test workflow. Continue reading if you want to understand or improve its mechanics.
+For instructions on following the regression testing workflow, see [this section](#add-regression-test-units-in-ci) and those preceding it. The remaining sections detail the mechanisms of MACESW regression testing, serving as a reference for developers who wish to understand or enhance this workflow.
 
 ## Table of Contents
 - [MACESW Regression Test Guide](#macesw-regression-test-guide)
@@ -10,14 +10,14 @@ Read only **until** the section [Add Regression Test Units in CI](#add-regressio
   - [Naming Convention](#naming-convention)
   - [Do Regression Test Locally](#do-regression-test-locally)
   - [Add Regression Test Units in CI](#add-regression-test-units-in-ci)
-    - [Test a new datatuple](#test-a-new-datatuple)
-    - [Test a new model](#test-a-new-model)
+    - [Test a New Datatuple](#test-a-new-datatuple)
+    - [Test a New Model](#test-a-new-model)
   - [Regression Test Mechanism of MACESW](#regression-test-mechanism-of-macesw)
-    - [High-level workflow](#high-level-workflow)
-    - [Data and histogram conventions](#data-and-histogram-conventions)
-    - [Files produced](#files-produced)
+    - [High-level Workflow](#high-level-workflow)
+    - [Data and Histogram Conventions](#data-and-histogram-conventions)
+    - [Files Produced](#files-produced)
   - [Notice About Details](#notice-about-details)
-  - [Edge cases and notes](#edge-cases-and-notes)
+  - [Edge Cases and Notes](#edge-cases-and-notes)
 
 ## Naming Convention
 The MACESW program has different simulation/generation/reconstruction units, each of which produce data based on the data model of MACESW.   
@@ -36,7 +36,7 @@ If you need to test a new datatuple or a new model, refer to the section [Add Re
 
 ## Add Regression Test Units in CI
 
-### Test a new datatuple
+### Test a New Datatuple
 - First of all, determine:
   - Which models will generate this new datatuple and which of them need to be tested.
   - Which columns in this new datatuple you want to test for those models as described above (e.g. `d`, `Edep`, `unitID`...).
@@ -46,14 +46,15 @@ If you need to test a new datatuple or a new model, refer to the section [Add Re
     - A fixed integer set if the data is limited integer (e.g. unitID).
 - Write a `Read<datatuple_name>.cxx` macro file for generating golden data and a `Test<datatuple_name>.cxx` macro file for testing in directory `src/test/scripts/`, based on the provided template file `ReadSomeDataTuple.cxx.template` and `TestSomeDataTuple.cxx.template` (*copy the template file and modify according to the guide text in it*).
 
-### Test a new model
+### Test a New Model
 - If the datatuples you want to test in this new model are already provided, just add extra `Read*.cxx(...)` lines in file `src/test/scripts/generate_regression_data.bash` and `Test*.cxx(...)` lines in file `src/test/scripts/regression_test.bash`.
 - If there are new datatuples you want to test in this new model, follow the section above: [Test a new datatuple](#test-a-new-datatuple)
 
 
 ---
 
->**Below is the detailed mechanism of regression test of MACESW, provided for those who have ideas about optimizing this workflow.**
+> [!NOTE]
+> Below details mechanism of regression test of MACESW, provided for those who have ideas about improving this workflow.
 
 
 ## Regression Test Mechanism of MACESW
@@ -61,7 +62,7 @@ If you need to test a new datatuple or a new model, refer to the section [Add Re
 
 This section explains how MACESW generates "golden" regression data (the left branch shown in the image above) and how it verifies new outputs against those golden data (the right branch shown in the image above). The repository provides two main driver scripts under `src/test/scripts`: `generate_regression_data.bash` (create/update the golden data) and `regression_test.bash` (run a test and compare current outputs to the golden data). The comparison itself is implemented in a set of ROOT macros (`Read*.cxx` to produce golden histograms and `Test*.cxx` to run comparisons and write a report).
 
-### High-level workflow
+### High-level Workflow
 - Data generation (create golden / sample data)  
   driver script: `generate_regression_data.bash`
   1. Run selected units (e.g., `SimMMS`, `SimTTC`, `SimMACE`). The script launches the binaries with the configured macros (e.g., `run_em_flat.mac`, `run_signal.mac`) using MPI (`mpiexec`).
@@ -84,7 +85,7 @@ This section explains how MACESW generates "golden" regression data (the left br
      - Based on the p-value, evaluate the homogeneity between the tested data and golden data and print per-histogram verdicts to stdout (**PASS**, **SUSPICIOUS**, **FAIL**, **IDENTICAL**).
      - Save visual comparisons and a pull histogram into `regression_report.root` (canvases overlaying sample vs test and the pull distribution). 
 
-### Data and histogram conventions
+### Data and Histogram Conventions
 - Histogram storage location:
   - Golden histograms are stored in `macesw_regression_data.root` under `/<ModuleName>/<DataTupleName>/` (each histogram named by the column/expression).
 - Bin count and ranges:
@@ -94,7 +95,7 @@ This section explains how MACESW generates "golden" regression data (the left br
   - During comparison the test code normalizes both sample and test histograms (scale to unit integral) before computing pulls.
   - A pull histogram (difference divided by combined error per bin) is produced, plotted, and written into `regression_report.root`.
 
-### Files produced
+### Files Produced
 - Golden/sample creation:
   - `macesw_regression_data.root` — the canonical golden dataset containing histograms used for comparisons.
   - `*_sample.root` — merged sample ROOT files created during generation.
@@ -144,7 +145,7 @@ Important operational details and assumptions you must follow so the test script
   - If regenerating golden data, back up existing `macesw_regression_data.root` or follow the script’s `old-regression-data/` move behavior.
   - Do not re-run a `Read*` macro for the same `<Module>/<DataTuple>` inside the same `macesw_regression_data.root` unless you first remove or archive the old entry.
 
-## Edge cases and notes
+## Edge Cases and Notes
 - Zero-integral histograms: the test macros handle zero-integral histograms by printing a warning and skipping scaling to avoid division-by-zero errors.
 - Missing golden file: regression_test.bash requires `macesw_regression_data.root` to exist in the script directory; if missing, tests that rely on it will fail when attempting to open the sample directory.
 - Binning/range mismatch: because ranges are computed when creating the golden sample, always regenerate golden data if upstream data schemas or distributions change (e.g., new columns or different units).
