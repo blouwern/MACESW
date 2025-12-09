@@ -40,7 +40,7 @@ If you need to test a new datatuple or a new model, refer to the section [Add Re
 - First of all, determine:
   - Which models will generate this new datatuple and which of them need to be tested.
   - Which columns in this new datatuple you want to test for those models as described above (e.g. `d`, `Edep`, `unitID`...).
-- Based on the data distribution characteristics of these columns, set an appropriate range for regression. Generally there are 3 typical range settings:
+- Based on the data distribution characteristics of these columns, set an appropriate range for regression testing. Generally there are 3 typical range settings:
     - $[min(x), max(x)]$ if the distribution is a broad spectrum.
     - $[\bar{x}-a\sigma_x, \bar{x}+a\sigma_x]$ if the distribution is a characteristic peak.
     - A fixed integer set if the data is limited integer (e.g. unitID).
