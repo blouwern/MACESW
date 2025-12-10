@@ -43,7 +43,7 @@ If you need to test a new datatuple or a new model, refer to the section [Add Re
 - Based on the data distribution characteristics of these columns, set an appropriate range for regression testing. Generally there are 3 typical range settings:
     - $[min(x), max(x)]$ if the distribution is a broad spectrum.
     - $[\bar{x}-a\sigma_x, \bar{x}+a\sigma_x]$ if the distribution is a characteristic peak.
-    - A fixed integer set if the data is limited integer (e.g. unitID).
+    - A limited set of integers if the data consists of a limited set of integer values (e.g. unitID).
 - Write a `Read<datatuple_name>.cxx` macro file for generating golden data and a `Test<datatuple_name>.cxx` macro file for testing in directory `src/test/scripts/`, based on the provided template file `ReadSomeDataTuple.cxx.template` and `TestSomeDataTuple.cxx.template` (*copy the template file and modify according to the guide text in it*).
 
 ### Test a New Model
@@ -134,7 +134,7 @@ Important operational details and assumptions you must follow so the test script
   - The range of each histogram is specified by the distributional characteristics of the data. Generally, for a tested data column $x$ (named "X" for example), there are 3 main range settings:
     - $[min(x), max(x)]$ if the distribution is a broad spectrum.
     - $[\bar{x}-a\sigma_x, \bar{x}+a\sigma_x]$ if the distribution is a characteristic peak.
-    - A fixed integer set if the data is limited integer (e.g. unitID).
+    - A limited set of integers if the data consists of a limited set of integer values (e.g. unitID).
   - The `Test*` macros normalize sample and test histograms to unit integral before computing pulls. If a histogram has zero integral, the test macro prints a warning and skips scaling for that histogram to avoid division-by-zero.
 
 - Practical pre-check list before running scripts
@@ -149,4 +149,4 @@ Important operational details and assumptions you must follow so the test script
 - Zero-integral histograms: the test macros handle zero-integral histograms by printing a warning and skipping scaling to avoid division-by-zero errors.
 - Missing golden file: regression_test.bash requires `macesw_regression_data.root` to exist in the script directory; if missing, tests that rely on it will fail when attempting to open the sample directory.
 - Binning/range mismatch: because ranges are computed when creating the golden sample, always regenerate golden data if upstream data schemas or distributions change (e.g., new columns or different units).
-- Determinism: regression_test.bash sets a seed (`--seed 0`, which triggers auto-seeding and results in a randomized seed that differs run-by-run) when launching simulations to reduce run-to-run statistical variance; however, some runs may still exhibit statistical fluctuations — watch for `SUSPICIOUS` flags.
+- Determinism: regression_test.bash launches simulations with `--seed 0`, which instructs the simulation to auto-generate a random seed for each run (i.e., the seed is not fixed and will differ every time the test is executed). This means outputs are non-deterministic and will vary run-by-run, which helps to reduce statistical variance across repeated tests. If strict reproducibility is required, specify a fixed nonzero seed (e.g., `--seed 12345`). Note that even with randomized seeding, some runs may still exhibit statistical fluctuations — watch for `SUSPICIOUS` flags.
