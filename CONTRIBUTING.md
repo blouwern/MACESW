@@ -79,8 +79,6 @@ We prioritize **English** as the working language to ensure smooth communication
   Follow the project's [coding style guide](STYLE_GUIDE.md). Always run code formatter and linter before submitting code.
 - 在适用的情况下，为新功能和错误修复添加单元测试或集成测试。  
   Add unit or integration tests for new features and bug fixes where applicable.
-- 请在提交前运行代码格式化工具。  
-  Format code before committing.
 - 确保所有测试在本地通过。  
   Ensure all tests pass locally.
 
