@@ -76,7 +76,7 @@ TTC::TTC() : // clang-format off
     fScintillationYield{this, 7600.},
     fScintillationRiseTimeConstant1{this, 1_ns},
     fScintillationDecayTimeConstant1{this, 2.4_ns},
-    fResolutionScale{this, 1.}, // Shanghai Shuojie
+    fResolutionScale{this, 1.}, // HaoTang
 
     // LightCoupler
     fLightCouplerDensity{this, 1.06_g_cm3},
@@ -105,7 +105,7 @@ TTC::TTC() : // clang-format off
     // Option
     fUseOptics{this, true} {
 
-    // Shanghai Shuojie
+    // HaoTang
     fScintillationComponent1EnergyBin = {2.364652_eV, 2.383758_eV, 2.405135_eV, 2.426898_eV, 2.449058_eV, 2.471627_eV, 2.494616_eV, 2.518037_eV, 2.541901_eV, 2.566222_eV, 2.591013_eV, 2.616288_eV, 2.640878_eV, 2.662326_eV, 2.680468_eV, 2.696392_eV, 2.710014_eV, 2.722518_eV, 2.735138_eV, 2.749156_eV, 2.765909_eV, 2.789445_eV, 2.818761_eV, 2.8487_eV, 2.872274_eV, 2.886324_eV, 2.897663_eV, 2.907659_eV, 2.916281_eV, 2.924242_eV, 2.935627_eV, 2.947291_eV, 2.9558_eV, 2.966124_eV, 2.975098_eV, 2.982617_eV, 2.990174_eV, 2.99777_eV, 3.003875_eV, 3.010004_eV, 3.016159_eV, 3.022338_eV, 3.028543_eV, 3.034774_eV, 3.04103_eV, 3.047312_eV, 3.05362_eV, 3.059955_eV, 3.066315_eV, 3.072702_eV, 3.079116_eV};
     fScintillationComponent1 = {0.434403, 1.582292, 3.084886, 4.612752, 6.271417, 8.051304, 10.12726, 12.376528, 14.988649, 17.939165, 21.472481, 25.741068, 30.767769, 35.904437, 41.161412, 46.389252, 51.290832, 55.99863, 60.371415, 65.183536, 69.599645, 72.422953, 72.822121, 73.213013, 76.559015, 80.622638, 85.027247, 89.716946, 94.083527, 98.012299, 100.0, 98.816769, 95.760048, 89.251097, 82.966493, 77.479502, 71.70861, 65.792378, 61.000588, 56.047106, 50.934253, 46.157431, 40.828953, 35.836262, 30.591153, 25.485149, 20.323703, 15.011678, 9.934578, 4.612821, 0.0};
 
@@ -203,7 +203,7 @@ auto TTC::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fScintillationComponent1, "ScintillationComponent1");
     ExportValue(node, fScintillationYield, "ScintillationYield");
     ExportValue(node, fScintillationRiseTimeConstant1, "ScintillationRiseTimeConstant1");
-    ExportValue(node, fScintillationDecayTimeConstant1, "ScintillationDcayTimeConstant1");
+    ExportValue(node, fScintillationDecayTimeConstant1, "ScintillationDecayTimeConstant1");
     ExportValue(node, fResolutionScale, "ResolutionScale");
     ExportValue(node, fLightCouplerDensity, "LightCouplerDensity");
     ExportValue(node, fLightCouplerCarbonElement, "LightCouplerCarbonElement");
