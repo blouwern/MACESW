@@ -72,8 +72,8 @@ auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
         generator.Acceptance([eMissCut = cli->get<double>("--emiss-soft-upper-bound"),
                               scEMiss = muc::soft_cmp{cli->get<double>("--emiss-softening-factor")}](auto&& momenta) {
             //.          e+  n   n   g   g
-            const auto& [p0, _1, _2, p3, p4]{momenta};
-            const auto eMiss{muon_mass_c2 - (p0.e() + p3.e() + p4.e())};
+            const auto& [q1, _1, _2, q4, q5]{momenta};
+            const auto eMiss{muon_mass_c2 - (q1.e() + q4.e() + q5.e())};
             return scEMiss(eMiss) < scEMiss(eMissCut);
         });
     }

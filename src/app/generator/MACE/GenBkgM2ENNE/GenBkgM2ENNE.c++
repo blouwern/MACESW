@@ -77,18 +77,17 @@ auto GenBkgM2ENNE::Main(int argc, char* argv[]) const -> int {
         const auto& cdc{Detector::Description::CDC::Instance()};
         const auto& ttc{Detector::Description::TTC::Instance()};
         const auto mmsB{Detector::Description::MMSField::Instance().FastField()};
-        generator.Acceptance([inPxyCut = (cdc.GasInnerRadius() / 2) * mmsB * c_light,
-                              outPxyCut = (ttc.Radius() / 2) * mmsB * c_light,
+        generator.Acceptance([outPxyCut = (ttc.Radius() / 2) * mmsB * c_light,
                               cosCut = 1 / muc::hypot(2 * cdc.GasOuterRadius() / cdc.GasOuterLength(), 1.),
                               epEkCut = cli->get<double>("--ep-ek-soft-upper-bound"),
                               scPxy = muc::soft_cmp{cli->get<double>("--pxy-softening-factor")},
                               scCos = muc::soft_cmp{cli->get<double>("--cos-theta-softening-factor")},
                               scEk = muc::soft_cmp{cli->get<double>("--ep-ek-softening-factor")}](auto&& momenta) {
-            // .         e+ n   n   e-
-            const auto& [p0, _1, _2, p3]{momenta};
-            const auto p0Low{scEk(p0.e() - electron_mass_c2) < scEk(epEkCut)};
-            const auto p3Seen{scPxy(p3.perp()) > scPxy(outPxyCut) and scCos(muc::abs(p3.cosTheta())) < scCos(cosCut)};
-            return p0Low and p3Seen;
+            // .         e+  n   n   e-
+            const auto& [q1, _1, _2, q4]{momenta};
+            const auto epSlow{scEk(q1.e() - electron_mass_c2) < scEk(epEkCut)};
+            const auto emFast{scPxy(q4.perp()) > scPxy(outPxyCut) and scCos(muc::abs(q4.cosTheta())) < scCos(cosCut)};
+            return epSlow and emFast;
         });
     } else if (cli["--ep-ek-bias"] == true) {
         generator.Acceptance([epEkCut = cli->get<double>("--ep-ek-soft-upper-bound"),
