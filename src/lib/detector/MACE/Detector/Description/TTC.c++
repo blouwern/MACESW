@@ -102,8 +102,8 @@ TTC::TTC() : // clang-format off
     fReflectorReflectivity{this, {0.985, 0.985}},
     fCouplerTransmittance{this, {1, 1}},
     fAirPaintReflectivity{this, {0, 0}},
-    fCathodeSurface{this, {0., 0.}} 
-    
+    fCathodeSurface{this, {0., 0.}},
+
     // Option
     fUseOptics{this, true} {
 
