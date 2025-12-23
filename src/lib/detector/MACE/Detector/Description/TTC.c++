@@ -102,7 +102,10 @@ TTC::TTC() : // clang-format off
     fReflectorReflectivity{this, {0.985, 0.985}},
     fCouplerTransmittance{this, {1, 1}},
     fAirPaintReflectivity{this, {0, 0}},
-    fCathodeSurface{this, {0., 0.}} {
+    fCathodeSurface{this, {0., 0.}} 
+    
+    // Option
+    fUseOptics{this, true} {
 
     // HaoTang
     fScintillationComponent1EnergyBin = {2.364652_eV, 2.383758_eV, 2.405135_eV, 2.426898_eV, 2.449058_eV, 2.471627_eV, 2.494616_eV, 2.518037_eV, 2.541901_eV, 2.566222_eV, 2.591013_eV, 2.616288_eV, 2.640878_eV, 2.662326_eV, 2.680468_eV, 2.696392_eV, 2.710014_eV, 2.722518_eV, 2.735138_eV, 2.749156_eV, 2.765909_eV, 2.789445_eV, 2.818761_eV, 2.8487_eV, 2.872274_eV, 2.886324_eV, 2.897663_eV, 2.907659_eV, 2.916281_eV, 2.924242_eV, 2.935627_eV, 2.947291_eV, 2.9558_eV, 2.966124_eV, 2.975098_eV, 2.982617_eV, 2.990174_eV, 2.99777_eV, 3.003875_eV, 3.010004_eV, 3.016159_eV, 3.022338_eV, 3.028543_eV, 3.034774_eV, 3.04103_eV, 3.047312_eV, 3.05362_eV, 3.059955_eV, 3.066315_eV, 3.072702_eV, 3.079116_eV};
@@ -124,7 +127,7 @@ auto TTC::CalculateWidth() -> std::vector<double> {
         dequeWidth.push_back(temporaryWidth);
     }
     auto nFinalSameSolidAngle{dequeWidth.size() / 2};
-    for (gsl::index nWidthUp = nFinalSameSolidAngle + 1; fRadius / std::tan(std::acos(nFinalSameSolidAngle * omega / (2 * pi))) + (nWidthUp - nFinalSameSolidAngle - 0.5) * fWidthUp <= fBarrelLength / 2; nWidthUp++) { // 第n块（上限宽度条件）
+    for (gsl::index nWidthUp = nFinalSameSolidAngle + 1; fRadius / std::tan(std::acos(nFinalSameSolidAngle * omega / (2 * pi))) + (nWidthUp - nFinalSameSolidAngle - 0.5) * fWidthUp <= fBarrelLength / 2; nWidthUp++) { // nth block (upper width condition)
         dequeWidth.push_front(fWidthUp);
         dequeWidth.push_back(fWidthUp);
     }
@@ -144,7 +147,7 @@ auto TTC::CalculatePosition() -> std::vector<muc::array3d> {
         dequePosition.push_back(muc::array3d{fRadius, 0, fRadius / 2 * (1 / std::tan(std::acos(nSameSolidAngle * omega / (2 * pi))) + 1 / std::tan(std::acos((nSameSolidAngle - 1) * omega / (2 * pi))))});
     }
     auto nFinalSameSolidAngle{dequePosition.size() / 2};
-    for (gsl::index nWidthUp = nFinalSameSolidAngle + 1; fRadius / std::tan(std::acos(nFinalSameSolidAngle * omega / (2 * pi))) + (nWidthUp - nFinalSameSolidAngle - 0.5) * fWidthUp <= fBarrelLength / 2; nWidthUp++) { // 第n块（上限宽度条件）
+    for (gsl::index nWidthUp = nFinalSameSolidAngle + 1; fRadius / std::tan(std::acos(nFinalSameSolidAngle * omega / (2 * pi))) + (nWidthUp - nFinalSameSolidAngle - 0.5) * fWidthUp <= fBarrelLength / 2; nWidthUp++) { // nth block (upper width condition)
         dequePosition.push_front(muc::array3d{fRadius, 0, -1 * (fRadius / std::tan(std::acos(nFinalSameSolidAngle * omega / (2 * pi))) + (nWidthUp - nFinalSameSolidAngle - 0.5) * fWidthUp)});
         dequePosition.push_back(muc::array3d{fRadius, 0, fRadius / std::tan(std::acos(nFinalSameSolidAngle * omega / (2 * pi))) + (nWidthUp - nFinalSameSolidAngle - 0.5) * fWidthUp});
     }
@@ -204,6 +207,8 @@ auto TTC::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fCouplerTransmittance, "CouplerTransmittance");
     ImportValue(node, fAirPaintReflectivity, "AirPaintReflectivity");
     ImportValue(node, fCathodeSurface, "CathodeSurface");
+    // Option
+    ImportValue(node, fUseOptics, "UseOptics");
 }
 
 auto TTC::ExportAllValue(YAML::Node& node) const -> void {
@@ -259,6 +264,8 @@ auto TTC::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fCouplerTransmittance, "CouplerTransmittance");
     ExportValue(node, fAirPaintReflectivity, "AirPaintReflectivity");
     ExportValue(node, fCathodeSurface, "CathodeSurface");
+    // Option
+    ExportValue(node, fUseOptics, "UseOptics");
 }
 
 } // namespace MACE::Detector::Description

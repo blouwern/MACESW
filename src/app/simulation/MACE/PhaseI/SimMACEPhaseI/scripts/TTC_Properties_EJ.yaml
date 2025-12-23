@@ -9,3 +9,4 @@ TTC:
   ScintillationYield: 10200
   ScintillationRiseTimeConstant1: 0.5
   ScintillationDecayTimeConstant1: 1.3999999999999999
+  UseOptics: true
