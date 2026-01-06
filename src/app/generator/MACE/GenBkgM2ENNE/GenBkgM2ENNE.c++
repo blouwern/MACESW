@@ -76,7 +76,7 @@ auto GenBkgM2ENNE::Main(int argc, char* argv[]) const -> int {
     if (cli["--mace-bias"] == true) {
         const auto& cdc{Detector::Description::CDC::Instance()};
         const auto& ttc{Detector::Description::TTC::Instance()};
-        const auto mmsB{Detector::Description::MMSField::Instance().FastField()};
+        const auto mmsB{Detector::Description::MMSField::Instance().NominalField()};
         generator.Acceptance([outPxyCut = (ttc.Radius() / 2) * mmsB * c_light,
                               cosCut = 1 / muc::hypot(2 * cdc.GasOuterRadius() / cdc.GasOuterLength(), 1.),
                               epEkCut = cli->get<double>("--ep-ek-soft-upper-bound"),
