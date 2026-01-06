@@ -120,13 +120,16 @@ For advanced users or developers building from source or contributing to MACESW:
 以下依赖是可选的。如果在配置过程中在您的系统上未找到它们，CMake 将自动下载并构建它们。  
 The following dependencies are optional. If they are not found on your system during configuration, CMake will automatically download and build them.
 
-| 库 Library                                                                      | 版本 Version  | 描述 Description                                                                                                       |
-| :------------------------------------------------------------------------------ | :------------ | :--------------------------------------------------------------------------------------------------------------------- |
-| [**macesw_offline_data**](https://code.ihep.ac.cn/zhaoshh7/macesw_offline_data) | 0.25.103013   | MACESW 离线数据 / MACESW offline data                                                                                  |
-| [**macesw_test_data**](https://code.ihep.ac.cn/zhaoshh7/macesw_test_data)       | 0.25.10301318 | MACESW 测试数据 / MACESW test data                                                                                     |
-| [**Mustard**](https://github.com/zhao-shihan/Mustard)                           | ≥ 0.25.1222   | 一个现代的、高性能的高能物理实验离线软件框架 / A modern, high-performance offline software framework for HEP experiments |
-| [**PMP Library**](https://www.pmp-library.org/)                                 | ≥ 3.0.0       | 多边形网格处理库 / The Polygon Mesh Processing Library                                                                 |
-| [**zhao-shihan/GenFit**](https://github.com/zhao-shihan/GenFit)                 | main          | 一个通用的径迹拟合工具包 / A generic track-fitting toolkit                                                             |
+| 库 Library                                                      | 版本 Version | 描述 Description                                                                                                         |
+| :-------------------------------------------------------------- | :----------- | :----------------------------------------------------------------------------------------------------------------------- |
+| [**Mustard**](https://github.com/zhao-shihan/Mustard)           | ≥ 0.25.1222  | 一个现代的、高性能的高能物理实验离线软件框架 / A modern, high-performance offline software framework for HEP experiments |
+| [**PMP Library**](https://www.pmp-library.org/)                 | ≥ 3.0.0      | 多边形网格处理库 / The Polygon Mesh Processing Library                                                                   |
+| [**zhao-shihan/GenFit**](https://github.com/zhao-shihan/GenFit) | main         | 一个通用的径迹拟合工具包 / A generic track-fitting toolkit                                                               |
+
+| 数据 Data           | 版本 Version | 描述 Description                      |
+| :------------------ | :----------- | :------------------------------------ |
+| macesw_offline_data | 0.26.010616  | MACESW 离线数据 / MACESW offline data |
+| macesw_test_data    | 0.26.010616  | MACESW 测试数据 / MACESW test data    |
 
 ## 引用 / Citation
 
