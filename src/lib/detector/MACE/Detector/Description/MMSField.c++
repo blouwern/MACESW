@@ -39,7 +39,7 @@ void MMSField::ImportAllValue(const YAML::Node& node) {
     ImportValue(node, fRadius, "Radius");
     ImportValue(node, fLength, "Length");
     // Field
-    ImportValue(node, fFastField, "FastField");
+    ImportValue(node, fFastField, "NominalField");
 }
 
 void MMSField::ExportAllValue(YAML::Node& node) const {
@@ -47,7 +47,7 @@ void MMSField::ExportAllValue(YAML::Node& node) const {
     ExportValue(node, fRadius, "Radius");
     ExportValue(node, fLength, "Length");
     // Field
-    ExportValue(node, fFastField, "FastField");
+    ExportValue(node, fFastField, "NominalField");
 }
 
 } // namespace MACE::Detector::Description

@@ -61,7 +61,7 @@ auto Solenoid::ImportAllValue(const YAML::Node& node) -> void {
     // Material
     ImportValue(node, fMaterialName, "MaterialName");
     // Field
-    ImportValue(node, fFastField, "FastField");
+    ImportValue(node, fFastField, "NominalField");
 }
 
 auto Solenoid::ExportAllValue(YAML::Node& node) const -> void {
@@ -79,7 +79,7 @@ auto Solenoid::ExportAllValue(YAML::Node& node) const -> void {
     // Material
     ExportValue(node, fMaterialName, "MaterialName");
     // Field
-    ExportValue(node, fFastField, "FastField");
+    ExportValue(node, fFastField, "NominalField");
 }
 
 } // namespace MACE::Detector::Description

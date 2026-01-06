@@ -51,9 +51,9 @@ public:
     // Field
     ///////////////////////////////////////////////////////////
 
-    auto FastField() const -> auto { return fFastField; }
+    auto NominalField() const -> auto { return fFastField; }
 
-    auto FastField(double val) -> void { fFastField = val; }
+    auto NominalField(double val) -> void { fFastField = val; }
 
 private:
     auto ImportAllValue(const YAML::Node& node) -> void override;

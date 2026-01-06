@@ -47,7 +47,7 @@ auto ECALField::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fRadius, "Radius");
     ImportValue(node, fLength, "Length");
     // Field
-    ImportValue(node, fFastField, "FastField");
+    ImportValue(node, fFastField, "NominalField");
 }
 
 auto ECALField::ExportAllValue(YAML::Node& node) const -> void {
@@ -55,7 +55,7 @@ auto ECALField::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fRadius, "Radius");
     ExportValue(node, fLength, "Length");
     // Field
-    ExportValue(node, fFastField, "FastField");
+    ExportValue(node, fFastField, "NominalField");
 }
 
 } // namespace MACE::Detector::Description
