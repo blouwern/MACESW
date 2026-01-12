@@ -79,7 +79,7 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     if (cli["--mace-bias"] == true) {
         const auto& cdc{Detector::Description::CDC::Instance()};
         const auto& ttc{Detector::Description::TTC::Instance()};
-        const auto mmsB{Detector::Description::MMSField::Instance().FastField()};
+        const auto mmsB{Detector::Description::MMSField::Instance().NominalField()};
         generator.Acceptance([inPxyCut = (cdc.GasInnerRadius() / 2) * mmsB * c_light,
                               outPxyCut = (ttc.Radius() / 2) * mmsB * c_light,
                               cosCut = 1 / muc::hypot(2 * cdc.GasOuterRadius() / cdc.GasOuterLength(), 1.),
@@ -87,14 +87,14 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
                               scPxy = muc::soft_cmp{cli->get<double>("--pxy-softening-factor")},
                               scCos = muc::soft_cmp{cli->get<double>("--cos-theta-softening-factor")},
                               scEk = muc::soft_cmp{cli->get<double>("--ep-ek-softening-factor")}](auto&& momenta) {
-            // .         e+ n   n   e-  e+
-            const auto& [p0, _1, _2, p3, p4]{momenta};
-            const auto p3Seen{scPxy(p3.perp()) > scPxy(outPxyCut) and scCos(muc::abs(p3.cosTheta())) < scCos(cosCut)};
-            const auto p0Miss{scPxy(p0.perp()) < scPxy(inPxyCut) or scCos(muc::abs(p0.cosTheta())) > scCos(cosCut)};
-            const auto p4Miss{scPxy(p4.perp()) < scPxy(inPxyCut) or scCos(muc::abs(p4.cosTheta())) > scCos(cosCut)};
-            const auto p0Low{scEk(p0.e() - electron_mass_c2) < scEk(epEkCut)};
-            const auto p4Low{scEk(p4.e() - electron_mass_c2) < scEk(epEkCut)};
-            return p3Seen and ((p0Miss and p4Low) or (p4Miss and p0Low));
+            // .         e+  n   n   e-  e+
+            const auto& [q1, _1, _2, q4, q5]{momenta};
+            const auto emFast{scPxy(q4.perp()) > scPxy(outPxyCut) and scCos(muc::abs(q4.cosTheta())) < scCos(cosCut)};
+            const auto ep1Miss{scPxy(q1.perp()) < scPxy(inPxyCut) or scCos(muc::abs(q1.cosTheta())) > scCos(cosCut)};
+            const auto ep2Miss{scPxy(q5.perp()) < scPxy(inPxyCut) or scCos(muc::abs(q5.cosTheta())) > scCos(cosCut)};
+            const auto ep1Low{scEk(q1.e() - electron_mass_c2) < scEk(epEkCut)};
+            const auto ep2Low{scEk(q5.e() - electron_mass_c2) < scEk(epEkCut)};
+            return emFast and ((ep1Miss and ep2Low) or (ep2Miss and ep1Low));
         });
     } else if (cli["--ep-ek-bias"] == true) {
         generator.Acceptance([epEkCut = cli->get<double>("--ep-ek-soft-upper-bound"),
@@ -106,8 +106,8 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
         generator.Acceptance([eMissCut = cli->get<double>("--emiss-soft-upper-bound"),
                               scEMiss = muc::soft_cmp{cli->get<double>("--emiss-softening-factor")}](auto&& momenta) {
             // .         e+ n   n   e-  e+
-            const auto& [p0, _1, _2, p3, p4]{momenta};
-            const auto eMiss{muon_mass_c2 - (p0.e() + p3.e() + p4.e())};
+            const auto& [q1, _1, _2, q4, q5]{momenta};
+            const auto eMiss{muon_mass_c2 - (q1.e() + q4.e() + q5.e())};
             return scEMiss(eMiss) < scEMiss(eMissCut);
         });
     }

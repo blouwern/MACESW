@@ -62,8 +62,6 @@ public:
     Analysis();
 
     auto CoincidenceWithECAL(G4bool val) -> void { fCoincidenceWithECAL = val; }
-    auto SaveTTCHitData(bool val) -> void { fSaveTTCHitData = val; }
-    auto SaveTTCSiPMHitData(bool val) -> void { fSaveTTCSiPMHitData = val; }
 
     auto SubmitPrimaryVertexData(const muc::unique_ptrvec<Mustard::Data::Tuple<MACE::Data::SimPrimaryVertex>>& data) -> void { fPrimaryVertex = &data; }
     auto SubmitDecayVertexData(const muc::unique_ptrvec<Mustard::Data::Tuple<MACE::Data::SimDecayVertex>>& data) -> void { fDecayVertex = &data; }
@@ -80,8 +78,6 @@ public:
 
 private:
     G4bool fCoincidenceWithECAL;
-    bool fSaveTTCHitData;
-    bool fSaveTTCSiPMHitData;
 
     std::optional<Mustard::Data::Output<MACE::Data::SimPrimaryVertex>> fPrimaryVertexOutput;
     std::optional<Mustard::Data::Output<MACE::Data::SimDecayVertex>> fDecayVertexOutput;

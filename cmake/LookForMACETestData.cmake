@@ -17,7 +17,7 @@
 
 message(STATUS "Looking for macesw_test_data")
 
-set(MACESW_MACESW_TEST_DATA_MINIMUM_REQUIRED 0.25.10301318)
+set(MACESW_MACESW_TEST_DATA_MINIMUM_REQUIRED 0.26.010616)
 
 if(NOT MACESW_BUILTIN_MACESW_TEST_DATA)
     find_package(macesw_test_data ${MACESW_MACESW_TEST_DATA_MINIMUM_REQUIRED})
@@ -36,7 +36,7 @@ if(MACESW_BUILTIN_MACESW_TEST_DATA)
     endif()
     # set download dest and URL
     set(MACESW_BUILTIN_MACESW_TEST_DATA_SRC_DIR "${MACESW_PROJECT_3RDPARTY_DIR}/macesw_test_data-v${MACESW_BUILTIN_MACESW_TEST_DATA_VERSION}")
-    set(MACESW_BUILTIN_MACESW_TEST_DATA_URL "https://code.ihep.ac.cn/zhaoshh7/macesw_test_data/-/archive/v${MACESW_BUILTIN_MACESW_TEST_DATA_VERSION}/macesw_test_data-v${MACESW_BUILTIN_MACESW_TEST_DATA_VERSION}.tar.gz")
+    set(MACESW_BUILTIN_MACESW_TEST_DATA_URL "https://github.com/MACESW-LFS/macesw_test_data/archive/refs/tags/v${MACESW_BUILTIN_MACESW_TEST_DATA_VERSION}.tar.gz")
     # reuse or download
     include(FetchContent)
     if(EXISTS "${MACESW_BUILTIN_MACESW_TEST_DATA_SRC_DIR}/CMakeLists.txt")

@@ -43,8 +43,6 @@ namespace MACE::PhaseI::SimMACEPhaseI {
 Analysis::Analysis() :
     AnalysisBase{this},
     fCoincidenceWithECAL{true},
-    fSaveTTCHitData{true},
-    fSaveTTCSiPMHitData{true},
     fPrimaryVertexOutput{},
     fDecayVertexOutput{},
     fECALSimHitOutput{},
@@ -70,12 +68,8 @@ auto Analysis::RunBeginUserAction(int runID) -> void {
     if (TrackingAction::Instance().SaveDecayVertexData()) {
         fDecayVertexOutput.emplace(fmt::format("G4Run{}/SimDecayVertex", runID));
     }
-    if (fSaveTTCHitData) {
-        fTTCSimHitOutput.emplace(fmt::format("G4Run{}/TTCSimHit", runID));
-    }
-    if (fSaveTTCSiPMHitData) {
-        fTTCSiPMHitOutput.emplace(fmt::format("G4Run{}/TTCSiPMHit", runID));
-    }
+    fTTCSimHitOutput.emplace(fmt::format("G4Run{}/TTCSimHit", runID));
+    fTTCSiPMHitOutput.emplace(fmt::format("G4Run{}/TTCSiPMHit", runID));
     fECALSimHitOutput.emplace(fmt::format("G4Run{}/ECALSimHit", runID));
     fECALPMHitOutput.emplace(fmt::format("G4Run{}/ECALPMHit", runID));
     fSciFiSimHitOutput.emplace(fmt::format("G4Run{}/SciFiSimHit", runID));
@@ -129,12 +123,8 @@ auto Analysis::RunEndUserAction(int) -> void {
     if (fDecayVertexOutput) {
         fDecayVertexOutput->Write();
     }
-    if (fTTCSimHitOutput) {
-        fTTCSimHitOutput->Write();
-    }
-    if (fTTCSiPMHitOutput) {
-        fTTCSiPMHitOutput->Write();
-    }
+    fTTCSimHitOutput->Write();
+    fTTCSiPMHitOutput->Write();
     fECALSimHitOutput->Write();
     fECALPMHitOutput->Write();
     fSciFiSimHitOutput->Write();
