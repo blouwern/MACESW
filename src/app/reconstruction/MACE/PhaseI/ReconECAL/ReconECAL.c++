@@ -32,26 +32,14 @@
 #include "Mustard/Parallel/ProcessSpecificPath.h++"
 #include "Mustard/Utility/LiteralUnit.h++"
 #include "Mustard/Utility/MathConstant.h++"
-#include "Mustard/Utility/PhysicalConstant.h++"
-#include "Mustard/Utility/VectorArithmeticOperator.h++"
 
 #include "CLHEP/Vector/ThreeVector.h"
 
 #include "ROOT/RDataFrame.hxx"
 #include "TFile.h"
-#include "TH1.h"
-#include "TH3.h"
-#include "TRandom.h"
 #include "TTree.h"
-#include "TVector3.h"
-
-#include "muc/algorithm"
-
-#include "fmt/format.h"
 
 #include <algorithm>
-#include <functional>
-#include <ranges>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -62,7 +50,6 @@ ReconECAL::ReconECAL() :
 
 using namespace Mustard::LiteralUnit;
 using namespace Mustard::MathConstant;
-using namespace Mustard::PhysicalConstant;
 using namespace std::literals;
 
 auto ReconECAL::Main(int argc, char* argv[]) const -> int {
@@ -118,8 +105,104 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
         Mustard::Data::Value<double, "cosTheta", "Cosine of angle between the tracks">,
         Mustard::Data::Value<double, "theta", "Angle between the tracks">>;
 
+    double energy1{};
+    double energy2{};
+    // double energy3{};
+    int pe1{};
+    // int pe2{};
+    // int pe3{};
+    CLHEP::Hep3Vector weightedPosition1{};
+    CLHEP::Hep3Vector weightedPosition2{};
+    // CLHEP::Hep3Vector weightedPosition3{};
+    CLHEP::Hep3Vector clusterPosition1{};
+    CLHEP::Hep3Vector clusterPosition2{};
+    // CLHEP::Hep3Vector clusterPosition3{};
+    Mustard::Data::Tuple<ECALEnergy> energyTuple;
+
+    auto setEnergyTupel1 = [&](std::vector<int>& potentialSeedModule, std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict, CLHEP::Hep3Vector& truthHitVector) -> void {
+        auto seedModule = potentialSeedModule.begin();
+        auto cluster = ECALClustering::Clusterer(*seedModule, moduleList);
+        for (const auto& module : cluster) {
+            auto hitIt = hitDict.find(module);
+            if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
+                continue;
+            }
+            auto energy = Get<"Edep">(*hitIt->second);
+            weightedPosition1 += energy * moduleList.at(module).centroid;
+            energy1 += energy;
+
+            auto pe = Get<"nOptPho">(*hitIt->second);
+            if (useOptics and pe > 3) {
+                pe1 += pe;
+            }
+        }
+
+        if (energy1 != 0) {
+            clusterPosition1 = weightedPosition1 / energy1;
+        }
+
+        Get<"Edep1">(energyTuple) = energy1;
+        Get<"PE1">(energyTuple) = pe1;
+        Get<"Position1">(energyTuple) = clusterPosition1;
+        if (useCalibration) {
+            Get<"cosTheta">(energyTuple) = clusterPosition1.cosTheta(truthHitVector);
+        }
+        Get<"theta">(energyTuple) = clusterPosition1.theta(CLHEP::Hep3Vector{0, 0, 1});
+    };
+
+    auto setEnergyTupel2 = [&](std::vector<int>& potentialSeedModule, std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict) -> void {
+        auto firstSeedModule = potentialSeedModule.begin();
+        auto secondSeedModule = std::ranges::find_if(
+            potentialSeedModule,
+            [&](int moduleID) {
+                const auto& c1{moduleList.at(*firstSeedModule).centroid};
+                const auto& c2{moduleList.at(moduleID).centroid};
+                return c1.angle(c2) > 0.8 * pi;
+            });
+        if (secondSeedModule == potentialSeedModule.end() or std::ssize(potentialSeedModule) < 2) {
+            return;
+        }
+        auto firstCluster = ECALClustering::Clusterer(*firstSeedModule, moduleList);
+        auto secondCluster = ECALClustering::Clusterer(*secondSeedModule, moduleList);
+
+        for (const auto& module : firstCluster) {
+            auto hitIt = hitDict.find(module);
+            if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
+                continue;
+            }
+            auto energy = Get<"Edep">(*hitIt->second);
+            weightedPosition1 += energy * moduleList.at(module).centroid;
+            energy1 += energy;
+        }
+        if (energy1 != 0) {
+            clusterPosition1 = weightedPosition1 / energy1;
+        }
+        for (const auto& module : secondCluster) {
+            auto hitIt = hitDict.find(module);
+            if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
+                continue;
+            }
+            auto energy = Get<"Edep">(*hitIt->second);
+            weightedPosition2 += energy * moduleList.at(module).centroid;
+            energy2 += energy;
+        }
+        if (energy2 != 0) {
+            clusterPosition2 = weightedPosition2 / energy2;
+        }
+
+        Get<"Edep1">(energyTuple) = energy1;
+        Get<"Position1">(energyTuple) = clusterPosition1;
+        Get<"Edep2">(energyTuple) = energy2;
+        Get<"Position2">(energyTuple) = clusterPosition2;
+        Get<"TotalEdep">(energyTuple) = energy1 + energy2;
+        Get<"dE">(energyTuple) = std::abs(energy1 - energy2);
+        Get<"dt">(energyTuple) = std::abs(*Get<"t">(*hitDict.at(*firstSeedModule)) - *Get<"t">(*hitDict.at(*secondSeedModule)));
+        Get<"cosTheta">(energyTuple) = clusterPosition1.cosTheta(clusterPosition2);
+    };
+
     Mustard::Data::Output<ECALEnergy> reconEnergy{"G4Run0/ReconECAL"};
     Mustard::Data::Processor processor;
+
     processor.Process<Data::ECALSimHit>(
         ROOT::RDataFrame{cli->get("--input-tree"), cli->get<std::vector<std::string>>("input")}, int{}, "EvtID",
         [&](bool byPass, auto&& event) {
@@ -132,8 +215,8 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                          });
             std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>> hitDict;
             std::vector<int> potentialSeedModule;
-            muc::array3f truthHitMomentum{};
 
+            muc::array3f truthHitMomentum{};
             for (auto&& hit : event) {
                 hitDict.try_emplace(Get<"ModID">(*hit), hit);
                 potentialSeedModule.emplace_back(Get<"ModID">(*hit));
@@ -146,103 +229,10 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                 truthHitMomentum.at(1),
                 truthHitMomentum.at(2)};
 
-            double energy1{};
-            double energy2{};
-            // double energy3{};
-            int pe1{};
-            // int pe2{};
-            // int pe3{};
-            CLHEP::Hep3Vector weightedPosition1{};
-            CLHEP::Hep3Vector weightedPosition2{};
-            // CLHEP::Hep3Vector weightedPosition3{};
-            CLHEP::Hep3Vector clusterPosition1{};
-            CLHEP::Hep3Vector clusterPosition2{};
-            // CLHEP::Hep3Vector clusterPosition3{};
-            Mustard::Data::Tuple<ECALEnergy> energyTuple;
-
             if (doSingle) {
-                auto seedModule = potentialSeedModule.begin();
-                auto cluster = ECALClustering::Clusterer(*seedModule, moduleList);
-                for (const auto& module : cluster) {
-                    auto hitIt = hitDict.find(module);
-                    if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
-                        continue;
-                    }
-                    auto energy = Get<"Edep">(*hitIt->second);
-                    weightedPosition1 += energy * moduleList.at(module).centroid;
-
-                    if (useOptics) {
-                        auto pe = Get<"nOptPho">(*hitIt->second);
-                        if (pe > 3) {
-                            energy1 += energy;
-                            pe1 += pe;
-                        }
-                    } else {
-                        energy1 += energy;
-                    }
-                    if (energy1 != 0) {
-                        clusterPosition1 = weightedPosition1 / energy1;
-                    }
-
-                    Get<"Edep1">(energyTuple) = energy1;
-                    Get<"PE1">(energyTuple) = pe1;
-                    Get<"Position1">(energyTuple) = clusterPosition1;
-                    if (useCalibration) {
-                        Get<"cosTheta">(energyTuple) = clusterPosition1.cosTheta(truthHitVector);
-                    } else {
-                        Get<"theta">(energyTuple) = clusterPosition1.theta(CLHEP::Hep3Vector{0, 0, 1});
-                    }
-                }
+                setEnergyTupel1(potentialSeedModule, hitDict, truthHitVector);
             } else if (doDouble) {
-                if (std::ssize(potentialSeedModule) < 2) {
-                    return;
-                }
-                auto firstSeedModule = potentialSeedModule.begin();
-                auto secondSeedModule = std::ranges::find_if(
-                    potentialSeedModule,
-                    [&](int moduleID) {
-                        const auto& c1{moduleList.at(*firstSeedModule).centroid};
-                        const auto& c2{moduleList.at(moduleID).centroid};
-                        return c1.angle(c2) > 0.8 * pi;
-                    });
-                if (secondSeedModule == potentialSeedModule.end()) {
-                    return;
-                }
-                auto firstCluster = ECALClustering::Clusterer(*firstSeedModule, moduleList);
-                auto secondCluster = ECALClustering::Clusterer(*secondSeedModule, moduleList);
-                for (const auto& module : firstCluster) {
-                    auto hitIt = hitDict.find(module);
-                    if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
-                        continue;
-                    }
-                    auto energy = Get<"Edep">(*hitIt->second);
-                    weightedPosition1 += energy * moduleList.at(module).centroid;
-                    energy1 += energy;
-                    if (energy1 != 0) {
-                        clusterPosition1 = weightedPosition1 / energy1;
-                    }
-                }
-                for (const auto& module : secondCluster) {
-                    auto hitIt = hitDict.find(module);
-                    if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
-                        continue;
-                    }
-                    auto energy = Get<"Edep">(*hitIt->second);
-                    weightedPosition2 += energy * moduleList.at(module).centroid;
-                    energy2 += energy;
-                    if (energy2 != 0) {
-                        clusterPosition2 = weightedPosition2 / energy2;
-                    }
-                }
-
-                Get<"Edep1">(energyTuple) = energy1;
-                Get<"Position1">(energyTuple) = clusterPosition1;
-                Get<"Edep2">(energyTuple) = energy2;
-                Get<"Position2">(energyTuple) = clusterPosition2;
-                Get<"TotalEdep">(energyTuple) = energy1 + energy2;
-                Get<"dE">(energyTuple) = std::abs(energy1 - energy2);
-                Get<"dt">(energyTuple) = std::abs(*Get<"t">(*hitDict.at(*firstSeedModule)) - *Get<"t">(*hitDict.at(*secondSeedModule)));
-                Get<"cosTheta">(energyTuple) = clusterPosition1.cosTheta(clusterPosition2);
+                setEnergyTupel2(potentialSeedModule, hitDict);
             } else if (doTriple) {
                 // To be implemented
             }
