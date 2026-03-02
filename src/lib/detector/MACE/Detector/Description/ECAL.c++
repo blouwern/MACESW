@@ -416,7 +416,7 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
         Mustard::MasterPrintLn<'I'>("### Type {}: \n", typeID);
         Mustard::MasterPrintLn<'I'>("- lengths: ");
         Mustard::MasterPrintLn<'I'>("{}, ", currentEdgeLengths);
-        Mustard::MasterPrintLn<'I'>("\n- modules({} in total):", std::ranges::distance(equalRange));
+        Mustard::MasterPrintLn<'I'>("\n- modules ({} in total):", std::ranges::distance(equalRange));
 
         for (auto&& [_, moduleID] : equalRange) {
             Mustard::MasterPrint<'I'>("{}, ", moduleID);
