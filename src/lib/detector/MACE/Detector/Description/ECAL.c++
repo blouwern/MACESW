@@ -403,8 +403,8 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
     }
 
     Mustard::MasterPrintLn<'I'>("\n======================================================");
-    Mustard::MasterPrintLn<'I'>("Information for ECAL");
-    Mustard::MasterPrintLn<'I'>("# ECAL Module Sorting\n");
+    Mustard::MasterPrintLn<'I'>("#Information for ECAL");
+    Mustard::MasterPrintLn<'I'>("## ECAL Module Sorting\n");
 
     typeID = 0;
     auto it{edgeLengthsMap.begin()};
@@ -413,7 +413,7 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
         auto currentEdgeLengths{it->first};
         const auto range{edgeLengthsMap.equal_range(currentEdgeLengths)};
         const std::ranges::subrange equalRange{range.first, range.second};
-        Mustard::MasterPrintLn<'I'>("## Type {}: \n", typeID);
+        Mustard::MasterPrintLn<'I'>("### Type {}: \n", typeID);
         Mustard::MasterPrintLn<'I'>("- lengths: ");
         Mustard::MasterPrintLn<'I'>("{}, ", currentEdgeLengths);
         Mustard::MasterPrintLn<'I'>("\n- modules({} in total):", std::ranges::distance(equalRange));
@@ -427,7 +427,7 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
         it = range.second;
     }
     if (not fModuleSelection->empty()) {
-        Mustard::MasterPrintLn<'I'>("## Selected Module Clustering ");
+        Mustard::MasterPrintLn<'I'>("### Selected Module Clustering ");
         for (auto&& m : *fModuleSelection) {
             Mustard::MasterPrintLn<'I'>("\n- Module {}", m);
             Mustard::MasterPrint<'I'>("{},", m);
