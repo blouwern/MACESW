@@ -17,26 +17,24 @@
 // You should have received a copy of the GNU General Public License along with
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// This file is deprecated and will be removed soon.
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 #pragma once
 
-#include "Mustard/Data/TupleModel.h++"
-#include "Mustard/Data/Value.h++"
+#include "Mustard/Math/GeometryRepresentation.h++"
 
-#include "muc/array"
+namespace MACE::inline Algorithm {
 
-#include <vector>
+/// @brief Extrapolation mode for extrapolation to POCA to a target object
+enum struct ExtrapolationMode {
+    Nearest, // extrapolate to the nearest POCA
+    Forward, // extrapolate forward only; fail if not possible
+    Backward // extrapolate backward only; fail if not possible
+};
 
-namespace MACE::Data {
+/// @brief Result of extrapolation to POCA to a target object
+struct ExtrapolationResult {
+    double doca;           // distance of closest approach
+    double deltaS;         // arc length extrapolated
+    Mustard::Point3D poca; // point of closest approach on target object
+};
 
-using DecayVertex = Mustard::Data::TupleModel<
-    Mustard::Data::Value<int, "EvtID", "Event ID">,
-    Mustard::Data::Value<int, "PDGID", "Parent PDG ID">,
-    Mustard::Data::Value<std::vector<int>, "SecPDGID", "PDG ID of decay products">,
-    Mustard::Data::Value<double, "t", "Decay time">,
-    Mustard::Data::Value<muc::array3f, "x", "Decay position">>;
-
-} // namespace MACE::Data
+} // namespace MACE::inline Algorithm

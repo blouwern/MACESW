@@ -17,28 +17,21 @@
 // You should have received a copy of the GNU General Public License along with
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// This file is deprecated and will be removed soon.
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 #pragma once
 
 #include "Mustard/Data/TupleModel.h++"
 #include "Mustard/Data/Value.h++"
 
-#include "muc/array"
+#include <vector>
 
 namespace MACE::Data {
 
-using TTCSiPMRawHit = Mustard::Data::TupleModel<
-    Mustard::Data::Value<short, "TileID", "Hit detector ID">,
-    Mustard::Data::Value<short, "SiPMID", "Hit Silicone ID">,
-    Mustard::Data::Value<double, "t", "Optical photon hit time">,
-    Mustard::Data::Value<muc::array2f, "x", "Relative hit position on the sensor">,
-    Mustard::Data::Value<muc::array3f, "k", "Wave vector of the photon">>;
-
-using ECALPMRawHit = Mustard::Data::TupleModel<
-    Mustard::Data::Value<short, "ModID", "Hit module ID">,
-    Mustard::Data::Value<double, "t", "Optical photon hit time">>;
+/// @brief Waveform model
+/// @note Shared between many digit models. Lossless up to 24-bit ADC and TDC
+using WaveformModel = Mustard::Data::TupleModel<
+    Mustard::Data::Value<double, "tF0", "[ns] Frame begin time">,
+    Mustard::Data::Value<float, "dtF", "[ns] Sampling interval">,
+    Mustard::Data::Value<std::vector<float>, "amp", "[a.u.] Waveform samples">>;
+using Waveform = Mustard::Data::Tuple<WaveformModel>;
 
 } // namespace MACE::Data

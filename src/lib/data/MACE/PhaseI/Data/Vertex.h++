@@ -17,28 +17,14 @@
 // You should have received a copy of the GNU General Public License along with
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// This file is deprecated and will be removed soon.
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 #pragma once
 
 #include "Mustard/Data/TupleModel.h++"
 #include "Mustard/Data/Value.h++"
 
-#include "muc/array"
+namespace MACE::PhaseI::Data {
 
-namespace MACE::Data {
+// TODO: define Track data model
+// using Track = Mustard::Data::TupleModel<...>;
 
-using TTCSiPMRawHit = Mustard::Data::TupleModel<
-    Mustard::Data::Value<short, "TileID", "Hit detector ID">,
-    Mustard::Data::Value<short, "SiPMID", "Hit Silicone ID">,
-    Mustard::Data::Value<double, "t", "Optical photon hit time">,
-    Mustard::Data::Value<muc::array2f, "x", "Relative hit position on the sensor">,
-    Mustard::Data::Value<muc::array3f, "k", "Wave vector of the photon">>;
-
-using ECALPMRawHit = Mustard::Data::TupleModel<
-    Mustard::Data::Value<short, "ModID", "Hit module ID">,
-    Mustard::Data::Value<double, "t", "Optical photon hit time">>;
-
-} // namespace MACE::Data
+} // namespace MACE::PhaseI::Data

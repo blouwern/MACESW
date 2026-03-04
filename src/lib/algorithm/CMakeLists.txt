@@ -15,11 +15,8 @@
 # You should have received a copy of the GNU General Public License along with
 # MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-add_subdirectory(algorithm)
-add_subdirectory(analysis)
-add_subdirectory(data)
-add_subdirectory(detector)
-add_subdirectory(generator)
-add_subdirectory(reconstruction)
-add_subdirectory(simulation)
-add_subdirectory(utility)
+file(GLOB_RECURSE MACESW_ALGORITHM_SRC ${CMAKE_CURRENT_SOURCE_DIR}/MACE/*.c++)
+
+add_library(MACEAlgorithm STATIC ${MACESW_ALGORITHM_SRC})
+target_include_directories(MACEAlgorithm PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(MACEAlgorithm PUBLIC MACEData MACEDetector Mustard::Mustard)
