@@ -19,13 +19,14 @@
 
 #pragma once
 
+#include "MACE/Data/WaveformModel.h++"
+#include "MACE/Data/internal/DigiModelHeader.h++"
 #include "MACE/Data/internal/HitModelHeader.h++"
 #include "MACE/Data/internal/SimHitTrackTruthModel.h++"
 
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Data/TupleModel.h++"
 #include "Mustard/Data/Value.h++"
-#include "Mustard/Data/WaveformModel.h++"
 
 #include "muc/array"
 
@@ -36,7 +37,7 @@ namespace MACE::Data {
 /// @brief Cell digit model
 /// @note For real data and simulation data
 using DriftCellDigiModel = Mustard::Data::TupleModel<
-    internal::HitModelHeader,
+    internal::DigiModelHeader,
     Mustard::Data::Value<std::int32_t, "CellID", "Cell ID">,
     Mustard::Data::Value<float, "Qtot", "[fC] Total charge">,
     Mustard::Data::Value<double, "t", "[ns] Signal time">,
