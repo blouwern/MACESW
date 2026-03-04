@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Mustard/Detector/Description/DescriptionWithCacheBase.h++"
+#include "Mustard/Math/GeometryRepresentation.h++"
 #include "Mustard/Math/Vector.h++"
 
 #include "CLHEP/Geometry/Point3D.h"

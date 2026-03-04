@@ -27,6 +27,7 @@
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Data/TupleModel.h++"
 #include "Mustard/IO/PrettyLog.h++"
+#include "Mustard/Math/GeometryRepresentation.h++"
 #include "Mustard/Math/Vector.h++"
 
 #include "muc/algorithm"

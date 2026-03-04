@@ -25,6 +25,7 @@
 #include "Mustard/Data/Processor.h++"
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Env/MPIEnv.h++"
+#include "Mustard/Math/GeometryRepresentation.h++"
 #include "Mustard/Math/Vector.h++"
 #include "Mustard/Parallel/ProcessSpecificPath.h++"
 #include "Mustard/Utility/LiteralUnit.h++"
