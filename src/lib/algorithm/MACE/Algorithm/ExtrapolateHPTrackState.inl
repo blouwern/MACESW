@@ -25,7 +25,7 @@ auto Extrapolate(Mustard::Data::SuperTuple<HPTrackState> auto& track, double del
 
     Get<"t">(track) += deltaS / c_light; // assume beta = 1
     if (std::isinf(Get<"r">(track))) {
-        auto x0{Get<"x0", Mustard::Vector3D>(track)};
+        auto x0{Get<"x0", Mustard::Point3D>(track)};
         x0 += deltaS * Get<"d0", Mustard::Vector3D>(track);
         Get<"x0">(track) = x0;
         // d0 and phi0 remain unchanged
@@ -49,20 +49,18 @@ auto Extrapolate(Mustard::Data::SuperTuple<HPTrackState> auto& track, Mustard::P
                  ExtrapolationMode mode) -> std::optional<ExtrapolationResult> {
     // deal with straight line case first
     if (std::isinf(Get<"r">(track))) {
-        const auto& [x0, y0, z0]{Get<"x0">(track)};
-        const auto& [dX, dY, _]{Get<"d0">(track)};
-        const Mustard::Point2D position2D{x0, y0};
-        const Mustard::Vector2D direction2D{dX, dY};
-        const auto deltaX{axis - position2D};
-        const auto deltaS{deltaX.dot(direction2D) / direction2D.mag()};
+        const auto x0{Get<"x0", Mustard::Point3D>(track)};
+        const auto d0{Get<"d0", Mustard::Vector3D>(track)};
+        const Mustard::Point3D axisPoint{axis.x(), axis.y(), 0};
+        const Mustard::Vector3D axisDirection{0, 0, 1};
+        const auto [poca1, poca2, doca]{Mustard::POCA({x0, d0}, {axisPoint, axisDirection})};
+        const auto deltaS{(poca1 - x0).dot(d0)};
         if ((mode == ExtrapolationMode::Forward and deltaS < 0) or
             (mode == ExtrapolationMode::Backward and deltaS > 0)) {
             return std::nullopt;
         }
-        const auto doca{std::sqrt(deltaX.mag2() - muc::pow<2>(deltaS))};
         Extrapolate(track, deltaS);
-        const Mustard::Vector3D poca{axis.x(), axis.y(), z0};
-        return ExtrapolationResult{doca, deltaS, poca};
+        return ExtrapolationResult{doca, deltaS, poca2};
     }
 
     // compute POCA
@@ -115,13 +113,13 @@ auto Extrapolate(Mustard::Data::SuperTuple<HPTrackState> auto& track, Mustard::P
                  int maxIter, double absTol, double relTol) -> std::optional<ExtrapolationResult> {
     // deal with straight line case first
     if (std::isinf(Get<"r">(track))) {
-        const auto deltaX{point - Get<"x0", Mustard::Vector3D>(track)};
+        const auto deltaX{point - Get<"x0", Mustard::Point3D>(track)};
         const auto deltaS{deltaX.dot(Get<"d0", Mustard::Vector3D>(track))};
         if ((mode == ExtrapolationMode::Forward and deltaS < 0) or
             (mode == ExtrapolationMode::Backward and deltaS > 0)) {
             return std::nullopt;
         }
-        const auto doca{std::sqrt(deltaX.mag2() - muc::pow<2>(deltaS))};
+        const auto doca{std::sqrt(deltaX.mag2() - muc::pow(deltaS, 2))};
         Extrapolate(track, deltaS);
         return ExtrapolationResult{doca, deltaS, point};
     }
@@ -165,12 +163,11 @@ auto Extrapolate(Mustard::Data::SuperTuple<HPTrackState> auto& track, Mustard::P
 auto Extrapolate(Mustard::Data::SuperTuple<HPTrackState> auto& track, Mustard::Line3D line,
                  ExtrapolationMode mode, double maxDeltaPhi, int nTrialPts,
                  int maxIter, double absTol, double relTol) -> std::optional<ExtrapolationResult> {
-    const auto x0{Get<"x0", Mustard::Vector3D>(track)};
-    const auto d0{Get<"d0", Mustard::Vector3D>(track)};
     // deal with straight line case first
     if (std::isinf(Get<"r">(track))) {
-        const Mustard::Line3D trackLine{x0, d0};
-        const auto [poca1, poca2, doca]{Mustard::POCA(trackLine, line)};
+        const auto x0{Get<"x0", Mustard::Point3D>(track)};
+        const auto d0{Get<"d0", Mustard::Vector3D>(track)};
+        const auto [poca1, poca2, doca]{Mustard::POCA({x0, d0}, line)};
         const auto deltaS{(poca1 - x0).dot(d0)};
         if ((mode == ExtrapolationMode::Forward and deltaS < 0) or
             (mode == ExtrapolationMode::Backward and deltaS > 0)) {

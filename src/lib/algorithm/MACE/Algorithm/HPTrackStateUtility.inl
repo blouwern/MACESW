@@ -49,7 +49,7 @@ auto UpdateKinematicState(Mustard::Data::SuperTuple<HPTrackState> auto& track, d
 auto UpdateHelixState(Mustard::Data::SuperTuple<HPTrackState> auto& track, double nominalB) -> void {
     using Mustard::PhysicalConstant::c_light;
 
-    const auto [d0x, d0y, cosLambda]{Get<"d0", std::array3d>(track)};
+    const auto [d0x, d0y, cosLambda]{Get<"d0", muc::array3d>(track)};
     const auto q{Get<"q">(track)};
     const auto sinLambda{(q < 0) xor (nominalB > 0) ?
                              +muc::hypot(d0x, d0y) :

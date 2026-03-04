@@ -19,11 +19,12 @@
 
 #pragma once
 
+#include "MACE/Data/internal/HitModelHeader.h++"
+#include "MACE/Data/internal/SimHitTrackTruthModel.h++"
+
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Data/TupleModel.h++"
 #include "Mustard/Data/Value.h++"
-#include "Mustard/Data/internal/HitModelHeader.h++"
-#include "Mustard/Data/internal/SimHitTrackTruthModel.h++"
 
 #include "muc/array"
 

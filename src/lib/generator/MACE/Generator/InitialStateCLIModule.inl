@@ -78,8 +78,8 @@ auto InitialStateCLIModule<P, Ms...>::Momentum() const -> std::array<Mustard::Ve
     requires(sizeof...(Ms) >= 2)
 {
     std::array<Mustard::Vector3D, sizeof...(Ms)> p;
-    for (auto i{1}; i <= sizeof...(Ms); ++i) {
-        p[i] = To3Vector(fmt::format("--momentum-{}", i));
+    for (int i{}; i < sizeof...(Ms); ++i) {
+        p[i] = To3Vector(fmt::format("--momentum-{}", i + 1));
     }
     return p;
 }
@@ -98,8 +98,8 @@ auto InitialStateCLIModule<P, Ms...>::Polarization() const -> std::array<Mustard
     requires(P == "polarized" and sizeof...(Ms) >= 2)
 {
     std::array<Mustard::Vector3D, sizeof...(Ms)> p;
-    for (auto i{1}; i <= sizeof...(Ms); ++i) {
-        p[i] = To3Vector(fmt::format("--polarization-{}", i));
+    for (int i{}; i < sizeof...(Ms); ++i) {
+        p[i] = To3Vector(fmt::format("--polarization-{}", i + 1));
     }
     return p;
 }

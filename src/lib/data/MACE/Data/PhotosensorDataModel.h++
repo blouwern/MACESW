@@ -19,11 +19,12 @@
 
 #pragma once
 
+#include "MACE/Data/WaveformModel.h++"
+#include "MACE/Data/internal/DigiModelHeader.h++"
+
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Data/TupleModel.h++"
 #include "Mustard/Data/Value.h++"
-#include "Mustard/Data/WaveformModel.h++"
-#include "Mustard/Data/internal/DigiModelHeader.h++"
 
 #include "muc/array"
 

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "Mustard/Data/Tuple.h++"
 #include "Mustard/Data/TupleModel.h++"
 #include "Mustard/Data/Value.h++"
 

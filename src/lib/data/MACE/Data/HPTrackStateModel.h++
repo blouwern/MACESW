@@ -41,11 +41,11 @@ namespace MACE::Data {
 ///
 /// @details The helix parametric equations are defined as
 /// @f[
-/// \begin{aligned}
-/// x(\phi) & = c_x + r \cos\left( \phi + \phi_0 \right) \right) \\
-/// y(\phi) & = c_y + r \sin\left( \phi + \phi_0 \right) \right) \\
+/// \begin{equation}
+/// x(\phi) & = c_x + r \cos\left( \phi + \phi_0 \right) \quad
+/// y(\phi) & = c_y + r \sin\left( \phi + \phi_0 \right) \quad
 /// z(\phi) & = z_0 + r \phi \cot\lambda
-/// \end{aligned}
+/// \end{equation}
 /// @f]
 /// where @f$(c_x, c_y)\in\mathbb{R}^2@f$ is the transverse center,
 /// @f$r\in(0, +\infty)@f$ is the transverse radius,
@@ -59,11 +59,11 @@ namespace MACE::Data {
 ///
 /// The relationship between direction and @f$(\phi_0, \lambda)@f$ is given by
 /// @f[
-/// \begin{aligned}
-/// d_{0,x} & = -\sin\phi_0 \sin\lambda \\
-/// d_{0,y} & = \cos\phi_0 \sin\lambda \\
-/// d_{0,z} & = \cos\lambda \\
-/// \end{aligned}
+/// \begin{equation}
+/// d_{0,x} & = -\sin\phi_0 \sin\lambda \quad
+/// d_{0,y} & = \cos\phi_0 \sin\lambda \quad
+/// d_{0,z} & = \cos\lambda
+/// \end{equation}
 /// @f]
 ///
 /// @warning This model lacks many transactional information and only for
