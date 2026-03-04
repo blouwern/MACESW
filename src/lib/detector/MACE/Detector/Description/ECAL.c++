@@ -25,8 +25,6 @@
 #include "Mustard/Utility/PhysicalConstant.h++"
 #include "Mustard/Utility/VectorCast.h++"
 
-#include "CLHEP/Vector/TwoVector.h"
-
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
 #include "G4Transform3D.hh"
@@ -295,11 +293,11 @@ auto ECAL::CalculateMeshInformation() const -> MeshInformation {
     const auto point{pmpMesh.vertex_property<pmp::Point>("v:point")};
     // construct vertexList
     for (auto&& v : pmpMesh.vertices()) {
-        vertexList.emplace_back(Mustard::VectorCast<CLHEP::Hep3Vector>(point[v]));
+        vertexList.emplace_back(Mustard::VectorCast<Mustard::Vector3D>(point[v]));
     }
     // construct faceList
     for (auto&& pmpFace : pmpMesh.faces()) {
-        const auto centroid{Mustard::VectorCast<CLHEP::Hep3Vector>(pmp::centroid(pmpMesh, pmpFace))};
+        const auto centroid{Mustard::VectorCast<Mustard::Vector3D>(pmp::centroid(pmpMesh, pmpFace))};
         if (const auto rXY{fInnerRadius * centroid.perp()};
             centroid.z() < 0) {
             if (rXY < fUpstreamWindowRadius) {
@@ -323,7 +321,7 @@ auto ECAL::CalculateMeshInformation() const -> MeshInformation {
 
         auto& face{faceList.emplace_back()};
         face.centroid = centroid;
-        face.normal = Mustard::VectorCast<CLHEP::Hep3Vector>(pmp::face_normal(pmpMesh, pmpFace));
+        face.normal = Mustard::VectorCast<Mustard::Vector3D>(pmp::face_normal(pmpMesh, pmpFace));
         for (auto&& pmpFaceVertex : pmpMesh.vertices(pmpFace)) {
             for (auto&& pmpVertexFace : pmpMesh.faces(pmpFaceVertex)) {
                 if (pmpVertexFace != pmpFace) {

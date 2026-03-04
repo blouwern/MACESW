@@ -25,13 +25,12 @@
 #include "Mustard/Data/Processor.h++"
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Env/MPIEnv.h++"
+#include "Mustard/Math/Vector.h++"
 #include "Mustard/Parallel/ProcessSpecificPath.h++"
 #include "Mustard/Utility/LiteralUnit.h++"
 #include "Mustard/Utility/MathConstant.h++"
 #include "Mustard/Utility/PhysicalConstant.h++"
 #include "Mustard/Utility/VectorArithmeticOperator.h++"
-
-#include "CLHEP/Vector/ThreeVector.h"
 
 #include "ROOT/RDataFrame.hxx"
 #include "TFile.h"
@@ -79,7 +78,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     const auto& ecal{Detector::Description::ECAL::Instance()};
     const auto& faceList{ecal.Mesh().faceList};
 
-    std::map<int, CLHEP::Hep3Vector> centroidMap;
+    std::map<int, Mustard::Vector3D> centroidMap;
 
     for (int i{}; auto&& [centroid, _1, _2, _3, _4] : std::as_const(faceList)) {
         centroidMap[i] = centroid;

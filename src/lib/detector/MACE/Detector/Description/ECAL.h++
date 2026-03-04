@@ -20,10 +20,10 @@
 #pragma once
 
 #include "Mustard/Detector/Description/DescriptionWithCacheBase.h++"
+#include "Mustard/Math/Vector.h++"
 
 #include "CLHEP/Geometry/Point3D.h"
 #include "CLHEP/Geometry/Transform3D.h"
-#include "CLHEP/Vector/ThreeVector.h"
 
 #include "muc/array"
 #include "muc/hash_map"
@@ -117,8 +117,8 @@ public:
 
     struct MeshInformation {
         struct Module {
-            CLHEP::Hep3Vector centroid{};
-            CLHEP::Hep3Vector normal{};
+            Mustard::Vector3D centroid{};
+            Mustard::Vector3D normal{};
             std::vector<gsl::index> vertexIndex{};
             int typeID{};
             std::unordered_set<int> neighborModuleID{};

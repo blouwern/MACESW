@@ -26,11 +26,10 @@
 #include "MACE/Detector/Description/World.h++"
 
 #include "Mustard/Detector/Definition/DefinitionBase.h++"
+#include "Mustard/Math/Transform.h++"
 #include "Mustard/Utility/LiteralUnit.h++"
 #include "Mustard/Utility/MathConstant.h++"
 #include "Mustard/Utility/VectorCast.h++"
-
-#include "CLHEP/Vector/RotationY.h"
 
 #include "G4Box.hh"
 #include "G4NistManager.hh"
