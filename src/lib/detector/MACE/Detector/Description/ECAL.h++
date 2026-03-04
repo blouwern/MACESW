@@ -117,7 +117,7 @@ public:
 
     struct MeshInformation {
         struct Module {
-            Mustard::Vector3D centroid{};
+            Mustard::Point3D centroid{};
             Mustard::Vector3D normal{};
             std::vector<gsl::index> vertexIndex{};
             int typeID{};

@@ -78,7 +78,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     const auto& ecal{Detector::Description::ECAL::Instance()};
     const auto& faceList{ecal.Mesh().faceList};
 
-    std::map<int, Mustard::Vector3D> centroidMap;
+    std::map<int, Mustard::Point3D> centroidMap;
 
     for (int i{}; auto&& [centroid, _1, _2, _3, _4] : std::as_const(faceList)) {
         centroidMap[i] = centroid;

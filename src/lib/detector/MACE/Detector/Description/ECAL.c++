@@ -293,11 +293,11 @@ auto ECAL::CalculateMeshInformation() const -> MeshInformation {
     const auto point{pmpMesh.vertex_property<pmp::Point>("v:point")};
     // construct vertexList
     for (auto&& v : pmpMesh.vertices()) {
-        vertexList.emplace_back(Mustard::VectorCast<Mustard::Vector3D>(point[v]));
+        vertexList.emplace_back(Mustard::VectorCast<Mustard::Point3D>(point[v]));
     }
     // construct faceList
     for (auto&& pmpFace : pmpMesh.faces()) {
-        const auto centroid{Mustard::VectorCast<Mustard::Vector3D>(pmp::centroid(pmpMesh, pmpFace))};
+        const auto centroid{Mustard::VectorCast<Mustard::Point3D>(pmp::centroid(pmpMesh, pmpFace))};
         if (const auto rXY{fInnerRadius * centroid.perp()};
             centroid.z() < 0) {
             if (rXY < fUpstreamWindowRadius) {
