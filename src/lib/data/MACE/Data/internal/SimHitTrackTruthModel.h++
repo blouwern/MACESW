@@ -17,10 +17,6 @@
 // You should have received a copy of the GNU General Public License along with
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// This file is deprecated and will be removed soon.
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 #pragma once
 
 #include "Mustard/Data/TupleModel.h++"
@@ -28,17 +24,19 @@
 
 #include "muc/array"
 
-namespace MACE::Data {
+#include <cstdint>
+#include <string>
 
-using TTCSiPMRawHit = Mustard::Data::TupleModel<
-    Mustard::Data::Value<short, "TileID", "Hit detector ID">,
-    Mustard::Data::Value<short, "SiPMID", "Hit Silicone ID">,
-    Mustard::Data::Value<double, "t", "Optical photon hit time">,
-    Mustard::Data::Value<muc::array2f, "x", "Relative hit position on the sensor">,
-    Mustard::Data::Value<muc::array3f, "k", "Wave vector of the photon">>;
+namespace MACE::Data::internal {
 
-using ECALPMRawHit = Mustard::Data::TupleModel<
-    Mustard::Data::Value<short, "ModID", "Hit module ID">,
-    Mustard::Data::Value<double, "t", "Optical photon hit time">>;
+/// @brief Shared between many simulated hit models
+using SimHitTrackTruthModel = Mustard::Data::TupleModel<
+    Mustard::Data::Value<std::int32_t, "TrkID", "MC Track ID">,
+    Mustard::Data::Value<std::int32_t, "PDGID", "Particle PDG ID (MC truth)">,
+    Mustard::Data::Value<double, "t0", "[ns] Track initial time (MC truth)">,
+    Mustard::Data::Value<muc::array3f, "x0", "[mm] Track initial position (MC truth)">,
+    Mustard::Data::Value<float, "Ek0", "[MeV] Track initial kinetic energy (MC truth)">,
+    Mustard::Data::Value<muc::array3f, "p0", "[MeV/c] Track initial momentum (MC truth)">,
+    Mustard::Data::Value<std::string, "CreatProc", "Track creator process (MC truth)">>;
 
-} // namespace MACE::Data
+} // namespace MACE::Data::internal

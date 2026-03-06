@@ -48,7 +48,7 @@ MatrixElementBasedGeneratorCLIModule::MatrixElementBasedGeneratorCLIModule(gsl::
         .scan<'g', long double>();
 }
 
-auto MatrixElementBasedGeneratorCLIModule::ContinueIntegration() const -> std::optional<Mustard::Math::MCIntegrationState> {
+auto MatrixElementBasedGeneratorCLIModule::ContinueIntegration() const -> std::optional<Mustard::MCIntegrationState> {
     const auto cliState{TheCLI()->present<std::vector<long double>>("--continue-integration")};
     if (not cliState.has_value()) {
         return {};
@@ -57,7 +57,7 @@ auto MatrixElementBasedGeneratorCLIModule::ContinueIntegration() const -> std::o
         Mustard::MasterPrintWarning("Option --continue-integration set but --seed not set! You are probably using the previous seed, "
                                     "and it will generate the same event series. Try set exclusive seeds for each run, or simply --seed 0");
     }
-    Mustard::Math::MCIntegrationState state{};
+    Mustard::MCIntegrationState state{};
     state.sum[0] = cliState->at(0);
     state.sum[1] = cliState->at(1);
     state.n = gsl::narrow_cast<decltype(state.n)>(cliState->at(2));

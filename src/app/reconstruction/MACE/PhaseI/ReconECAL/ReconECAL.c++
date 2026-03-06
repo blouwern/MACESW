@@ -28,13 +28,13 @@
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Detector/Description/DescriptionIO.h++"
 #include "Mustard/Env/MPIEnv.h++"
+#include "Mustard/Math/GeometryRepresentation.h++"
+#include "Mustard/Math/Vector.h++"
 #include "Mustard/Parallel/ProcessSpecificPath.h++"
 #include "Mustard/Utility/LiteralUnit.h++"
 #include "Mustard/Utility/MathConstant.h++"
 #include "Mustard/Utility/PhysicalConstant.h++"
 #include "Mustard/Utility/VectorArithmeticOperator.h++"
-
-#include "CLHEP/Vector/ThreeVector.h"
 
 #include "ROOT/RDataFrame.hxx"
 #include "TFile.h"
@@ -83,7 +83,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     const auto& ecal{MACE::Detector::Description::ECAL::Instance()};
     const auto& faceList{ecal.Mesh().faceList};
 
-    std::map<int, CLHEP::Hep3Vector> centroidMap;
+    std::map<int, Mustard::Point3D> centroidMap;
 
     for (int i{}; auto&& [centroid, _1, _2, _3, _4] : std::as_const(faceList)) {
         centroidMap[i] = centroid;
@@ -128,8 +128,8 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
             std::unordered_set<short> firstCluster;
             std::unordered_set<short> secondCluster;
 
-            CLHEP::Hep3Vector firstCenter{};
-            CLHEP::Hep3Vector secondCenter{};
+            Mustard::Point3D firstCenter{};
+            Mustard::Point3D secondCenter{};
 
             auto firstSeedModule = potentialSeedModule.begin();
             auto secondSeedModule = std::ranges::find_if(
@@ -140,7 +140,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
             }
 
             const auto clustering = [&](std::unordered_set<short>& set,
-                                        CLHEP::Hep3Vector& c,
+                                        Mustard::Point3D& c,
                                         std::vector<short>::iterator seedIt) {
                 const auto addClusterLayers = [&](short module) {
                     set.insert(module);
@@ -154,7 +154,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                 };
                 addClusterLayers(*seedIt);
                 float totalEnergy{};
-                CLHEP::Hep3Vector weightedCentroid{};
+                Mustard::Point3D weightedCentroid{};
 
                 for (const auto& module : set) {
                     auto hitIt = hitDict.find(module);

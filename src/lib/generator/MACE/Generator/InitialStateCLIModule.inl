@@ -66,7 +66,7 @@ InitialStateCLIModule<P, Ms...>::InitialStateCLIModule(gsl::not_null<Mustard::CL
 
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
-auto InitialStateCLIModule<P, Ms...>::Momentum() const -> CLHEP::Hep3Vector
+auto InitialStateCLIModule<P, Ms...>::Momentum() const -> Mustard::Vector3D
     requires(sizeof...(Ms) == 1)
 {
     return To3Vector("--momentum");
@@ -74,19 +74,19 @@ auto InitialStateCLIModule<P, Ms...>::Momentum() const -> CLHEP::Hep3Vector
 
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
-auto InitialStateCLIModule<P, Ms...>::Momentum() const -> std::array<CLHEP::Hep3Vector, sizeof...(Ms)>
+auto InitialStateCLIModule<P, Ms...>::Momentum() const -> std::array<Mustard::Vector3D, sizeof...(Ms)>
     requires(sizeof...(Ms) >= 2)
 {
-    std::array<CLHEP::Hep3Vector, sizeof...(Ms)> p;
-    for (auto i{1}; i <= sizeof...(Ms); ++i) {
-        p[i] = To3Vector(fmt::format("--momentum-{}", i));
+    std::array<Mustard::Vector3D, sizeof...(Ms)> p;
+    for (int i{}; i < sizeof...(Ms); ++i) {
+        p[i] = To3Vector(fmt::format("--momentum-{}", i + 1));
     }
     return p;
 }
 
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
-auto InitialStateCLIModule<P, Ms...>::Polarization() const -> CLHEP::Hep3Vector
+auto InitialStateCLIModule<P, Ms...>::Polarization() const -> Mustard::Vector3D
     requires(P == "polarized" and sizeof...(Ms) == 1)
 {
     return To3Vector("--polarization");
@@ -94,19 +94,19 @@ auto InitialStateCLIModule<P, Ms...>::Polarization() const -> CLHEP::Hep3Vector
 
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
-auto InitialStateCLIModule<P, Ms...>::Polarization() const -> std::array<CLHEP::Hep3Vector, sizeof...(Ms)>
+auto InitialStateCLIModule<P, Ms...>::Polarization() const -> std::array<Mustard::Vector3D, sizeof...(Ms)>
     requires(P == "polarized" and sizeof...(Ms) >= 2)
 {
-    std::array<CLHEP::Hep3Vector, sizeof...(Ms)> p;
-    for (auto i{1}; i <= sizeof...(Ms); ++i) {
-        p[i] = To3Vector(fmt::format("--polarization-{}", i));
+    std::array<Mustard::Vector3D, sizeof...(Ms)> p;
+    for (int i{}; i < sizeof...(Ms); ++i) {
+        p[i] = To3Vector(fmt::format("--polarization-{}", i + 1));
     }
     return p;
 }
 
 template<muc::ceta_string P, muc::ceta_string... Ms>
     requires((P == "polarized" or P == "unpolarized") and sizeof...(Ms) >= 1)
-auto InitialStateCLIModule<P, Ms...>::To3Vector(std::string_view option) const -> CLHEP::Hep3Vector {
+auto InitialStateCLIModule<P, Ms...>::To3Vector(std::string_view option) const -> Mustard::Vector3D {
     const auto vector{TheCLI()->template get<std::vector<double>>(option)};
     return {vector[0], vector[1], vector[2]};
 }
