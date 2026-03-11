@@ -38,8 +38,8 @@ auto MatrixElementBasedGeneratorCLIModule::PhaseSpaceIntegral(Mustard::Executor<
         } else {
             result = generator.PhaseSpaceIntegral(executor, precisionGoal);
         }
-        Mustard::MasterPrintLn("You can save the above phase-space integral and integration state for future use "
-                               "as long as initial state properties and acceptance function does not change "
+        Mustard::MasterPrintLn("You can save the above phase-space integral and integration state for future use, "
+                               "as long as initial state properties, acceptance function, and IR cutoffs (if any) does not change "
                                "(see option -i or --phase-space-integral and --continue-integration)."
                                "\n");
     }

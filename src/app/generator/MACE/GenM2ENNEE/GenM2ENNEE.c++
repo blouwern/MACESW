@@ -124,8 +124,8 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
                          branchingRatio.uncertainty / branchingRatio.value * 100, nEff);
 
     // Return if nothing to be generated
-    const auto nEvent{cli.GenerateOrExit()};
-    if (not nEvent.has_value()) {
+    const auto nEvent{cli.NEvent()};
+    if (nEvent == 0) {
         return EXIT_SUCCESS;
     }
 
@@ -136,11 +136,8 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     Generator::WriteAutocorrelationFunction(autocorrelationFunction);
 
     // Generate events
-    if (*nEvent == 0) {
-        return EXIT_SUCCESS;
-    }
     Mustard::Data::Output<Mustard::Data::GeneratedKinematics> writer{cli->get("--output-tree")};
-    executor(*nEvent, [&](auto) {
+    executor(nEvent, [&](auto) {
         const auto [weight, pdgID, p]{generator(rng)};
         Mustard::Data::Tuple<Mustard::Data::GeneratedKinematics> event;
         // 0: e+, 3: e-, 4: e+
