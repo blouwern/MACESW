@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 
-const std::string dataTupleName{"ECALSimHit"};
+const std::string dataTupleName{"TTCSimHit"};
 
 const void Judge(double pValue) {
     const std::string boldInvert{"\x1B[1m\x1B[7m"};
@@ -30,7 +30,7 @@ const void Judge(double pValue) {
     }
 }
 
-auto TestECALSimHit(std::string moduleName, std::string testFileName, std::string sampleFileName) {
+auto TestTTCSimHit(std::string moduleName, std::string testFileName, std::string sampleFileName) {
     gROOT->SetBatch(kTRUE);
 
     auto SaveRegressionResult{

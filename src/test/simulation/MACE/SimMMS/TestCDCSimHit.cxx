@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 
-const std::string dataTupleName{"MRPCSimHit"};
+const std::string dataTupleName{"CDCSimHit"};
 
 const void Judge(double pValue) {
     const std::string boldInvert{"\x1B[1m\x1B[7m"};
@@ -30,7 +30,7 @@ const void Judge(double pValue) {
     }
 }
 
-auto TestMRPCSimHit(std::string moduleName, std::string testFileName, std::string sampleFileName) {
+auto TestCDCSimHit(std::string moduleName, std::string testFileName, std::string sampleFileName) {
     gROOT->SetBatch(kTRUE);
 
     auto SaveRegressionResult{
@@ -94,7 +94,6 @@ auto TestMRPCSimHit(std::string moduleName, std::string testFileName, std::strin
             h2->DrawClone();
             h1->DrawClone("SAME");
             pad2->cd();
-            pull->SetStats(false);
             pull->Draw();
             auto file{TFile("regression_report.root", "update")};
             c1->Write();
@@ -122,9 +121,6 @@ auto TestMRPCSimHit(std::string moduleName, std::string testFileName, std::strin
                 .Define("p_0", "p[0]")
                 .Define("p_1", "p[1]")
                 .Define("p_2", "p[2]")
-                .Define("x0_0", "x0[0]")
-                .Define("x0_1", "x0[1]")
-                .Define("x0_2", "x0[2]")
                 .Define("p0_0", "p0[0]")
                 .Define("p0_1", "p0[1]")
                 .Define("p0_2", "p0[2]")};
