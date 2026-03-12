@@ -13,7 +13,7 @@ for arg in "$@"; do
 done
 
 driver_script_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-test_root_dir=$driver_script_dir
+test_src_dir=$driver_script_dir
 build_dir=$test_script_dir/..
 regression_data_dir=$test_script_dir/regression_data_$(date --utc +%Y%m%d-%H%M%S)
 
@@ -59,16 +59,16 @@ else
     fi
 fi
 
-if [ -f "$test_root_dir/macesw_regression_data.root" ]; then
-    mkdir -p "$test_root_dir/old-regression-data/"
-    mv "$test_root_dir/macesw_regression_data.root" "$script_dir/old-regression-data/outdated_at_$(date "+%Y%m%d-%H%M").root"
+if [ -f "$test_src_dir/macesw_regression_data.root" ]; then
+    mkdir -p "$test_src_dir/old-regression-data/"
+    mv "$test_src_dir/macesw_regression_data.root" "$script_dir/old-regression-data/outdated_at_$(date "+%Y%m%d-%H%M").root"
     echo "==> NOTICE: old version of macesw_regression_data.root moved to $script_dir/old-regression-data/"
 fi
 
 echo "Start simulation..."
-source $test_root_dir/simulation/MACE/SimMACE/generate_regression_data.bash
-source $test_root_dir/simulation/MACE/SimMMS/generate_regression_data.bash
-source $test_root_dir/simulation/MACE/SimTTC/generate_regression_data.bash
+source $test_src_dir/simulation/MACE/SimMACE/generate_regression_data.bash
+source $test_src_dir/simulation/MACE/SimMMS/generate_regression_data.bash
+source $test_src_dir/simulation/MACE/SimTTC/generate_regression_data.bash
 
 end_time=$(date +%s)
 total_time=$((end_time - start_time))

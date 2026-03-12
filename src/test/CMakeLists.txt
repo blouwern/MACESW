@@ -17,10 +17,11 @@
 
 set(SOURCE_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/simulation"
+    "${CMAKE_CURRENT_SOURCE_DIR}/rc"
 )
 set(SOURCE_FILE
     "${CMAKE_CURRENT_SOURCE_DIR}/generate_regression_data_dr.bash"
-    "${CMAKE_CURRENT_SOURCE_DIR}/regression_test_dr.bash"
+    "${CMAKE_CURRENT_SOURCE_DIR}/regression_test_all.bash"
 )
 set(DEST_DIR "${CMAKE_BINARY_DIR}/test")
 
