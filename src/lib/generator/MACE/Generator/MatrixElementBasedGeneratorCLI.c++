@@ -35,7 +35,7 @@ MatrixElementBasedGeneratorCLIModule::MatrixElementBasedGeneratorCLIModule(gsl::
         .nargs(1)
         .scan<'g', double>();
     TheCLI()
-        ->add_argument("--integral-precision-goal")
+        ->add_argument("-c", "--integral-precision-goal")
         .help("Precision goal for phase-space integral.")
         .default_value(0.01)
         .required()

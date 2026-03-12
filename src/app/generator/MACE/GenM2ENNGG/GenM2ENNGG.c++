@@ -62,7 +62,7 @@ auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
     auto& biasCLI{cli->add_mutually_exclusive_group()};
     biasCLI.add_argument("--emiss-bias").help("Apply soft upper bound for missing energy.").flag();
     cli->add_argument("--emiss-soft-upper-bound").help("Soft upper bound for missing energy in --emiss-bias.").default_value(0_MeV).required().nargs(1).scan<'g', double>();
-    cli->add_argument("--emiss-softening-factor").help("Softening factor for missing energy upper bound in --emiss-bias.").default_value(1_MeV).required().nargs(1).scan<'g', double>();
+    cli->add_argument("--emiss-softening-scale").help("Softening scale for missing energy upper bound in --emiss-bias.").default_value(1_MeV).required().nargs(1).scan<'g', double>();
     Mustard::Env::MPIEnv env{argc, argv, cli};
     Mustard::UseXoshiro<256> random{cli};
 
@@ -73,7 +73,7 @@ auto GenM2ENNGG::Main(int argc, char* argv[]) const -> int {
 
     if (cli["--emiss-bias"] == true) {
         generator.Acceptance([eMissCut = cli->get<double>("--emiss-soft-upper-bound"),
-                              scEMiss = muc::soft_cmp{cli->get<double>("--emiss-softening-factor")}](auto&& momenta) {
+                              scEMiss = muc::soft_cmp{cli->get<double>("--emiss-softening-scale")}](auto&& momenta) {
             //.          e+  n   n   g   g
             const auto& [q1, _1, _2, q4, q5]{momenta};
             const auto eMiss{muon_mass_c2 - (q1.e() + q4.e() + q5.e())};

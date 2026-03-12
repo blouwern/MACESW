@@ -62,10 +62,10 @@ auto GenBkgM2ENNE::Main(int argc, char* argv[]) const -> int {
     auto& biasCLI{cli->add_mutually_exclusive_group()};
     biasCLI.add_argument("--mace-bias").help("Enable MACE detector signal region importance sampling.").flag();
     biasCLI.add_argument("--ep-ek-bias").help("Apply soft upper bound for positron kinetic energy.").flag();
-    cli->add_argument("--pxy-softening-factor").help("Softening factor for transverse momentum soft cut in --mace-bias.").default_value(0.25_MeV).required().nargs(1).scan<'g', double>();
-    cli->add_argument("--cos-theta-softening-factor").help("Softening factor for momentum cosine soft cut in --mace-bias.").default_value(0.025).required().nargs(1).scan<'g', double>();
+    cli->add_argument("--pxy-softening-scale").help("Softening scale for transverse momentum soft cut in --mace-bias.").default_value(0.25_MeV).required().nargs(1).scan<'g', double>();
+    cli->add_argument("--cos-theta-softening-scale").help("Softening scale for momentum cosine soft cut in --mace-bias.").default_value(0.025).required().nargs(1).scan<'g', double>();
     cli->add_argument("--ep-ek-soft-upper-bound").help("Soft upper bound for positron kinetic energy in --ep-ek-bias or --mace-bias.").default_value(0_eV).required().nargs(1).scan<'g', double>();
-    cli->add_argument("--ep-ek-softening-factor").help("Softening factor for positron kinetic energy upper bound in --ep-ek-bias or --mace-bias.").default_value(1_keV).required().nargs(1).scan<'g', double>();
+    cli->add_argument("--ep-ek-softening-scale").help("Softening scale for positron kinetic energy upper bound in --ep-ek-bias or --mace-bias.").default_value(1_keV).required().nargs(1).scan<'g', double>();
     Mustard::Env::MPIEnv env{argc, argv, cli};
     Mustard::UseXoshiro<256> random{cli};
 
@@ -80,9 +80,9 @@ auto GenBkgM2ENNE::Main(int argc, char* argv[]) const -> int {
         generator.Acceptance([outPxyCut = (ttc.Radius() / 2) * mmsB * c_light,
                               cosCut = 1 / muc::hypot(2 * cdc.GasOuterRadius() / cdc.GasOuterLength(), 1.),
                               epEkCut = cli->get<double>("--ep-ek-soft-upper-bound"),
-                              scPxy = muc::soft_cmp{cli->get<double>("--pxy-softening-factor")},
-                              scCos = muc::soft_cmp{cli->get<double>("--cos-theta-softening-factor")},
-                              scEk = muc::soft_cmp{cli->get<double>("--ep-ek-softening-factor")}](auto&& momenta) {
+                              scPxy = muc::soft_cmp{cli->get<double>("--pxy-softening-scale")},
+                              scCos = muc::soft_cmp{cli->get<double>("--cos-theta-softening-scale")},
+                              scEk = muc::soft_cmp{cli->get<double>("--ep-ek-softening-scale")}](auto&& momenta) {
             // .         e+  n   n   e-
             const auto& [q1, _1, _2, q4]{momenta};
             const auto epSlow{scEk(q1.e() - electron_mass_c2) < scEk(epEkCut)};
@@ -91,7 +91,7 @@ auto GenBkgM2ENNE::Main(int argc, char* argv[]) const -> int {
         });
     } else if (cli["--ep-ek-bias"] == true) {
         generator.Acceptance([epEkCut = cli->get<double>("--ep-ek-soft-upper-bound"),
-                              scEk = muc::soft_cmp{cli->get<double>("--ep-ek-softening-factor")}](auto&& p) {
+                              scEk = muc::soft_cmp{cli->get<double>("--ep-ek-softening-scale")}](auto&& p) {
             const auto epEk{p[0].e() - electron_mass_c2};
             return scEk(epEk) < scEk(epEkCut);
         });

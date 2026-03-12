@@ -25,16 +25,16 @@ InitialStateCLIModule<P, Ms...>::InitialStateCLIModule(gsl::not_null<Mustard::CL
     ModuleBase{cli} {
     if constexpr (sizeof...(Ms) == 1) {
         TheCLI()
-            ->add_argument("-p", "--momentum")
-            .help(fmt::format("Parent momentum", Ms.sv()...))
+            ->add_argument("-k", "--momentum")
+            .help("Parent momentum")
             .default_value(std::vector{0., 0., 0.})
             .required()
             .nargs(3)
             .template scan<'g', double>();
         if constexpr (P == "polarized") {
             TheCLI()
-                ->add_argument("-P", "--polarization")
-                .help(fmt::format("Parent polarization vector", Ms.sv()...))
+                ->add_argument("-p", "--polarization")
+                .help("Parent polarization vector")
                 .default_value(std::vector{0., 0., 0.})
                 .required()
                 .nargs(3)
@@ -44,8 +44,8 @@ InitialStateCLIModule<P, Ms...>::InitialStateCLIModule(gsl::not_null<Mustard::CL
         const std::array parent{Ms.sv()...};
         for (std::size_t i{}; i < sizeof...(Ms); ++i) {
             TheCLI()
-                ->add_argument(fmt::format("-p{}", i), fmt::format("--momentum-{}", i))
-                .help(fmt::format("Parent {} momentum", parent[i]))
+                ->add_argument(fmt::format("-k{}", i), fmt::format("--momentum-{}", i))
+                .help(fmt::format("Parent {} momentum.", parent[i]))
                 .required()
                 .nargs(3)
                 .template scan<'g', double>();
@@ -53,8 +53,8 @@ InitialStateCLIModule<P, Ms...>::InitialStateCLIModule(gsl::not_null<Mustard::CL
         if constexpr (P == "polarized") {
             for (std::size_t i{}; i < sizeof...(Ms); ++i) {
                 TheCLI()
-                    ->add_argument(fmt::format("-P{}", i), fmt::format("--polarization-{}", i))
-                    .help(fmt::format("Parent {} polarization vector", parent[i]))
+                    ->add_argument(fmt::format("-p{}", i), fmt::format("--polarization-{}", i))
+                    .help(fmt::format("Parent {} polarization vector.", parent[i]))
                     .default_value(std::vector{0., 0., 0.})
                     .required()
                     .nargs(3)
