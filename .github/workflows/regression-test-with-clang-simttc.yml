@@ -1,4 +1,4 @@
-name: Regression test (AMD64 GNU/Linux Clang)
+name: Regression test SimTTC (AMD64 GNU/Linux Clang)
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
       - rc
     paths:
-      - ".github/workflows/regression-test-with-clang.yml"
+      - ".github/workflows/regression-test-with-clang-simttc.yml"
       - "src/**"
       - "test/**"
       - "MACE.c\\+\\+"
@@ -18,7 +18,7 @@ on:
       - main
       - rc
     paths:
-      - ".github/workflows/regression-test-with-clang.yml"
+      - ".github/workflows/regression-test-with-clang-simttc.yml"
       - "src/**"
       - "test/**"
       - "MACE.c\\+\\+"
@@ -29,17 +29,17 @@ permissions:
   contents: read
 
 jobs:
-  regression-test-with-clang:
-    name: Regression test (Clang)
+  regression-test-with-clang-simttc:
+    name: Regression test SimTTC (Clang)
     timeout-minutes: 180
     runs-on: ubuntu-latest
     strategy:
       matrix:
         image:
           - url: ghcr.io/zhao-shihan/rgb-docker:mpich
-            artifact-name: Regression test report (AMD64 GNU-Linux Clang, MPICH)
+            artifact-name: Regression test report (SimTTC, AMD64 GNU-Linux Clang, MPICH)
           - url: ghcr.io/zhao-shihan/rgb-docker:openmpi
-            artifact-name: Regression test report (AMD64 GNU-Linux Clang, OpenMPI)
+            artifact-name: Regression test report (SimTTC, AMD64 GNU-Linux Clang, OpenMPI)
     container: ${{ matrix.image.url }}
     defaults:
       run:
@@ -64,7 +64,7 @@ jobs:
       - name: Run regression test
         run: |
           . /environment
-          bash build/test/regression_test_dr.bash --use-hwthreads
+          bash build/test/simulation/MACE/SimTTC/regression_test.bash --use-hwthreads
 
       - name: Restore regression report
         uses: actions/upload-artifact@v4
