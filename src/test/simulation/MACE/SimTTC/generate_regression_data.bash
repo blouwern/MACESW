@@ -1,5 +1,8 @@
-#!/usr/bin/env bash
 # --SimTTC regression data generation script--
+# IMPORTANT: This file is not a standalone executable.
+# 			 It must be sourced by the main test driver script, which is responsible
+# 			 for defining the 'run_command' helper function and the required
+# 			 environment variables (n_proc, build_dir, test_src_dir).
 
 simttc_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
