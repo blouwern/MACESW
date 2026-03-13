@@ -6,9 +6,9 @@ test_src_dir=$rc_dir/..
 build_dir=$test_src_dir/..
 
 init() {
-    module=$1
+    module_name=$1
 
-    test_dir=$test_src_dir/test_$(module)_$(date --utc +%Y%m%d-%H%M%S)
+    test_dir=$test_src_dir/test_$(module_name)_$(date --utc +%Y%m%d-%H%M%S)
 
     mkdir "$test_dir" && cd "$test_dir"
     echo "Working directory: $(pwd)"

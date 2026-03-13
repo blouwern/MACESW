@@ -10,5 +10,5 @@ echo "Merging results..."
 run_command hadd -ff SimTTC_em_flat_sample.root SimTTC_em_flat_test/*
 
 echo "Drawing & saving regression histograms..."
-run_command root -l -q "$simttc_dir/ReadTTCSimHit.cxx(\"SimTTC_em_flat\",\"SimTTC_em_flat_sample.root\",\"$test_root_dir/macesw_regression_data.root\")"
+run_command root -l -q "$simttc_dir/ReadTTCSimHit.cxx(\"SimTTC_em_flat\",\"SimTTC_em_flat_sample.root\",\"$test_src_dir/macesw_regression_data.root\")"
 
