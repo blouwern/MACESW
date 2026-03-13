@@ -6,7 +6,7 @@ test_src_dir=$rc_dir/..
 build_dir=$test_src_dir/..
 
 init() {
-    module_name=$1
+    local module_name=$1
 
     test_dir=$test_src_dir/test_$(module_name)_$(date --utc +%Y%m%d-%H%M%S)
 
