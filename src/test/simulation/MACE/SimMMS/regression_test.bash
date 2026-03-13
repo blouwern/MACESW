@@ -11,7 +11,7 @@ source $simmms_dir/../../../rc/parexec-rc.bash
 init $module_name
 
 golden_file="$test_src_dir/macesw_regression_data.root"
-if[[ ! -f "$golden_file" ]];
+if [[ ! -f "$golden_file" ]]; then
     echo "ERROR: $golden_file not found."
     exit 1
 fi
