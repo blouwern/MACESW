@@ -26,7 +26,7 @@ parexec() {
         if [[ -z "$threads_per_core" || "$threads_per_core" -eq 0 ]]; then
             threads_per_core=1  # Fallback to assuming 1 thread per core
         fi
-        local n_physical_cores=$(echo "$(nproc) / $threads_per_core" | bc)
+        local n_physical_cores=$(( $(nproc) / threads_per_core ))
         if [[ "$n_physical_cores" -lt 1 ]]; then
             n_physical_cores=1  # Ensure at least 1 core
         fi
@@ -47,7 +47,7 @@ else
     if [[ -z "$threads_per_core" || "$threads_per_core" -eq 0 ]]; then
         threads_per_core=1  # Fallback to assuming 1 thread per core
     fi
-    n_proc=$(echo "$(nproc) / $threads_per_core" | bc)
+    n_proc=$(( $(nproc) / threads_per_core ))
     if [[ "$n_proc" -lt 1 ]]; then
         n_proc=1  # Ensure at least 1 core
     fi
