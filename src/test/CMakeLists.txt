@@ -13,7 +13,7 @@
 # A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along with
-# MACESW. If not, see <https://www.gnu.org/
+# MACESW. If not, see <https://www.gnu.org/licenses/>.
 
 set(SOURCE_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/simulation"
