@@ -24,7 +24,6 @@ if [ -d "SimMACE_signal_test" ]; then
     run_command hadd -ff SimMACE_signal_test.root SimMACE_signal_test/*.root
 else
     echo "Single file already present."
-    run_command mv SimMACE_signal_test*.root SimMACE_signal_test.root
 fi
 
 echo "Generating regression report..."
