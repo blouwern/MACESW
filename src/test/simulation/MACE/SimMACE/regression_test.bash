@@ -20,7 +20,12 @@ echo "Start SimMACE"
 run_command parexec $build_dir/MACE SimMACE --seed 0 $build_dir/SimMACE/run_signal.mac
 
 echo "Merging results..."
-run_command hadd -ff SimMACE_signal_test.root SimMACE_signal_test/*
+if [ -d "SimMACE_signal_test" ]; then
+    run_command hadd -ff SimMACE_signal_test.root SimMACE_signal_test/*.root
+else
+    echo "Single file already present."
+    run_command mv SimMACE_signal_test*.root SimMACE_signal_test.root
+fi
 
 echo "Generating regression report..."
 run_command root -l -q "$simmace_dir/TestMCPSimHit.cxx(\"SimMACE_signal\",\"SimMACE_signal_test.root\",\"$golden_file\")"

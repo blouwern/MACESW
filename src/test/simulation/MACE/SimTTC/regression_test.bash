@@ -21,7 +21,12 @@ echo "Start SimTTC"
 run_command parexec $build_dir/MACE SimTTC --seed 0 $build_dir/SimTTC/run_em_flat.mac
 
 echo "Merging results..."
-run_command hadd -ff SimTTC_em_flat_test.root SimTTC_em_flat_test/*
+if [ -d "SimTTC_em_flat_test" ]; then
+    run_command hadd -ff SimTTC_em_flat_test.root SimTTC_em_flat_test/*.root
+else
+    echo "Single file already present."
+    run_command mv SimTTC_em_flat_test*.root SimTTC_em_flat_test.root
+fi
 
 echo "Generating regression report..."
 run_command root -l -q "$simttc_dir/TestTTCSimHit.cxx(\"SimTTC_em_flat\",\"SimTTC_em_flat_test.root\",\"$golden_file\")"

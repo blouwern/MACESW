@@ -20,7 +20,12 @@ echo "Start SimMMS"
 run_command parexec $build_dir/MACE SimMMS --seed 0 $build_dir/SimMMS/run_em_flat.mac
 
 echo "Merging results..."
-run_command hadd -ff SimMMS_em_flat_test.root SimMMS_em_flat_test/*
+if [ -d "SimMMS_em_flat_test" ]; then
+    run_command hadd -ff SimMMS_em_flat_test.root SimMMS_em_flat_test/*.root
+else
+    echo "Single file already present."
+    run_command mv SimMMS_em_flat_test*.root SimMMS_em_flat_test.root
+fi
 
 echo "Generating regression report..."
 run_command root -l -q "$simmms_dir/TestCDCSimHit.cxx(\"SimMMS_em_flat\",\"SimMMS_em_flat_test.root\",\"$golden_file\")"
