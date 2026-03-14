@@ -15,8 +15,9 @@ done
 parexec() {
     if $use_hwthreads; then
         # Use hardware threads (hyperthreading included)
-         if mpiexec --version 2>/dev/null | grep -q "Open MPI"; then
-             mpiexec --allow-run-as-root --use-hwthread-cpus $@
+        if mpiexec --version 2>/dev/null | grep -q "Open MPI"; then
+            mpiexec --allow-run-as-root --use-hwthread-cpus $@
+        else
             mpiexec -n $(nproc) $@
         fi
     else
@@ -29,9 +30,9 @@ parexec() {
         if [[ "$n_physical_cores" -lt 1 ]]; then
             n_physical_cores=1  # Ensure at least 1 core
         fi
-         if mpiexec --version 2>/dev/null | grep -q "Open MPI"; then
-             mpiexec --allow-run-as-root -n $n_physical_cores $@
-         else
+        if mpiexec --version 2>/dev/null | grep -q "Open MPI"; then
+            mpiexec --allow-run-as-root -n $n_physical_cores $@
+        else
             mpiexec -n $n_physical_cores $@
         fi
     fi
