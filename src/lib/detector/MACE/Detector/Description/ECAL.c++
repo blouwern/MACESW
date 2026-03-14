@@ -403,8 +403,8 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
     }
 
     Mustard::MasterPrintLn<'I'>("\n======================================================");
-    Mustard::MasterPrintLn<'I'>("Information for ECAL\n");
-    Mustard::MasterPrintLn<'I'>(">>> Module Sorting of ECAL");
+    Mustard::MasterPrintLn<'I'>("#Information for ECAL");
+    Mustard::MasterPrintLn<'I'>("## ECAL Module Sorting\n");
 
     typeID = 0;
     auto it{edgeLengthsMap.begin()};
@@ -413,10 +413,10 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
         auto currentEdgeLengths{it->first};
         const auto range{edgeLengthsMap.equal_range(currentEdgeLengths)};
         const std::ranges::subrange equalRange{range.first, range.second};
-        Mustard::MasterPrintLn<'I'>("--- Type {}: \n", typeID);
+        Mustard::MasterPrintLn<'I'>("### Type {}: \n", typeID);
         Mustard::MasterPrintLn<'I'>("- lengths: ");
         Mustard::MasterPrintLn<'I'>("{}, ", currentEdgeLengths);
-        Mustard::MasterPrintLn<'I'>("\n- modules({} in total):", std::ranges::distance(equalRange));
+        Mustard::MasterPrintLn<'I'>("\n- modules ({} in total):", std::ranges::distance(equalRange));
 
         for (auto&& [_, moduleID] : equalRange) {
             Mustard::MasterPrint<'I'>("{}, ", moduleID);
@@ -427,16 +427,25 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
         it = range.second;
     }
     if (not fModuleSelection->empty()) {
-        Mustard::MasterPrintLn<'I'>("\n>>> Selected Module Clustering of ECAL ");
+        std::unordered_set<int> neighborModuleSet;
+        Mustard::MasterPrintLn<'I'>("### Selected Module Clustering ");
         for (auto&& m : *fModuleSelection) {
+            neighborModuleSet.insert(m);
             Mustard::MasterPrintLn<'I'>("\n- Module {}", m);
             Mustard::MasterPrint<'I'>("{},", m);
             for (auto&& n : moduleList.at(m).neighborModuleID) {
+                neighborModuleSet.insert(n);
+                neighborModuleSet.insert(moduleList.at(n).neighborModuleID.begin(), moduleList.at(n).neighborModuleID.end());
                 Mustard::MasterPrint<'I'>("{},", n);
             }
         }
-        Mustard::MasterPrintLn<'I'>("\n======================================================\n");
+        Mustard::MasterPrint<'I'>("\n");
+        Mustard::MasterPrint<'I'>("\n- Summary: ");
+        for (auto&& m : neighborModuleSet) {
+            Mustard::MasterPrint<'I'>("{},", m);
+        }
     }
+    Mustard::MasterPrintLn<'I'>("\n======================================================");
 
     return outputArrayInfo;
 }
