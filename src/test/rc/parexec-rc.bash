@@ -17,7 +17,7 @@ parexec() {
         # Use hardware threads (hyperthreading included)
          if mpiexec --version 2>/dev/null | grep -q "Open MPI"; then
              mpiexec --allow-run-as-root --use-hwthread-cpus $@
-            mpiexec -n "$(nproc)" $@
+            mpiexec -n $(nproc) $@
         fi
     else
         # Use physical cores (default)
@@ -30,24 +30,9 @@ parexec() {
             n_physical_cores=1  # Ensure at least 1 core
         fi
          if mpiexec --version 2>/dev/null | grep -q "Open MPI"; then
-             mpiexec --allow-run-as-root -n "$n_physical_cores" $@
+             mpiexec --allow-run-as-root -n $n_physical_cores $@
          else
-            mpiexec -n "$n_physical_cores" $@
+            mpiexec -n $n_physical_cores $@
         fi
     fi
 }
-
-if $use_hwthreads; then
-    # Use hardware threads (hyperthreading included)
-    n_proc=$(nproc)
-else
-    # Use physical cores (default)
-    threads_per_core=$(env LC_ALL=C lscpu | grep "Thread(s) per core" | awk '{print $4}')
-    if [[ -z "$threads_per_core" || "$threads_per_core" -eq 0 ]]; then
-        threads_per_core=1  # Fallback to assuming 1 thread per core
-    fi
-    n_proc=$(( $(nproc) / threads_per_core ))
-    if [[ "$n_proc" -lt 1 ]]; then
-        n_proc=1  # Ensure at least 1 core
-    fi
-fi
