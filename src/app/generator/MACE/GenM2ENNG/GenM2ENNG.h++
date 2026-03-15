@@ -19,25 +19,14 @@
 
 #pragma once
 
-#include "Mustard/CLI/Module/ModuleBase.h++"
-#include "Mustard/CLI/MonteCarloCLI.h++"
+#include "Mustard/Application/Subprogram.h++"
 
-#include <string>
+namespace MACE::GenM2ENNG {
 
-namespace MACE::Generator {
-
-class EventGeneratorCLIModule : public Mustard::CLI::ModuleBase {
+class GenM2ENNG : public Mustard::Application::Subprogram {
 public:
-    explicit EventGeneratorCLIModule(gsl::not_null<Mustard::CLI::CLI<>*> cli);
-
-    auto DefaultOutput(std::string path) -> void;
-    auto DefaultOutputTree(std::string name) -> void;
-
-    auto NEvent() const -> unsigned long long;
+    GenM2ENNG();
+    auto Main(int argc, char* argv[]) const -> int override;
 };
 
-template<std::derived_from<Mustard::CLI::ModuleBase>... AExtraModules>
-using EventGeneratorCLI = Mustard::CLI::MonteCarloCLI<EventGeneratorCLIModule,
-                                                      AExtraModules...>;
-
-} // namespace MACE::Generator
+} // namespace MACE::GenM2ENNG
