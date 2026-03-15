@@ -52,7 +52,7 @@ using namespace Mustard::PhysicalConstant;
 using namespace std::string_literals;
 
 GenM2ENNEE::GenM2ENNEE() :
-    Subprogram{"GenM2ENNEE", "Generate internal conversion muon decay (mu+ -> e+ nu nu e- e+)."} {}
+    Subprogram{"GenM2ENNEE", "Generate internal conversion muon decay (mu+ -> e+ nu_e nu_mu e- e+)."} {}
 
 auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     Generator::MCMCGeneratorCLI<Generator::InitialStateCLIModule<"polarized", "muon">> cli;
@@ -87,7 +87,7 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
                               scPxy = muc::soft_cmp{cli->get<double>("--pxy-softening-scale")},
                               scCos = muc::soft_cmp{cli->get<double>("--cos-theta-softening-scale")},
                               scEk = muc::soft_cmp{cli->get<double>("--ep-ek-softening-scale")}](auto&& momenta) {
-            // .         e+  n   n   e-  e+
+            //.          e+  νe νμ e-  e+
             const auto& [q1, _1, _2, q4, q5]{momenta};
             const auto emFast{scPxy(q4.perp()) > scPxy(outPxyCut) and scCos(muc::abs(q4.cosTheta())) < scCos(cosCut)};
             const auto ep1Miss{scPxy(q1.perp()) < scPxy(inPxyCut) or scCos(muc::abs(q1.cosTheta())) > scCos(cosCut)};
@@ -105,7 +105,7 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     } else if (cli["--emiss-bias"] == true) {
         generator.Acceptance([eMissCut = cli->get<double>("--emiss-soft-upper-bound"),
                               scEMiss = muc::soft_cmp{cli->get<double>("--emiss-softening-scale")}](auto&& momenta) {
-            // .         e+ n   n   e-  e+
+            //.          e+  νe  νμ  e-  e+
             const auto& [q1, _1, _2, q4, q5]{momenta};
             const auto eMiss{muon_mass_c2 - (q1.e() + q4.e() + q5.e())};
             return scEMiss(eMiss) < scEMiss(eMissCut);
@@ -140,7 +140,7 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     executor(nEvent, [&](auto) {
         const auto [weight, pdgID, p]{generator(rng)};
         Mustard::Data::Tuple<Mustard::Data::GeneratedKinematics> event;
-        // 0: e+, 3: e-, 4: e+
+        // Index: 0: e+, 1: νe, 2: νμ, 3: γ
         Get<"pdgID">(event) = {pdgID[0], pdgID[3], pdgID[4]};
         Get<"E">(event) = {static_cast<float>(p[0].e()), static_cast<float>(p[3].e()), static_cast<float>(p[4].e())};
         Get<"px">(event) = {static_cast<float>(p[0].x()), static_cast<float>(p[3].x()), static_cast<float>(p[4].x())};

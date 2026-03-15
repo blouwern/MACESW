@@ -122,7 +122,7 @@ The following dependencies are optional. If they are not found on your system du
 
 | 库 Library                                                      | 版本 Version | 描述 Description                                                                                                         |
 | :-------------------------------------------------------------- | :----------- | :----------------------------------------------------------------------------------------------------------------------- |
-| [**Mustard**](https://github.com/zhao-shihan/Mustard)           | ≥ 0.26.304   | 一个现代的、高性能的高能物理实验离线软件框架 / A modern, high-performance offline software framework for HEP experiments |
+| [**Mustard**](https://github.com/zhao-shihan/Mustard)           | ≥ 0.26.315   | 一个现代的、高性能的高能物理实验离线软件框架 / A modern, high-performance offline software framework for HEP experiments |
 | [**PMP Library**](https://www.pmp-library.org/)                 | ≥ 3.0.0      | 多边形网格处理库 / The Polygon Mesh Processing Library                                                                   |
 | [**zhao-shihan/GenFit**](https://github.com/zhao-shihan/GenFit) | main         | 一个通用的径迹拟合工具包 / A generic track-fitting toolkit                                                               |
 
