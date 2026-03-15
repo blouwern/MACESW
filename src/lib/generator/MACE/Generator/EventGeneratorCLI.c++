@@ -31,7 +31,7 @@ EventGeneratorCLIModule::EventGeneratorCLIModule(gsl::not_null<Mustard::CLI::CLI
     using namespace std::string_literals;
     TheCLI()
         ->add_argument("n")
-        .help("Number of events to generate. Program will skip event generation if get 0 (but could still compute the phase-space integral).")
+        .help("Number of events to generate. Program will skip event generation if n is 0 (but could still compute the phase-space integral).")
         .nargs(1)
         .scan<'i', unsigned long long>();
     TheCLI()

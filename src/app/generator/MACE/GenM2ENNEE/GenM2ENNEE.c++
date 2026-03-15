@@ -140,7 +140,7 @@ auto GenM2ENNEE::Main(int argc, char* argv[]) const -> int {
     executor(nEvent, [&](auto) {
         const auto [weight, pdgID, p]{generator(rng)};
         Mustard::Data::Tuple<Mustard::Data::GeneratedKinematics> event;
-        // Index: 0: e+, 1: νe, 2: νμ, 3: γ
+        // Index: 0: e+, 1: νe, 2: νμ, 3: e-, 4: e+
         Get<"pdgID">(event) = {pdgID[0], pdgID[3], pdgID[4]};
         Get<"E">(event) = {static_cast<float>(p[0].e()), static_cast<float>(p[3].e()), static_cast<float>(p[4].e())};
         Get<"px">(event) = {static_cast<float>(p[0].x()), static_cast<float>(p[3].x()), static_cast<float>(p[4].x())};
