@@ -33,8 +33,6 @@ auto UsePhaseIDefault() -> void {
     using namespace Mustard::LiteralUnit::Energy;
     namespace MACE = MACE::Detector::Description;
 
-    Mustard::MasterPrintLn("Applying PhaseI default detector description settings...");
-
     { // set accelerator up/downstream length to a random equal value
         auto& accelerator{MACE::Accelerator::Instance()};
         accelerator.MaxPotentialPosition(0);
@@ -75,6 +73,7 @@ auto UsePhaseIDefault() -> void {
         ecal.MPPCEfficiency({0.26319, 0.395706, 0.503681, 0.525767, 0.555215, 0.570552, 0.597546, 0.59816, 0.599387, 0.593252, 0.521472, 0.466258, 0.458896, 0.408589, 0.196933});
         ecal.WaveformIntegralTime(200_ns);
     }
+    Mustard::MasterPrintLn("Default detector description settings for Phase-I applied.");
 }
 
 } // namespace MACE::PhaseI::Detector::Description
