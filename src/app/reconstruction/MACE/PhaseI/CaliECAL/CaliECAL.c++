@@ -59,8 +59,6 @@ using namespace Mustard::MathConstant;
 using namespace std::literals;
 
 auto CaliECAL::Main(int argc, char* argv[]) const -> int {
-    Detector::Description::UsePhaseIDefault();
-
     Mustard::CLI::BasicCLI<Mustard::CLI::DetectorDescriptionModule<MACE::Detector::Description::ECAL>> cli;
     cli->add_argument("input").help("Input file path(s).").nargs(argparse::nargs_pattern::at_least_one);
     cli->add_argument("-p", "--input-primary-vertex-tree").help("Input primary vertex tree name.").default_value("G4Run0/SimPrimaryVertex"s).required().nargs(1);
@@ -73,6 +71,7 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
     cli.DetectorDescriptionIOIfFlagged();
 
     Mustard::Env::BasicEnv env{argc, argv, cli};
+    Detector::Description::UsePhaseIDefault();
 
     const auto& ecal{MACE::Detector::Description::ECAL::Instance()};
     const auto& moduleList{ecal.Array().moduleList};

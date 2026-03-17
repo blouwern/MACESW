@@ -52,8 +52,6 @@ using namespace Mustard::MathConstant;
 using namespace std::literals;
 
 auto ReconECAL::Main(int argc, char* argv[]) const -> int {
-    Detector::Description::UsePhaseIDefault();
-
     Mustard::CLI::BasicCLI<Mustard::CLI::DetectorDescriptionModule<MACE::Detector::Description::ECAL>> cli;
     auto& modeCLI{cli->add_mutually_exclusive_group()};
     modeCLI.add_argument("--single").help("Reconstruction of single-cluster event.").flag();
@@ -68,6 +66,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     cli.DetectorDescriptionIOIfFlagged();
 
     Mustard::Env::MPIEnv env{argc, argv, cli};
+    Detector::Description::UsePhaseIDefault();
 
     const auto& ecal{MACE::Detector::Description::ECAL::Instance()};
     const auto& moduleList{ecal.Array().moduleList};
