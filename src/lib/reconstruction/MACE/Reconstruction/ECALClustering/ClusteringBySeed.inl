@@ -19,8 +19,8 @@
 
 namespace MACE::inline Reconstruction::ECALClustering {
 
-inline auto Clusterer(int seedID,
-                      const std::vector<MACE::Detector::Description::ECAL::ArrayInformation::Module>& moduleList) -> std::unordered_set<int> {
+inline auto ClusteringBySeed(int seedID,
+                             const std::vector<MACE::Detector::Description::ECAL::ArrayInformation::Module>& moduleList) -> std::unordered_set<int> {
     std::unordered_set<int> modulesInCluster;
 
     modulesInCluster.insert(seedID);
