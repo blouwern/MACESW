@@ -9,7 +9,7 @@ using namespace Mustard::LiteralUnit::Angle;
 
 Target::Target() :
     DescriptionBase("Target"),
-    fProjectionRadius{60_mm},
+    fProjectionRadius{30_mm},
     fThickness{900_um},
     fInclinationAngle{45_deg} {}
 
