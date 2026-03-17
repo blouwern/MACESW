@@ -122,11 +122,14 @@ public:
 
     struct ArrayInformation {
         struct Module {
+            int moduleID{};
+            std::unordered_set<int> neighborModuleID{};
+            int typeID{};
             Mustard::Point3D centroid{};
             Mustard::Vector3D normal{};
             std::vector<gsl::index> vertexIndex{};
         };
-        std::vector<HepGeom::Point3D<double>> vertexList{};
+        std::vector<Mustard::Point3D> vertexList{};
         std::vector<Module> moduleList{};
     };
 
