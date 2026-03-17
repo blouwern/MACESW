@@ -35,8 +35,6 @@
 #include "Mustard/Utility/LiteralUnit.h++"
 #include "Mustard/Utility/MathConstant.h++"
 
-#include "CLHEP/Vector/ThreeVector.h"
-
 #include "ROOT/RDataFrame.hxx"
 #include "TFile.h"
 #include "TTree.h"

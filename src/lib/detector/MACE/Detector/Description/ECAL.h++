@@ -20,10 +20,11 @@
 #pragma once
 
 #include "Mustard/Detector/Description/DescriptionWithCacheBase.h++"
+#include "Mustard/Math/GeometryRepresentation.h++"
+#include "Mustard/Math/Vector.h++"
 
 #include "CLHEP/Geometry/Point3D.h"
 #include "CLHEP/Geometry/Transform3D.h"
-#include "CLHEP/Vector/ThreeVector.h"
 
 #include "muc/array"
 #include "muc/hash_map"
@@ -121,11 +122,8 @@ public:
 
     struct ArrayInformation {
         struct Module {
-            int moduleID{};
-            std::unordered_set<int> neighborModuleID{};
-            int typeID{};
-            CLHEP::Hep3Vector centroid{};
-            CLHEP::Hep3Vector normal{};
+            Mustard::Point3D centroid{};
+            Mustard::Vector3D normal{};
             std::vector<gsl::index> vertexIndex{};
         };
         std::vector<HepGeom::Point3D<double>> vertexList{};

@@ -25,8 +25,6 @@
 #include "Mustard/Utility/PhysicalConstant.h++"
 #include "Mustard/Utility/VectorCast.h++"
 
-#include "CLHEP/Vector/TwoVector.h"
-
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
 #include "G4Transform3D.hh"
@@ -303,7 +301,7 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
     const auto point{pmpMesh.vertex_property<pmp::Point>("v:point")};
     // construct vertexList
     for (auto&& v : pmpMesh.vertices()) {
-        vertexList.emplace_back(Mustard::VectorCast<CLHEP::Hep3Vector>(point[v]));
+        vertexList.emplace_back(Mustard::VectorCast<Mustard::Point3D>(point[v]));
     }
 
     // map from pmp face index to moduleID
@@ -311,7 +309,7 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
     muc::flat_hash_map<pmp::IndexType, ModuleID> indexMap;
     for (int moduleID{};
          auto&& pmpFace : pmpMesh.faces()) {
-        const auto centroid{Mustard::VectorCast<CLHEP::Hep3Vector>(pmp::centroid(pmpMesh, pmpFace))};
+        const auto centroid{Mustard::VectorCast<Mustard::Point3D>(pmp::centroid(pmpMesh, pmpFace))};
         if (const auto rXY{fInnerRadius * centroid.perp()};
             centroid.z() < 0) {
             if (rXY < fUpstreamWindowRadius) {
@@ -343,8 +341,8 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
 
         auto& face{moduleList.emplace_back()};
         face.moduleID = indexMap.at(pmpFace.idx());
-        face.centroid = Mustard::VectorCast<CLHEP::Hep3Vector>(pmp::centroid(pmpMesh, pmpFace));
-        face.normal = Mustard::VectorCast<CLHEP::Hep3Vector>(pmp::face_normal(pmpMesh, pmpFace));
+        face.centroid = Mustard::VectorCast<Mustard::Point3D>(pmp::centroid(pmpMesh, pmpFace));
+        face.normal = Mustard::VectorCast<Mustard::Vector3D>(pmp::face_normal(pmpMesh, pmpFace));
         for (auto&& pmpFaceVertex : pmpMesh.vertices(pmpFace)) {
             for (auto&& pmpVertexFace : pmpMesh.faces(pmpFaceVertex)) {
                 if (pmpVertexFace != pmpFace and indexMap.contains(pmpVertexFace.idx())) {
