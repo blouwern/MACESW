@@ -22,14 +22,16 @@
 #include "MACE/Detector/Description/ECAL.h++"
 #include "MACE/PhaseI/CaliECAL/CaliECAL.h++"
 #include "MACE/PhaseI/Detector/Description/UsePhaseIDefault.h++"
-#include "MACE/Reconstruction/ECALClustering/Clusterer.h++"
+#include "MACE/Reconstruction/ECALClustering/Reconstructing.h++"
 
 #include "Mustard/CLI/BasicCLI.h++"
+#include "Mustard/CLI/Module/DetectorDescriptionModule.h++"
 #include "Mustard/Data/Output.h++"
 #include "Mustard/Data/SeqProcessor.h++"
 #include "Mustard/Data/Tuple.h++"
 #include "Mustard/Detector/Description/DescriptionIO.h++"
 #include "Mustard/Env/BasicEnv.h++"
+#include "Mustard/IO/File.h++"
 #include "Mustard/IO/PrettyLog.h++"
 #include "Mustard/Parallel/ProcessSpecificPath.h++"
 #include "Mustard/Utility/LiteralUnit.h++"
@@ -46,7 +48,6 @@
 #include <algorithm>
 #include <stdexcept>
 #include <unordered_map>
-#include <unordered_set>
 
 namespace MACE::PhaseI::CaliECAL {
 
@@ -58,20 +59,20 @@ using namespace Mustard::MathConstant;
 using namespace std::literals;
 
 auto CaliECAL::Main(int argc, char* argv[]) const -> int {
-    Mustard::CLI::BasicCLI<> cli;
-    cli->add_argument("input").help("Input file path(s).").nargs(argparse::nargs_pattern::at_least_one);
-    cli->add_argument("-t", "--input-tree").help("Input tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
-    cli->add_argument("-o", "--output").help("Output file path.").required().nargs(1);
-    cli->add_argument("-m", "--output-mode").help("Output file creation mode.").default_value("RECREATE"s).required().nargs(1);
-    cli->add_argument("-d", "--description").help("Description YAML file path.").nargs(1);
-    cli->add_argument("-optics", "--optics").help("Use optical response.").flag();
-    Mustard::Env::BasicEnv env{argc, argv, cli};
+    Detector::Description::UsePhaseIDefault();
 
-    if (const auto descriptionPath{cli->present("--description")}) {
-        Mustard::Detector::Description::DescriptionIO::Import<MACE::Detector::Description::ECAL>(*descriptionPath);
-    } else {
-        Detector::Description::UsePhaseIDefault();
-    }
+    Mustard::CLI::BasicCLI<Mustard::CLI::DetectorDescriptionModule<MACE::Detector::Description::ECAL>> cli;
+    cli->add_argument("input").help("Input file path(s).").nargs(argparse::nargs_pattern::at_least_one);
+    cli->add_argument("-p", "--input-primary-vertex-tree").help("Input primary vertex tree name.").default_value("G4Run0/SimPrimaryVertex"s).required().nargs(1);
+    cli->add_argument("-h", "--input-ecal-hit-tree").help("Input ecal hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
+    cli->add_argument("-o", "--output").help("Output file path.").required().nargs(1);
+    cli->add_argument("-r", "--output-tree").help("Output tree name.").default_value("G4Run0/CaliECAL"s).required().nargs(1);
+    cli->add_argument("-m", "--output-mode").help("Output file creation mode.").default_value("NEW"s).required().nargs(1);
+    cli->add_argument("-d", "--description").help("Description YAML file path.").nargs(1);
+    cli->add_argument("--optics").help("Use optical response.").flag();
+    cli.DetectorDescriptionIOIfFlagged();
+
+    Mustard::Env::BasicEnv env{argc, argv, cli};
 
     const auto& ecal{MACE::Detector::Description::ECAL::Instance()};
     const auto& moduleList{ecal.Array().moduleList};
@@ -84,46 +85,26 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
         Mustard::Data::Value<double, "cosTheta", "Cosine of angle between the tracks">,
         Mustard::Data::Value<double, "theta", "Angle between the tracks">>;
 
-    Mustard::Data::Tuple<ECALEnergy> energyTuple;
+    auto setEnergyTuple = [&](Mustard::Data::Tuple<ECALEnergy>& energyTuple,
+                              const std::vector<int>& potentialSeedModule,
+                              const std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict,
+                              const CLHEP::Hep3Vector& truthHitMomentum) -> void {
+        constexpr auto energyThreshold{50_keV};
+        constexpr auto peCountThreshold{3};
+        const auto seedModule{potentialSeedModule.begin()};
+        const auto cluster{ECALClustering::Reconstructing(*seedModule, moduleList, hitDict, energyThreshold, cli["--optics"] == true, peCountThreshold)};
 
-    auto setEnergyTuple = [&](std::vector<int>& potentialSeedModule, std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict, CLHEP::Hep3Vector truthHitMomentum) -> void {
-        double energy{};
-        int pe{};
-        CLHEP::Hep3Vector weightedPosition{};
-        CLHEP::Hep3Vector clusterPosition{};
-
-        auto seedModule = potentialSeedModule.begin();
-        auto cluster = ECALClustering::Clusterer(*seedModule, moduleList);
-        for (const auto& module : cluster) {
-            auto hitIt = hitDict.find(module);
-            if (hitIt == hitDict.end() or Get<"Edep">(*hitIt->second) < 50_keV) {
-                continue;
-            }
-            auto e = Get<"Edep">(*hitIt->second);
-            weightedPosition += e * moduleList.at(module).centroid;
-            energy += e;
-
-            auto hitPE = Get<"nOptPho">(*hitIt->second);
-            if (cli["--optics"] == true and hitPE > 3) {
-                pe += hitPE;
-            }
-        }
-
-        if (energy != 0) {
-            clusterPosition = weightedPosition / energy;
-        }
-
-        Get<"Edep">(energyTuple) = energy;
-        Get<"PE">(energyTuple) = pe;
-        Get<"Position">(energyTuple) = clusterPosition;
-        Get<"cosTheta">(energyTuple) = clusterPosition.cosTheta(truthHitMomentum);
-        Get<"theta">(energyTuple) = clusterPosition.theta(truthHitMomentum);
+        Get<"Edep">(energyTuple) = cluster.energy;
+        Get<"PE">(energyTuple) = cluster.peCount;
+        Get<"Position">(energyTuple) = cluster.position;
+        Get<"cosTheta">(energyTuple) = cluster.position.cosTheta(truthHitMomentum);
+        Get<"theta">(energyTuple) = cluster.position.theta(truthHitMomentum);
     };
 
-    auto primaryData = ROOT::RDataFrame{"G4Run0/SimPrimaryVertex", cli->get<std::vector<std::string>>("input")};
-    auto inputData = ROOT::RDataFrame{cli->get("--input-tree"), cli->get<std::vector<std::string>>("input")};
-    TFile outputFile{Mustard::Parallel::ProcessSpecificPath(cli->get("--output").c_str()).generic_string().c_str(), cli->get("--output-mode").c_str()};
-    Mustard::Data::Output<ECALEnergy> reconEnergy{"G4Run0/CaliECAL"};
+    ROOT::RDataFrame primaryData{cli->get("--input-primary-vertex-tree"), cli->get<std::vector<std::string>>("input")};
+    ROOT::RDataFrame inputData{cli->get("--input-ecal-hit-tree"), cli->get<std::vector<std::string>>("input")};
+    Mustard::ProcessSpecificFile<TFile> outputFile{cli->get("--output"), cli->get("--output-mode")};
+    Mustard::Data::Output<ECALEnergy> reconEnergy{cli->get("--output-tree")};
     Mustard::Data::SeqProcessor processor;
 
     processor.Process<Data::SimPrimaryVertex, Data::ECALSimHit>(
@@ -149,12 +130,13 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
                 return;
             }
             primaryMomentum = Get<"p0">(*primary.front());
-            truthHitMomentum.set(
-                primaryMomentum.at(0),
-                primaryMomentum.at(1),
-                primaryMomentum.at(2));
+            truthHitMomentum.set(primaryMomentum.at(0),
+                                 primaryMomentum.at(1),
+                                 primaryMomentum.at(2));
 
-            setEnergyTuple(potentialSeedModule, hitDict, truthHitMomentum);
+            Mustard::Data::Tuple<ECALEnergy> energyTuple;
+
+            setEnergyTuple(energyTuple, potentialSeedModule, hitDict, truthHitMomentum);
 
             reconEnergy.Fill(std::move(energyTuple));
         });
