@@ -46,6 +46,7 @@
 #include "fmt/format.h"
 
 #include <algorithm>
+#include <optional>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -62,16 +63,18 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
     Mustard::CLI::BasicCLI<Mustard::CLI::DetectorDescriptionModule<MACE::Detector::Description::ECAL>> cli;
     cli->add_argument("input").help("Input file path(s).").nargs(argparse::nargs_pattern::at_least_one);
     cli->add_argument("-p", "--input-primary-vertex-tree").help("Input primary vertex tree name.").default_value("G4Run0/SimPrimaryVertex"s).required().nargs(1);
-    cli->add_argument("-h", "--input-ecal-hit-tree").help("Input ecal hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
+    cli->add_argument("-h", "--input-ecal-hit-tree").help("Input ECAL hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
     cli->add_argument("-o", "--output").help("Output file path.").required().nargs(1);
     cli->add_argument("-r", "--output-tree").help("Output tree name.").default_value("G4Run0/CaliECAL"s).required().nargs(1);
     cli->add_argument("-m", "--output-mode").help("Output file creation mode.").default_value("NEW"s).required().nargs(1);
     cli->add_argument("-d", "--description").help("Description YAML file path.").nargs(1);
+    cli->add_argument("-e", "--energy-threshold").help("Energy threshold for clustering.").default_value(50_keV).required().nargs(1);
+    cli->add_argument("-c", "--pe-count-threshold").help("Photoelectron count threshold for clustering.").default_value(3).required().nargs(1);
     cli->add_argument("--optics").help("Use optical response.").flag();
-    cli.DetectorDescriptionIOIfFlagged();
 
     Mustard::Env::BasicEnv env{argc, argv, cli};
     Detector::Description::UsePhaseIDefault();
+    cli.DetectorDescriptionIOIfFlagged();
 
     const auto& ecal{MACE::Detector::Description::ECAL::Instance()};
     const auto& moduleList{ecal.Array().moduleList};
@@ -84,13 +87,19 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
         Mustard::Data::Value<double, "cosTheta", "Cosine of angle between the tracks">,
         Mustard::Data::Value<double, "theta", "Angle between the tracks">>;
 
-    auto setEnergyTuple = [&](Mustard::Data::Tuple<ECALEnergy>& energyTuple,
-                              const std::vector<int>& potentialSeedModule,
-                              const std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict,
-                              const CLHEP::Hep3Vector& truthHitMomentum) -> void {
-        constexpr auto energyThreshold{50_keV};
-        constexpr auto peCountThreshold{3};
+    auto createEnergyTuple = [&](const std::vector<int>& potentialSeedModule,
+                                 const std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict,
+                                 const CLHEP::Hep3Vector& truthHitMomentum) -> std::optional<Mustard::Data::Tuple<ECALEnergy>> {
+        Mustard::Data::Tuple<ECALEnergy> energyTuple;
+
+        if (potentialSeedModule.empty()) {
+            return std::nullopt;
+        }
+
+        const auto energyThreshold{cli->get<double>("--energy-threshold")};
+        const auto peCountThreshold{cli->get<int>("--pe-count-threshold")};
         const auto seedModule{potentialSeedModule.begin()};
+
         const auto cluster{ECALClustering::Reconstructing(*seedModule, moduleList, hitDict, energyThreshold, cli["--optics"] == true, peCountThreshold)};
 
         Get<"Edep">(energyTuple) = cluster.energy;
@@ -98,6 +107,8 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
         Get<"Position">(energyTuple) = cluster.position;
         Get<"cosTheta">(energyTuple) = cluster.position.cosTheta(truthHitMomentum);
         Get<"theta">(energyTuple) = cluster.position.theta(truthHitMomentum);
+
+        return energyTuple;
     };
 
     ROOT::RDataFrame primaryData{cli->get("--input-primary-vertex-tree"), cli->get<std::vector<std::string>>("input")};
@@ -133,11 +144,12 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
                                  primaryMomentum.at(1),
                                  primaryMomentum.at(2));
 
-            Mustard::Data::Tuple<ECALEnergy> energyTuple;
+            const auto energyTuple{createEnergyTuple(potentialSeedModule, hitDict, truthHitMomentum)};
+            if (not energyTuple) {
+                return;
+            }
 
-            setEnergyTuple(energyTuple, potentialSeedModule, hitDict, truthHitMomentum);
-
-            reconEnergy.Fill(std::move(energyTuple));
+            reconEnergy.Fill(std::move(*energyTuple));
         });
     reconEnergy.Write();
 

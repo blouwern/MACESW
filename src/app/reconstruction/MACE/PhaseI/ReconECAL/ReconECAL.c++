@@ -40,6 +40,7 @@
 #include "TTree.h"
 
 #include <algorithm>
+#include <optional>
 #include <unordered_map>
 
 namespace MACE::PhaseI::ReconECAL {
@@ -58,15 +59,16 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     modeCLI.add_argument("--double").help("Reconstruction of double-cluster events.").flag();
     modeCLI.add_argument("--triple").help("Reconstruction of triple-cluster events.").flag();
     cli->add_argument("input").help("Input file path(s).").nargs(argparse::nargs_pattern::at_least_one);
-    cli->add_argument("-h", "--input-ecal-hit-tree").help("Input ecal hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
+    cli->add_argument("-h", "--input-ecal-hit-tree").help("Input ECAL hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
     cli->add_argument("-o", "--output").help("Output file path.").required().nargs(1);
     cli->add_argument("-r", "--output-tree").help("Output tree name.").default_value("G4Run0/ReconECAL"s).required().nargs(1);
     cli->add_argument("-m", "--output-mode").help("Output file creation mode.").default_value("NEW"s).required().nargs(1);
+    cli->add_argument("-e", "--energy-threshold").help("Energy threshold for clustering.").default_value(50_keV).required().nargs(1);
     cli->add_argument("-d", "--description").help("Description YAML file path.").nargs(1);
-    cli.DetectorDescriptionIOIfFlagged();
 
     Mustard::Env::MPIEnv env{argc, argv, cli};
     Detector::Description::UsePhaseIDefault();
+    cli.DetectorDescriptionIOIfFlagged();
 
     const auto& ecal{MACE::Detector::Description::ECAL::Instance()};
     const auto& moduleList{ecal.Array().moduleList};
@@ -85,10 +87,15 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
         Mustard::Data::Value<double, "cosTheta", "Cosine of angle between the tracks">,
         Mustard::Data::Value<double, "theta", "Angle between the tracks">>;
 
-    auto setEnergyTuple1 = [&](Mustard::Data::Tuple<ECALEnergy>& energyTuple,
-                               const std::vector<int>& potentialSeedModule,
-                               const std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict) -> void {
-        constexpr auto energyThreshold{50_keV};
+    const auto createEnergyTuple1{[&](const std::vector<int>& potentialSeedModule,
+                                      const std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict) -> std::optional<Mustard::Data::Tuple<ECALEnergy>> {
+        Mustard::Data::Tuple<ECALEnergy> energyTuple;
+
+        if (potentialSeedModule.empty()) {
+            return std::nullopt;
+        }
+
+        const auto energyThreshold{cli->get<double>("--energy-threshold")};
         const auto seedModule{potentialSeedModule.begin()};
         const auto cluster{ECALClustering::Reconstructing(*seedModule, moduleList, hitDict, energyThreshold)};
 
@@ -96,12 +103,19 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
         Get<"Position1">(energyTuple) = cluster.position;
         Get<"TotalEdep">(energyTuple) = cluster.energy;
         Get<"theta">(energyTuple) = cluster.position.theta(CLHEP::Hep3Vector{0, 0, 1});
-    };
 
-    auto setEnergyTuple2 = [&](Mustard::Data::Tuple<ECALEnergy>& energyTuple,
-                               const std::vector<int>& potentialSeedModule,
-                               const std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict) -> void {
-        constexpr auto energyThreshold{50_keV};
+        return energyTuple;
+    }};
+
+    const auto createEnergyTuple2{[&](const std::vector<int>& potentialSeedModule,
+                                      const std::unordered_map<int, std::shared_ptr<Mustard::Data::Tuple<Data::ECALSimHit>>>& hitDict) -> std::optional<Mustard::Data::Tuple<ECALEnergy>> {
+        Mustard::Data::Tuple<ECALEnergy> energyTuple;
+
+        if (std::ssize(potentialSeedModule) < 2) {
+            return std::nullopt;
+        }
+
+        const auto energyThreshold{cli->get<double>("--energy-threshold")};
         const auto firstSeedModule{potentialSeedModule.begin()};
         const auto secondSeedModule{std::ranges::find_if(
             potentialSeedModule,
@@ -110,8 +124,8 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                 const auto& c2{moduleList.at(moduleID).centroid};
                 return c1.angle(c2) > 0.8 * pi;
             })};
-        if (secondSeedModule == potentialSeedModule.end() or std::ssize(potentialSeedModule) < 2) {
-            return;
+        if (secondSeedModule == potentialSeedModule.end()) {
+            return std::nullopt;
         }
         const auto firstCluster{ECALClustering::Reconstructing(*firstSeedModule, moduleList, hitDict, energyThreshold)};
         const auto secondCluster{ECALClustering::Reconstructing(*secondSeedModule, moduleList, hitDict, energyThreshold)};
@@ -124,7 +138,9 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
         Get<"dE">(energyTuple) = std::abs(firstCluster.energy - secondCluster.energy);
         Get<"dt">(energyTuple) = std::abs(*Get<"t">(*hitDict.at(*firstSeedModule)) - *Get<"t">(*hitDict.at(*secondSeedModule)));
         Get<"cosTheta">(energyTuple) = firstCluster.position.cosTheta(secondCluster.position);
-    };
+
+        return energyTuple;
+    }};
 
     TFile outputFile{Mustard::Parallel::ProcessSpecificPath(cli->get("--output").c_str()).generic_string().c_str(), cli->get("--output-mode").c_str()};
     Mustard::Data::Output<ECALEnergy> reconEnergy{cli->get("--output-tree")};
@@ -149,17 +165,25 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                 potentialSeedModule.emplace_back(Get<"ModID">(*hit));
             }
 
-            Mustard::Data::Tuple<ECALEnergy> energyTuple;
+            const auto energyTuple{[&]() -> std::optional<Mustard::Data::Tuple<ECALEnergy>> {
+                if (cli->get("--single") == true) {
+                    return createEnergyTuple1(potentialSeedModule, hitDict);
+                }
+                if (cli->get("--double") == true) {
+                    return createEnergyTuple2(potentialSeedModule, hitDict);
+                }
+                if (cli->get("--triple") == true) {
+                    // To be implemented
+                    return std::nullopt;
+                }
+                return std::nullopt;
+            }()};
 
-            if (cli->get("--single") == true) {
-                setEnergyTuple1(energyTuple, potentialSeedModule, hitDict);
-            } else if (cli->get("--double") == true) {
-                setEnergyTuple2(energyTuple, potentialSeedModule, hitDict);
-            } else if (cli->get("--triple") == true) {
-                // To be implemented
+            if (not energyTuple) {
+                return;
             }
 
-            reconEnergy.Fill(std::move(energyTuple));
+            reconEnergy.Fill(std::move(*energyTuple));
         });
     reconEnergy.Write();
 
