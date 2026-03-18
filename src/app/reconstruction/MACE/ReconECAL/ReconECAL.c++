@@ -52,7 +52,7 @@ ReconECAL::ReconECAL() :
 auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     Mustard::CLI::BasicCLI<> cli;
     cli->add_argument("input").help("Input file path(s).").nargs(argparse::nargs_pattern::at_least_one);
-    cli->add_argument("-h", "--input-ecal-hit-tree").help("Input ECAL hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
+    cli->add_argument("-t", "--input-ecal-hit-tree").help("Input ECAL hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
     cli->add_argument("-o", "--output").help("Output file path.").required().nargs(1);
     cli->add_argument("-r", "--output-tree").help("Output tree name.").default_value("G4Run0/ReconECAL"s).required().nargs(1);
     cli->add_argument("-m", "--output-mode").help("Output file creation mode.").default_value("NEW"s).required().nargs(1);
