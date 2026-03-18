@@ -178,8 +178,8 @@ ECAL::ECAL() :
     DescriptionWithCacheBase{"ECAL"},
     // geometry param.s
     fNSubdivision{this, 3},
-    fInnerRadius{this, 260_cm},
-    fCrystalHypotenuse{this, 280_cm},
+    fInnerRadius{this, 260_mm},
+    fCrystalHypotenuse{this, 280_mm},
     fCrystalPackageThickness{this, 0.2_mm},
     fUpstreamWindowRadius{this, 50_mm},
     fDownstreamWindowRadius{this, 5_mm},
