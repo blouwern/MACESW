@@ -164,7 +164,7 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                 potentialSeedModule.emplace_back(Get<"ModID">(*hit));
             }
 
-            const auto energyTuple{[&]() -> std::optional<Mustard::Data::Tuple<ECALEnergy>> {
+            auto energyTuple{[&]() -> std::optional<Mustard::Data::Tuple<ECALEnergy>> {
                 if (cli->get("--single") == true) {
                     return createEnergyTuple1(potentialSeedModule, hitDict);
                 }

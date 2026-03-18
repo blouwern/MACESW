@@ -132,8 +132,8 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
                 potentialSeedModule.emplace_back(Get<"ModID">(*hit));
             }
 
-            const auto energyTuple{createEnergyTuple2(potentialSeedModule, hitDict)};
-            if (!energyTuple) {
+            auto energyTuple{createEnergyTuple2(potentialSeedModule, hitDict)};
+            if (not energyTuple) {
                 return;
             }
 

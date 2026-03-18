@@ -143,7 +143,7 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
                                  primaryMomentum.at(1),
                                  primaryMomentum.at(2));
 
-            const auto energyTuple{createEnergyTuple(potentialSeedModule, hitDict, truthHitMomentum)};
+            auto energyTuple{createEnergyTuple(potentialSeedModule, hitDict, truthHitMomentum)};
             if (not energyTuple) {
                 return;
             }
