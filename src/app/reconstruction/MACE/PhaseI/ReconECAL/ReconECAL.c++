@@ -64,7 +64,6 @@ auto ReconECAL::Main(int argc, char* argv[]) const -> int {
     cli->add_argument("-r", "--output-tree").help("Output tree name.").default_value("G4Run0/ReconECAL"s).required().nargs(1);
     cli->add_argument("-m", "--output-mode").help("Output file creation mode.").default_value("NEW"s).required().nargs(1);
     cli->add_argument("-e", "--energy-threshold").help("Energy threshold for clustering.").default_value(50_keV).required().nargs(1);
-    cli->add_argument("-d", "--description").help("Description YAML file path.").nargs(1);
 
     Mustard::Env::MPIEnv env{argc, argv, cli};
     Detector::Description::UsePhaseIDefault();

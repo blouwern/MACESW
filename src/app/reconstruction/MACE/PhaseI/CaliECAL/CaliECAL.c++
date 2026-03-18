@@ -63,11 +63,10 @@ auto CaliECAL::Main(int argc, char* argv[]) const -> int {
     Mustard::CLI::BasicCLI<Mustard::CLI::DetectorDescriptionModule<MACE::Detector::Description::ECAL>> cli;
     cli->add_argument("input").help("Input file path(s).").nargs(argparse::nargs_pattern::at_least_one);
     cli->add_argument("-p", "--input-primary-vertex-tree").help("Input primary vertex tree name.").default_value("G4Run0/SimPrimaryVertex"s).required().nargs(1);
-    cli->add_argument("-h", "--input-ecal-hit-tree").help("Input ECAL hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
+    cli->add_argument("-t", "--input-ecal-hit-tree").help("Input ECAL hit tree name.").default_value("G4Run0/ECALSimHit"s).required().nargs(1);
     cli->add_argument("-o", "--output").help("Output file path.").required().nargs(1);
     cli->add_argument("-r", "--output-tree").help("Output tree name.").default_value("G4Run0/CaliECAL"s).required().nargs(1);
     cli->add_argument("-m", "--output-mode").help("Output file creation mode.").default_value("NEW"s).required().nargs(1);
-    cli->add_argument("-d", "--description").help("Description YAML file path.").nargs(1);
     cli->add_argument("-e", "--energy-threshold").help("Energy threshold for clustering.").default_value(50_keV).required().nargs(1);
     cli->add_argument("-c", "--pe-count-threshold").help("Photoelectron count threshold for clustering.").default_value(3).required().nargs(1);
     cli->add_argument("--optics").help("Use optical response.").flag();
