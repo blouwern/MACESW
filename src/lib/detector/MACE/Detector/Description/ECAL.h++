@@ -62,16 +62,6 @@ public:
     auto ScintillationTimeConstant1() const -> auto { return *fScintillationTimeConstant1; }
     auto ResolutionScale() const -> auto { return *fResolutionScale; }
 
-    auto UsePhaseICrystal() const -> auto { return *fUsePhaseICrystal; }
-    auto UseMPPC() const -> auto { return *fUseMPPC; }
-
-    auto PMTDimensions() const -> const auto& { return *fPMTDimensions; }
-    auto PMTCouplerThickness() const -> auto { return *fPMTCouplerThickness; }
-    auto PMTWindowThickness() const -> auto { return *fPMTWindowThickness; }
-    auto PMTCathodeThickness() const -> auto { return *fPMTCathodeThickness; }
-    auto PMTEnergyBin() const -> const auto& { return *fPMTEnergyBin; }
-    auto PMTQuantumEfficiency() const -> const auto& { return *fPMTQuantumEfficiency; }
-
     auto MPPCNPixelRowSet() const -> const auto& { return *fMPPCNPixelRowSet; }
     auto MPPCPixelSizeSet() const -> const auto& { return *fMPPCPixelSizeSet; }
     auto MPPCPitch() const -> auto { return *fMPPCPitch; }
@@ -98,16 +88,6 @@ public:
     auto ScintillationYield(double val) -> void { fScintillationYield = val; }
     auto ScintillationTimeConstant1(double val) -> void { fScintillationTimeConstant1 = val; }
     auto ResolutionScale(double val) -> void { fResolutionScale = val; }
-
-    auto UsePhaseICrystal(bool val) -> void { fUsePhaseICrystal = val; }
-    auto UseMPPC(bool val) -> void { fUseMPPC = val; }
-
-    auto PMTDimensions(std::vector<muc::array3d> val) -> void { fPMTDimensions = std::move(val); }
-    auto PMTCouplerThickness(double val) -> void { fPMTCouplerThickness = val; }
-    auto PMTWindowThickness(double val) -> void { fPMTWindowThickness = val; }
-    auto PMTCathodeThickness(double val) -> void { fPMTCathodeThickness = val; }
-    auto PMTEnergyBin(std::vector<double> val) -> void { fPMTEnergyBin = std::move(val); }
-    auto PMTQuantumEfficiency(std::vector<double> val) -> void { fPMTQuantumEfficiency = std::move(val); }
 
     auto MPPCNPixelRowSet(std::vector<int> val) -> void { fMPPCNPixelRowSet = std::move(val); }
     auto MPPCPixelSizeSet(std::vector<double> val) -> void { fMPPCPixelSizeSet = std::move(val); }
@@ -154,16 +134,6 @@ private:
     Simple<double> fScintillationYield;
     Simple<double> fScintillationTimeConstant1;
     Simple<double> fResolutionScale;
-
-    Simple<bool> fUsePhaseICrystal;
-    Simple<bool> fUseMPPC;
-
-    Simple<std::vector<muc::array3d>> fPMTDimensions;
-    Simple<double> fPMTCouplerThickness;
-    Simple<double> fPMTWindowThickness;
-    Simple<double> fPMTCathodeThickness;
-    Simple<std::vector<double>> fPMTEnergyBin;
-    Simple<std::vector<double>> fPMTQuantumEfficiency;
 
     Simple<std::vector<int>> fMPPCNPixelRowSet;
     Simple<std::vector<double>> fMPPCPixelSizeSet;
