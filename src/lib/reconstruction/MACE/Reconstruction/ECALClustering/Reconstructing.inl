@@ -31,13 +31,13 @@ inline auto Reconstructing(int seedID,
                            int peCountThreshold) -> ClusterTuple {
     ClusterTuple result;
 
-    auto cluster = ClusteringBySeed(seedID, moduleList);
-    for (const auto module : cluster) {
-        const auto hitIt = hitDict.find(module);
+    auto cluster{ClusteringBySeed(seedID, moduleList)};
+    for (auto&& module : cluster) {
+        const auto hitIt{hitDict.find(module)};
         if (hitIt == hitDict.end()) {
             continue;
         }
-        const auto& [moduleID, hit] = *hitIt;
+        const auto& [moduleID, hit]{*hitIt};
 
         const auto energy{Get<"Edep">(*hit)};
         if (energy < energyThreshold) {

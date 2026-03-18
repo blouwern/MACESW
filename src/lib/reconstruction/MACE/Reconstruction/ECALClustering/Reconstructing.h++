@@ -35,8 +35,8 @@ namespace MACE::inline Reconstruction::ECALClustering {
 struct ClusterTuple {
     double energy{};
     int peCount{};
-    CLHEP::Hep3Vector weightedPosition{};
-    CLHEP::Hep3Vector position{};
+    Mustard::Vector3D weightedPosition{};
+    Mustard::Vector3D position{};
 };
 
 inline auto Reconstructing(int seedID,
