@@ -1,20 +1,9 @@
 #!/usr/bin/env bash
 # --SimMMS regression test script--
 
-module_name='SimMMS'
-simmms_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+module_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-source $simmms_dir/../../../rc/init-rc.bash
-source $simmms_dir/../../../rc/run_command-rc.bash
-source $simmms_dir/../../../rc/parexec-rc.bash
-
-init $module_name
-
-golden_file="$test_src_dir/macesw_regression_data.root"
-if [[ ! -f "$golden_file" ]]; then
-    echo "ERROR: $golden_file not found."
-    exit 1
-fi
+source $module_dir/../../../rc/init-source.bash 'SimMMS'
 
 echo "Start SimMMS"
 run_command parexec $build_dir/MACE SimMMS --seed 0 $build_dir/SimMMS/run_em_flat.mac
@@ -27,7 +16,7 @@ else
 fi
 
 echo "Generating regression report..."
-run_command root -l -q "$simmms_dir/TestCDCSimHit.cxx(\"SimMMS_em_flat\",\"SimMMS_em_flat_test.root\",\"$golden_file\")"
-run_command root -l -q "$simmms_dir/TestMMSSimTrack.cxx(\"SimMMS_em_flat\",\"SimMMS_em_flat_test.root\",\"$golden_file\")"
+run_command root -l -q "$module_dir/TestCDCSimHit.cxx(\"SimMMS_em_flat\",\"SimMMS_em_flat_test.root\",\"$golden_file\")"
+run_command root -l -q "$module_dir/TestMMSSimTrack.cxx(\"SimMMS_em_flat\",\"SimMMS_em_flat_test.root\",\"$golden_file\")"
 
-source $simmms_dir/../../../rc/summarize-rc.bash 
+source $module_dir/../../../rc/summarize-source.bash 

@@ -50,7 +50,8 @@ If you need to test a new datatuple or a new module, refer to the section [Add R
 
 ### Test a New Module
 - Create a new directory for this module: `src/test/<domain>/<Suite>/<Module>/`
-- Follow the section above to define the regression test of this module: [Test a new datatuple](#test-a-new-datatuple)
+- Follow the section above to define the regression test data of this module: [Test a new datatuple](#test-a-new-datatuple). (i.e. Write `Read<datatuple_name>.cxx` & `Test<datatuple_name>.cxx` macro files.)
+- Create module generator. (i.e. Write bash scripts `regression_test.bash` & `generate_regression_data.bash` to invoke the macro files.) It is recommended to read the bash source code of the existing modules.
 - Source the module generator from `src/test/generate_regression_data_dr.bash` and (if desired) the module test from `src/test/regression_test_all.bash`.
 
 
