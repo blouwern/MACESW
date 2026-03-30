@@ -54,6 +54,18 @@ If you need to test a new datatuple or a new module, refer to the section [Add R
 - Create module generator. (i.e. Write bash scripts `regression_test.bash` & `generate_regression_data.bash` to invoke the macro files.) It is recommended to read the bash source code of the existing modules.
 - Source the module generator from `src/test/generate_regression_data_dr.bash` and (if desired) the module test from `src/test/regression_test_all.bash`.
 
+### Generate CI Workflow YAMLs
+Use the helper script to generate the GitHub Actions workflow files for both GCC and Clang regression tests.
+
+- Script: `tooling/gen-regression-workflows.sh`
+- Usage: `bash tooling/gen-regression-workflows.sh <ModuleName> <TestPath>`
+- Inputs:
+  - `ModuleName` (e.g. `SimMACE`, `SimTTC`, `SimMMS`)
+  - `TestPath` in the format `/test/<Domain>/<Suite>/<ModuleName>` (example: `/test/simulation/MACE/SimMACE`)
+- Output files:
+  - `.github/workflows/regression-test-with-gcc-<module_lower_case>.yml`
+  - `.github/workflows/regression-test-with-clang-<module_lower_case>.yml`
+
 
 ---
 
