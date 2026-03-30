@@ -1,4 +1,4 @@
-name: Regression test SimMMS (AMD64 GNU/Linux GCC)
+name: SimMMS regression test (AMD64 GNU/Linux GCC)
 
 on:
   push:
@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   regression-test-with-gcc-simmms:
-    name: Regression test SimMMS (GCC)
+    name: SimMMS regression test (AMD64 GNU/Linux GCC)
     timeout-minutes: 180
     runs-on: ubuntu-latest
     strategy:

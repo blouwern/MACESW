@@ -1,4 +1,4 @@
-name: Regression test SimMMS (AMD64 GNU/Linux Clang)
+name: SimMMS regression test (AMD64 GNU/Linux Clang)
 
 on:
   push:
@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   regression-test-with-clang-simmms:
-    name: Regression test SimMMS (Clang)
+    name: SimMMS regression test (AMD64 GNU/Linux Clang)
     timeout-minutes: 180
     runs-on: ubuntu-latest
     strategy:

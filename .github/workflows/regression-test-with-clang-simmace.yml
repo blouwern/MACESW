@@ -1,4 +1,4 @@
-name: Regression test SimMACE (AMD64 GNU/Linux Clang)
+name: SimMACE regression test (AMD64 GNU/Linux Clang)
 
 on:
   push:
@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   regression-test-with-clang-simmace:
-    name: Regression test SimMACE (Clang)
+    name: SimMACE regression test (AMD64 GNU/Linux Clang)
     timeout-minutes: 180
     runs-on: ubuntu-latest
     strategy:

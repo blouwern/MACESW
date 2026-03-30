@@ -1,4 +1,4 @@
-name: Regression test SimTTC (AMD64 GNU/Linux Clang)
+name: SimTTC regression test (AMD64 GNU/Linux Clang)
 
 on:
   push:
@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   regression-test-with-clang-simttc:
-    name: Regression test SimTTC (Clang)
+    name: SimTTC regression test (AMD64 GNU/Linux Clang)
     timeout-minutes: 180
     runs-on: ubuntu-latest
     strategy:

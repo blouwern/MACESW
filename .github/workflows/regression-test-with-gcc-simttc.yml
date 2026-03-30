@@ -1,4 +1,4 @@
-name: Regression test SimTTC (AMD64 GNU/Linux GCC)
+name: SimTTC regression test (AMD64 GNU/Linux GCC)
 
 on:
   push:
@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   regression-test-with-gcc-simttc:
-    name: Regression test SimTTC (GCC)
+    name: SimTTC regression test (AMD64 GNU/Linux GCC)
     timeout-minutes: 180
     runs-on: ubuntu-latest
     strategy:

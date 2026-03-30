@@ -1,4 +1,4 @@
-name: Regression test SimMACE (AMD64 GNU/Linux GCC)
+name: SimMACE regression test (AMD64 GNU/Linux GCC)
 
 on:
   push:
@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   regression-test-with-gcc-simmace:
-    name: Regression test SimMACE (GCC)
+    name: SimMACE regression test (AMD64 GNU/Linux GCC)
     timeout-minutes: 180
     runs-on: ubuntu-latest
     strategy:
