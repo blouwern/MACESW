@@ -11,7 +11,7 @@
 
 const std::string dataTupleName{"MMSSimTrack"};
 
-const void Judge(double pValue) {
+auto Conclude(double pValue) -> void {
     const std::string boldInvert{"\x1B[1m\x1B[7m"};
     const std::string boldRedInvert{boldInvert + "\x1B[38;5;9m"};
     const std::string boldYellowInvert{boldInvert + "\x1B[38;5;11m"};
@@ -139,7 +139,7 @@ auto TestMMSSimTrack(std::string moduleName, std::string testFileName, std::stri
         std::cout << "\n"
                   << "(#" << ++idx << ") " << " Column " << branchName << std::endl;
         auto pValue{hist->Chi2Test(testHist.GetPtr(), "P")};
-        Judge(pValue);
+        Conclude(pValue);
         SaveRegressionResult(hist, testHist.GetPtr(), branchName);
         std::cout << "\n";
     }
