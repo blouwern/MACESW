@@ -48,8 +48,9 @@ public:
     auto Radius() const -> const auto& { return *fRadius; }
     auto SlantAngle() const -> auto { return *fSlantAngle; }
     auto NAlongPhi() const -> const auto& { return *fNAlongPhi; }
-    auto Gap() const -> auto { return *fGap; }
-    auto NCircles() const -> auto { return *fNCircles; }
+    auto CircleSpacing() const -> auto { return *fCircleSpacing; }
+    auto NCircle() const -> auto { return *fNCircle; }
+    auto NTile() const -> auto { return *fNTile; }
     auto PCBLength() const -> auto { return *fPCBLength; }
     auto PCBWidth() const -> auto { return *fPCBWidth; }
     auto PCBThickness() const -> auto { return *fPCBThickness; }
@@ -70,8 +71,9 @@ public:
     auto Radius(double val) -> void { fRadius = val; }
     auto SlantAngle(double val) -> void { fSlantAngle = val; }
     auto NAlongPhi(int val) -> void { fNAlongPhi = val; }
-    auto Gap(double val) -> void { fGap = val; }
-    auto NCircles(int val) -> void { fNCircles = val; }
+    auto CircleSpacing(double val) -> void { fCircleSpacing = val; }
+    auto NCircle(int val) -> void { fNCircle = val; }
+    auto NTile(int val) -> void { fNTile = val; }
     auto PCBLength(double val) -> void { fPCBLength = val; }
     auto PCBWidth(double val) -> void { fPCBWidth = val; }
     auto PCBThickness(double val) -> void { fPCBThickness = val; }
@@ -166,8 +168,9 @@ private:
     Simple<double> fRadius;
     Simple<double> fSlantAngle;
     Simple<int> fNAlongPhi;
-    Simple<double> fGap;
-    Simple<int> fNCircles;
+    Simple<double> fCircleSpacing;
+    Simple<int> fNCircle;
+    Simple<int> fNTile;
     Simple<double> fPCBLength;
     Simple<double> fPCBWidth;
     Simple<double> fPCBThickness;

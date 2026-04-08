@@ -120,7 +120,7 @@ auto TTC::Construct(G4bool checkOverlaps) -> void {
         ttcVirtualBoxSolid,
         ttcVirtualBoxMaterial,
         "TTCVirtualBox")};
-    for (int i{}; i < ttc.NCircles(); ++i) {
+    for (int i{}; i < ttc.NCircle(); ++i) {
         auto deltaPhi{2 * pi / ttc.NAlongPhi()};
         // set the position of air mother box
         for (int j{}; j < ttc.NAlongPhi(); ++j, ++tileID) {

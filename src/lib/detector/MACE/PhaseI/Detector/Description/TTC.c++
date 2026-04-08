@@ -44,8 +44,9 @@ TTC::TTC() : // clang-format off
     fRadius{this, 8.5_cm},
     fSlantAngle{this, 17_deg},
     fNAlongPhi{this, 12},
-    fGap{this, 0.15_cm},
-    fNCircles{this, 9},
+    fCircleSpacing{this, 0.15_cm},
+    fNCircle{this, 9},
+    fNTile{this, fNAlongPhi * fNCircle},
 
     fPCBLength{this, 3_cm},
     fPCBWidth{this, 1_cm},
@@ -114,20 +115,22 @@ TTC::TTC() : // clang-format off
 }
 
 auto TTC::TilePosition(int detID) const -> Mustard::Point3D {
-    if (detID < 0 or detID >= *fNAlongPhi * *fNCircles) {
-        throw std::out_of_range(fmt::format("DetID {} is out of range [0, {})", detID, fNAlongPhi * fNCircles));
+    if (detID < 0 or detID >= fNTile) {
+        throw std::out_of_range(fmt::format("DetID {} is out of range [0, {})", detID, *fNTile));
     }
     const auto phiIdx{detID % fNAlongPhi};
     const auto phi{2 * pi * phiIdx / fNAlongPhi};
     const auto [sinPhi, cosPhi]{muc::sincos(phi)};
+    const auto normalizedCircleOffset{(fNCircle - 1) / 2.0};
+    const auto circleIdx{muc::lltrunc(static_cast<double>(detID) / fNAlongPhi)};
     return {fRadius * cosPhi,
             fRadius * sinPhi,
-            ((fNCircles - 1) / 2.0 - detID / fNAlongPhi) * (fWidth + fGap)};
+            normalizedCircleOffset - circleIdx * (fWidth + fCircleSpacing)};
 }
 
 auto TTC::TileNormal(int detID) const -> Mustard::Point3D {
-    if (detID < 0 or detID >= *fNAlongPhi * *fNCircles) {
-        throw std::out_of_range(fmt::format("DetID {} is out of range [0, {})", detID, fNAlongPhi * fNCircles));
+    if (detID < 0 or detID >= fNTile) {
+        throw std::out_of_range(fmt::format("DetID {} is out of range [0, {})", detID, *fNTile));
     }
     const auto phiIdx{detID % fNAlongPhi};
     const auto phi{2 * pi * phiIdx / fNAlongPhi};
@@ -143,8 +146,9 @@ auto TTC::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fRadius, "DistanceToCDC");
     ImportValue(node, fSlantAngle, "SlantAngle");
     ImportValue(node, fNAlongPhi, "NAlongPhi");
-    ImportValue(node, fGap, "Gap");
-    ImportValue(node, fNCircles, "NCircles");
+    ImportValue(node, fCircleSpacing, "CircleSpacing");
+    ImportValue(node, fNCircle, "NCircle");
+    ImportValue(node, fNTile, "NTile");
     ImportValue(node, fPCBLength, "PCBLength");
     ImportValue(node, fPCBWidth, "PCBWidth");
     ImportValue(node, fPCBThickness, "PCBThickness");
@@ -200,8 +204,9 @@ auto TTC::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fRadius, "DistanceToCDC");
     ExportValue(node, fSlantAngle, "SlantAngle");
     ExportValue(node, fNAlongPhi, "NAlongPhi");
-    ExportValue(node, fGap, "Gap");
-    ExportValue(node, fNCircles, "NCircles");
+    ExportValue(node, fCircleSpacing, "CircleSpacing");
+    ExportValue(node, fNCircle, "NCircle");
+    ExportValue(node, fNTile, "NTile");
     ExportValue(node, fPCBLength, "PCBLength");
     ExportValue(node, fPCBWidth, "PCBWidth");
     ExportValue(node, fPCBThickness, "PCBThickness");
