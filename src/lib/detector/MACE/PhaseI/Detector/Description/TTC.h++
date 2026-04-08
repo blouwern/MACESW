@@ -45,12 +45,12 @@ public:
     auto Length() const -> auto { return *fLength; }
     auto Width() const -> auto { return *fWidth; }
     auto Thickness() const -> auto { return *fThickness; }
-    auto Radius() const -> const auto& { return *fRadius; }
+    auto Radius() const -> auto { return *fRadius; }
     auto SlantAngle() const -> auto { return *fSlantAngle; }
-    auto NAlongPhi() const -> const auto& { return *fNAlongPhi; }
-    auto CircleSpacing() const -> auto { return *fCircleSpacing; }
+    auto NAlongPhi() const -> auto { return *fNAlongPhi; }
     auto NCircle() const -> auto { return *fNCircle; }
-    auto NTile() const -> auto { return *fNTile; }
+    auto NTile() const -> auto { return fNAlongPhi * fNCircle; }
+    auto CircleSpacing() const -> auto { return *fCircleSpacing; }
     auto PCBLength() const -> auto { return *fPCBLength; }
     auto PCBWidth() const -> auto { return *fPCBWidth; }
     auto PCBThickness() const -> auto { return *fPCBThickness; }
@@ -71,9 +71,8 @@ public:
     auto Radius(double val) -> void { fRadius = val; }
     auto SlantAngle(double val) -> void { fSlantAngle = val; }
     auto NAlongPhi(int val) -> void { fNAlongPhi = val; }
-    auto CircleSpacing(double val) -> void { fCircleSpacing = val; }
     auto NCircle(int val) -> void { fNCircle = val; }
-    auto NTile(int val) -> void { fNTile = val; }
+    auto CircleSpacing(double val) -> void { fCircleSpacing = val; }
     auto PCBLength(double val) -> void { fPCBLength = val; }
     auto PCBWidth(double val) -> void { fPCBWidth = val; }
     auto PCBThickness(double val) -> void { fPCBThickness = val; }
@@ -168,9 +167,9 @@ private:
     Simple<double> fRadius;
     Simple<double> fSlantAngle;
     Simple<int> fNAlongPhi;
-    Simple<double> fCircleSpacing;
     Simple<int> fNCircle;
-    Simple<int> fNTile;
+    Cached<int> fNTile;
+    Simple<double> fCircleSpacing;
     Simple<double> fPCBLength;
     Simple<double> fPCBWidth;
     Simple<double> fPCBThickness;

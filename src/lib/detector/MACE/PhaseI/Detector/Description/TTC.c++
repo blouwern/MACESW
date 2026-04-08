@@ -44,9 +44,9 @@ TTC::TTC() : // clang-format off
     fRadius{this, 8.5_cm},
     fSlantAngle{this, 17_deg},
     fNAlongPhi{this, 12},
-    fCircleSpacing{this, 0.15_cm},
     fNCircle{this, 9},
-    fNTile{this, fNAlongPhi * fNCircle},
+    fNTile{this, [this] { return fNAlongPhi * fNCircle; }},
+    fCircleSpacing{this, 0.15_cm},
 
     fPCBLength{this, 3_cm},
     fPCBWidth{this, 1_cm},
@@ -146,9 +146,8 @@ auto TTC::ImportAllValue(const YAML::Node& node) -> void {
     ImportValue(node, fRadius, "DistanceToCDC");
     ImportValue(node, fSlantAngle, "SlantAngle");
     ImportValue(node, fNAlongPhi, "NAlongPhi");
-    ImportValue(node, fCircleSpacing, "CircleSpacing");
     ImportValue(node, fNCircle, "NCircle");
-    ImportValue(node, fNTile, "NTile");
+    ImportValue(node, fCircleSpacing, "CircleSpacing");
     ImportValue(node, fPCBLength, "PCBLength");
     ImportValue(node, fPCBWidth, "PCBWidth");
     ImportValue(node, fPCBThickness, "PCBThickness");
@@ -204,9 +203,8 @@ auto TTC::ExportAllValue(YAML::Node& node) const -> void {
     ExportValue(node, fRadius, "DistanceToCDC");
     ExportValue(node, fSlantAngle, "SlantAngle");
     ExportValue(node, fNAlongPhi, "NAlongPhi");
-    ExportValue(node, fCircleSpacing, "CircleSpacing");
     ExportValue(node, fNCircle, "NCircle");
-    ExportValue(node, fNTile, "NTile");
+    ExportValue(node, fCircleSpacing, "CircleSpacing");
     ExportValue(node, fPCBLength, "PCBLength");
     ExportValue(node, fPCBWidth, "PCBWidth");
     ExportValue(node, fPCBThickness, "PCBThickness");
