@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Mustard/Detector/Description/DescriptionWithCacheBase.h++"
+#include "Mustard/Math/GeometryRepresentation.h++"
 #include "Mustard/Utility/MathConstant.h++"
 
 #include "muc/array"
@@ -29,6 +30,7 @@
 
 namespace MACE::PhaseI::Detector::Description {
 using namespace Mustard::MathConstant;
+using namespace Mustard::Math;
 
 class TTC final : public Mustard::Detector::Description::DescriptionWithCacheBase<TTC> {
     friend Mustard::Env::Memory::SingletonInstantiator;
@@ -84,15 +86,8 @@ public:
     auto SiliconeThickness(double val) -> void { fSiliconeThickness = val; }
     auto NSiPM(int val) -> void { fNSiPM = val; }
 
-    auto DetIDToPos(int detID) const -> std::pair<muc::array3d, double> {
-        auto xPoz = fRadius * std::cos((detID % fNCircles) * 2 * pi / fNAlongPhi);
-        auto yPoz = fRadius * std::sin((detID % fNCircles) * 2 * pi / fNAlongPhi);
-        auto zPos = ((fNCircles - 1) / 2.0 - std::floor(detID / static_cast<double>(fNCircles))) * (fWidth + fGap);
-        return {
-            muc::array3d{xPoz, yPoz, zPos},
-            fSlantAngle
-        };
-    }
+    auto TilePosition(int detID) const -> Mustard::Point3D;
+    auto TileNormal(int detID) const -> Mustard::Point3D;
 
     // Material
 

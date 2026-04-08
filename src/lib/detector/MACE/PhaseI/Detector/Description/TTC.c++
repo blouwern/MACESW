@@ -113,6 +113,28 @@ TTC::TTC() : // clang-format off
     fSiPMEfficiency = {3.425656704, 3.648011349, 4.27165845, 4.946418576, 5.668359955, 6.429619045, 7.11080412, 7.497475278, 8.039291484, 8.821556901, 9.725285753, 10.25184232, 10.83322274, 11.69811431, 12.64197787, 13.57371735, 13.9856202, 14.80405969, 15.76358392, 16.75862246, 17.6931202, 18.89748135, 19.87240864, 20.95305937, 22.05877027, 23.28104155, 24.20768377, 25.00459784, 25.80394272, 26.89978015, 27.83080795, 28.83258008, 30.09983902, 31.17956649, 32.19281801, 33.10216044, 34.03745256, 34.97274467, 35.91391372, 36.90276753, 37.50595677, 38.13880536, 38.91429156, 39.30108444, 39.61979201, 39.86809295, 40.14914912, 40.16543674, 39.9601454, 39.64945991, 39.23407951, 38.63977117, 37.62528396, 36.96457658, 36.28223308, 35.54774213, 34.47404186, 33.17361068, 32.28915844, 30.68109949, 29.99828974, 29.44758984, 28.30684101, 27.12648793, 25.99030638, 24.78502023, 23.73010063, 22.79343306, 21.55889817, 20.49402454, 19.57991462, 18.52052398, 17.43525619, 16.35128295, 15.24864181, 14.15760743, 13.13714031, 12.12532309, 10.86827626, 9.937387296, 9.115710781, 8.311601404, 7.157647218, 5.786493629, 4.148860814, 2.819490889}; // S13360-3050VE
 }
 
+auto TTC::TilePosition(int detID) const -> Mustard::Point3D {
+    if (detID < 0 or detID >= *fNAlongPhi * *fNCircles) {
+        throw std::out_of_range(fmt::format("DetID {} is out of range [0, {})", detID, fNAlongPhi * fNCircles));
+    }
+    const auto phiIdx{detID % fNAlongPhi};
+    const auto phi{2 * pi * phiIdx / fNAlongPhi};
+    const auto [sinPhi, cosPhi]{muc::sincos(phi)};
+    return {fRadius * cosPhi,
+            fRadius * sinPhi,
+            ((fNCircles - 1) / 2.0 - detID / fNAlongPhi) * (fWidth + fGap)};
+}
+
+auto TTC::TileNormal(int detID) const -> Mustard::Point3D {
+    if (detID < 0 or detID >= *fNAlongPhi * *fNCircles) {
+        throw std::out_of_range(fmt::format("DetID {} is out of range [0, {})", detID, fNAlongPhi * fNCircles));
+    }
+    const auto phiIdx{detID % fNAlongPhi};
+    const auto phi{2 * pi * phiIdx / fNAlongPhi};
+    const auto [sinAngle, cosAngle]{muc::sincos(phi + fSlantAngle)};
+    return {cosAngle, sinAngle, 0};
+}
+
 auto TTC::ImportAllValue(const YAML::Node& node) -> void {
     // Geometry
     ImportValue(node, fLength, "Length");

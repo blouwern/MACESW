@@ -122,11 +122,12 @@ auto TTC::Construct(G4bool checkOverlaps) -> void {
         "TTCVirtualBox")};
     for (int i{}; i < ttc.NCircles(); ++i) {
         auto deltaPhi{2 * pi / ttc.NAlongPhi()};
-        auto zPos = (ttc.Width() + ttc.Gap()) * ((ttc.NCircles() - 1) / 2.0 - i);
         // set the position of air mother box
-        const auto transform{G4Translate3D{G4ThreeVector(ttc.Radius(), 0, zPos)} *
-                             G4RotateZ3D{ttc.SlantAngle()}};
         for (int j{}; j < ttc.NAlongPhi(); ++j, ++tileID) {
+            auto zPos = ttc.TilePosition(tileID).z();
+            const auto transform{G4Translate3D{G4ThreeVector(ttc.Radius(), 0, zPos)} *
+                                 G4RotateZ3D{ttc.SlantAngle()}};
+
             Make<G4PVPlacement>(
                 G4RotateZ3D{j * deltaPhi} * transform,
                 ttcVirtualBoxLogic,
