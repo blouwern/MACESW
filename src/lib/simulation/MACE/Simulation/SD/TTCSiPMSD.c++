@@ -75,7 +75,7 @@ auto TTCSiPMSD::ProcessHits(G4Step* theStep, G4TouchableHistory*) -> G4bool {
     // new a hit
     auto hit{std::make_unique_for_overwrite<PhotosensorHit>()};
     Get<"EvtID">(*hit) = G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID();
-    Get<"ChID">(*hit) = tileID * nSiPM - siPMLocalID;
+    Get<"ChID">(*hit) = tileID * nSiPM + siPMLocalID;
     Get<"t">(*hit) = postStepPoint.GetGlobalTime();
     Get<"x">(*hit) = {static_cast<float>(position.x()), static_cast<float>(position.z())};
     Get<"k">(*hit) = preStepPoint.GetTouchable()->GetHistory()->GetTopTransform().TransformAxis(preStepPoint.GetMomentum()) / hbarc;
@@ -86,7 +86,7 @@ auto TTCSiPMSD::ProcessHits(G4Step* theStep, G4TouchableHistory*) -> G4bool {
 
 auto TTCSiPMSD::EndOfEvent(G4HCofThisEvent*) -> void {
     for (
-        auto&& [tileID, hitOfDetector] : fHit) {
+        auto&& [_, hitOfDetector] : fHit) {
         for (auto&& hit : hitOfDetector) {
             fHitsCollection->insert(hit.release());
         }

@@ -21,7 +21,6 @@
 
 #include "Mustard/Detector/Description/DescriptionWithCacheBase.h++"
 #include "Mustard/Math/GeometryRepresentation.h++"
-#include "Mustard/Utility/MathConstant.h++"
 
 #include "muc/array"
 
@@ -29,8 +28,6 @@
 #include <vector>
 
 namespace MACE::PhaseI::Detector::Description {
-using namespace Mustard::MathConstant;
-using namespace Mustard::Math;
 
 class TTC final : public Mustard::Detector::Description::DescriptionWithCacheBase<TTC> {
     friend Mustard::Env::Memory::SingletonInstantiator;

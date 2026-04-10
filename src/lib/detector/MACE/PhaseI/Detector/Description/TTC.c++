@@ -23,6 +23,8 @@
 #include "Mustard/Utility/MathConstant.h++"
 #include "Mustard/Utility/PhysicalConstant.h++"
 
+#include "muc/math"
+
 #include "fmt/core.h"
 
 #include <algorithm>
@@ -125,7 +127,7 @@ auto TTC::TilePosition(int detID) const -> Mustard::Point3D {
     const auto circleIdx{muc::lltrunc(static_cast<double>(detID) / fNAlongPhi)};
     return {fRadius * cosPhi,
             fRadius * sinPhi,
-            normalizedCircleOffset - circleIdx * (fWidth + fCircleSpacing)};
+            (normalizedCircleOffset - circleIdx) * (fWidth + fCircleSpacing)};
 }
 
 auto TTC::TileNormal(int detID) const -> Mustard::Point3D {
