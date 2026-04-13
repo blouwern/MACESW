@@ -56,7 +56,7 @@ The recommended approach for basic user to build MACESW is using the RGB Apptain
 对于 Debian 系 GNU/Linux 系统，可直接从 APT 安装：  
 Install Apptainer via APT on Debian-based systems:
 ```bash
-sudo apt install apptainer
+sudo apt install apptainer squashfuse fuse2fs gocryptfs
 ```
 您也可从[官方发布页](https://github.com/apptainer/apptainer/releases)下载并安装 Apptainer。  
 You can also download and install Apptainer from the [official releases](https://github.com/apptainer/apptainer/releases).
