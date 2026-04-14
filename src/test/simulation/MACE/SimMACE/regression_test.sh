@@ -3,7 +3,7 @@
 
 module_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-source $module_dir/../../../source/init-source.bash 'SimMACE'
+source $module_dir/../../../source/init-source.sh 'SimMACE'
 
 echo "Start SimMACE"
 run_command parexec $build_dir/MACE SimMACE --seed 0 $build_dir/SimMACE/run_signal.mac
@@ -21,4 +21,4 @@ run_command root -l -q "$module_dir/TestTTCSimHit.cxx(\"SimMACE_signal\",\"SimMA
 run_command root -l -q "$module_dir/TestCDCSimHit.cxx(\"SimMACE_signal\",\"SimMACE_signal_test.root\",\"$golden_file\")"
 run_command root -l -q "$module_dir/TestMMSSimTrack.cxx(\"SimMACE_signal\",\"SimMACE_signal_test.root\",\"$golden_file\")"
 
-source $module_dir/../../../source/summarize-source.bash
+source $module_dir/../../../source/summarize-source.sh

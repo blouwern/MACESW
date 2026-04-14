@@ -66,9 +66,9 @@ if [ -f "$test_src_dir/macesw_regression_data.root" ]; then
 fi
 
 echo "Start simulation..."
-source $test_src_dir/simulation/MACE/SimMACE/generate_regression_data.bash
-source $test_src_dir/simulation/MACE/SimMMS/generate_regression_data.bash
-source $test_src_dir/simulation/MACE/SimTTC/generate_regression_data.bash
+source $test_src_dir/simulation/MACE/SimMACE/generate_regression_data.sh
+source $test_src_dir/simulation/MACE/SimMMS/generate_regression_data.sh
+source $test_src_dir/simulation/MACE/SimTTC/generate_regression_data.sh
 
 end_time=$(date +%s)
 total_time=$((end_time - start_time))

@@ -3,7 +3,7 @@
 
 module_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-source $module_dir/../../../source/init-source.bash 'SimMMS'
+source $module_dir/../../../source/init-source.sh 'SimMMS'
 
 echo "Start SimMMS"
 run_command parexec $build_dir/MACE SimMMS --seed 0 $build_dir/SimMMS/run_em_flat.mac
@@ -19,4 +19,4 @@ echo "Generating regression report..."
 run_command root -l -q "$module_dir/TestCDCSimHit.cxx(\"SimMMS_em_flat\",\"SimMMS_em_flat_test.root\",\"$golden_file\")"
 run_command root -l -q "$module_dir/TestMMSSimTrack.cxx(\"SimMMS_em_flat\",\"SimMMS_em_flat_test.root\",\"$golden_file\")"
 
-source $module_dir/../../../source/summarize-source.bash 
+source $module_dir/../../../source/summarize-source.sh

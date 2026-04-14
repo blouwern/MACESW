@@ -64,7 +64,7 @@ jobs:
       - name: Run regression test
         run: |
           . /environment
-          bash build/test/simulation/MACE/SimMACE/regression_test.bash --use-hwthreads
+          bash build/test/simulation/MACE/SimMACE/regression_test.sh --use-hwthreads
 
       - name: Restore regression report
         uses: actions/upload-artifact@v4

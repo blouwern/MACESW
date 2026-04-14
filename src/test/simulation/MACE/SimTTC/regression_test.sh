@@ -3,7 +3,7 @@
 
 module_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-source $module_dir/../../../source/init-source.bash 'SimTTC'
+source $module_dir/../../../source/init-source.sh 'SimTTC'
 
 echo "Start SimTTC"
 run_command parexec $build_dir/MACE SimTTC --seed 0 $build_dir/SimTTC/run_em_flat.mac
@@ -18,4 +18,4 @@ fi
 echo "Generating regression report..."
 run_command root -l -q "$module_dir/TestTTCSimHit.cxx(\"SimTTC_em_flat\",\"SimTTC_em_flat_test.root\",\"$golden_file\")"
 
-source $module_dir/../../../source/summarize-source.bash 
+source $module_dir/../../../source/summarize-source.sh

@@ -92,7 +92,7 @@ jobs:
       - name: Run regression test
         run: |
           . /environment
-          bash build${test_path}/regression_test.bash --use-hwthreads
+          bash build${test_path}/regression_test.sh --use-hwthreads
 
       - name: Restore regression report
         uses: actions/upload-artifact@v4
@@ -170,7 +170,7 @@ jobs:
       - name: Run regression test
         run: |
           . /environment
-          bash build${test_path}/regression_test.bash --use-hwthreads
+          bash build${test_path}/regression_test.sh --use-hwthreads
 
       - name: Restore regression report
         uses: actions/upload-artifact@v4

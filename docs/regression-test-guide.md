@@ -29,8 +29,8 @@ In this guide
 If no new datatuples or modules are to be tested in your update:
 - Build program MACE
 - Run the modular regression test scripts with bash.
-  - All-in-one driver: `src/test/regression_test_all.bash` (creates `build/test/test_ALL_YYYYMMDD-HHMMSS`).
-  - Per-module scripts follow the app layout under `src/test/<domain>/<Suite>/<Module>/regression_test.bash` (creates `build/test/test_<Module>_YYYYMMDD-HHMMSS`).
+  - All-in-one driver: `src/test/regression_test_all.sh` (creates `build/test/test_ALL_YYYYMMDD-HHMMSS`).
+  - Per-module scripts follow the app layout under `src/test/<domain>/<Suite>/<Module>/regression_test.sh` (creates `build/test/test_<Module>_YYYYMMDD-HHMMSS`).
 - Check the standard output of each data's verdict of regression test.
 - For more information about regression test, check the file `regression_report.root` in the working directory of regression test.
 
@@ -51,8 +51,8 @@ If you need to test a new datatuple or a new module, refer to the section [Add R
 ### Test a New Module
 - Create a new directory for this module: `src/test/<domain>/<Suite>/<Module>/`
 - Follow the section above to define the regression test data of this module: [Test a new datatuple](#test-a-new-datatuple). (i.e. Write `Read<datatuple_name>.cxx` & `Test<datatuple_name>.cxx` macro files.)
-- Create module generator. (i.e. Write bash scripts `regression_test.bash` & `generate_regression_data.bash` to invoke the macro files.) It is recommended to read the bash source code of the existing modules.
-- Source the module generator from `src/test/generate_regression_data_dr.bash` and (if desired) the module test from `src/test/regression_test_all.bash`.
+- Create module generator. (i.e. Write bash scripts `regression_test.sh` & `generate_regression_data.sh` to invoke the macro files.) It is recommended to read the bash source code of the existing modules.
+- Source the module generator from `src/test/generate_regression_data_dr.sh` and (if desired) the module test from `src/test/regression_test_all.sh`.
 
 ### Generate CI Workflow YAMLs
 Use the helper script to generate the GitHub Actions workflow files for both GCC and Clang regression tests.
@@ -76,11 +76,11 @@ Use the helper script to generate the GitHub Actions workflow files for both GCC
 ## Regression Test Mechanism of MACESW
 <img src="picture/Regression_test_mechanism.svg" alt="Intuitive flowchart showing the MACESW regression test workflow.">
 
-This section explains how MACESW generates "golden" regression data (the left branch shown in the image above) and how it verifies new outputs against those golden data (the right branch shown in the image above). The repository provides two main driver scripts under `src/test`: `generate_regression_data_dr.bash` (create/update the golden data) and `regression_test_all.bash` (run tests and compare current outputs to the golden data). The per-module scripts mirror the app layout under `src/test/<domain>/<Suite>/<Module>/` (for example `MACE` or `PhaseI`) and are sourced or called by these drivers. The comparison itself is implemented in a set of ROOT macros (`Read*.cxx` to produce golden histograms and `Test*.cxx` to run comparisons and write a report).
+This section explains how MACESW generates "golden" regression data (the left branch shown in the image above) and how it verifies new outputs against those golden data (the right branch shown in the image above). The repository provides two main driver scripts under `src/test`: `generate_regression_data_dr.sh` (create/update the golden data) and `regression_test_all.sh` (run tests and compare current outputs to the golden data). The per-module scripts mirror the app layout under `src/test/<domain>/<Suite>/<Module>/` (for example `MACE` or `PhaseI`) and are sourced or called by these drivers. The comparison itself is implemented in a set of ROOT macros (`Read*.cxx` to produce golden histograms and `Test*.cxx` to run comparisons and write a report).
 
 ### High-level Workflow
 - Data generation (create golden / sample data)
-  driver script: `generate_regression_data_dr.bash`
+  driver script: `generate_regression_data_dr.sh`
   1. Run selected units (e.g., `SimMMS`, `SimTTC`, `SimMACE`). The script launches the binaries with the configured macros (e.g., `run_em_flat.mac`, `run_signal.mac`) using MPI (`mpiexec`).
   2. Merge per-process ROOT outputs into a single sample file per unit using `hadd -ff`. Example output names created by the script:
      - `SimMMS_em_flat_sample.root`
@@ -89,7 +89,7 @@ This section explains how MACESW generates "golden" regression data (the left br
   3. Run the `Read*.cxx` ROOT macros (e.g., ReadCDCSimHit.cxx, `ReadMMSSimTrack.cxx`, `ReadTTCSimHit.cxx`) to produce histogram summaries from the sample ROOT files. These macros create and append histograms into `macesw_regression_data.root` (the golden data file), placed in the scripts directory. Each macro writes under a TDirectory named after the Module (e.g., `SimMACE_signal/`) and a subdirectory matching the datatuple (e.g.`CDCSimHit/`), which contains the histograms of selected column of data to be tested (e.g. `Edep`, `d`...).
 
 - Regression testing (compare current output to golden)
-  driver script: `regression_test_all.bash` (or per-module `src/test/<domain>/<Suite>/<Module>/regression_test.bash`)
+  driver script: `regression_test_all.sh` (or per-module `src/test/<domain>/<Suite>/<Module>/regression_test.sh`)
   1. Run the same simulation units as the generation process, merges outputs into `*_test.root` files:
      - `SimMMS_em_flat_test.root`
      - `SimTTC_em_flat_test.root`
@@ -129,17 +129,17 @@ Important operational details and assumptions you must follow so the test script
 
 - Working directories and artifacts
   - Both driver scripts create timestamped working directories under which they run and store temporary outputs; the script prints the working directory at start. Inspect those directories when debugging.
-  - generate_regression_data_dr.bash moves an existing `macesw_regression_data.root` into `old-regression-data/` before writing a new golden file. Check that folder if you need the previous golden data.
+  - generate_regression_data_dr.sh moves an existing `macesw_regression_data.root` into `old-regression-data/` before writing a new golden file. Check that folder if you need the previous golden data.
 
 - Naming conventions (recommended and used by the scripts)
   - `*_sample.root` — merged sample files produced by the generation script. These are the outputs of `hadd` when creating the golden dataset (e.g., `SimMMS_em_flat_sample.root`).
-  - `*_test.root` — merged outputs produced for a test run (the test-run `.mac` files in this repository are configured to produce output filenames containing `_test`; regression_test.bash merges per-rank outputs into these files).
+  - `*_test.root` — merged outputs produced for a test run (the test-run `.mac` files in this repository are configured to produce output filenames containing `_test`; regression_test.sh merges per-rank outputs into these files).
   - `macesw_regression_data.root` — the canonical golden dataset (contains TDirectories per Module and per data-tuple with the stored histograms).
   - `regression_report.root` — the visual report produced by the `Test*.cxx` macros (canvases and pull histograms); the macros open it in update mode and append results.
 
 - Important rules about Read / Test macros and TDirectory layout
   - A single `macesw_regression_data.root` must not be written twice for the same `<Module>/<DataTuple>` by repeated `Read*` calls. Otherwise the `Read*` macros returns with an error.
-  - Before running any `Read<DataTuple>.cxx` macro, ensure the destination golden file is writable and that there is no conflicting `<Module>/<DataTuple>` directory inside it (or intentionally archive the old golden file). The script `generate_regression_data_dr.bash` already moves the old golden file to `old-regression-data/` to avoid this conflict when regenerating.
+  - Before running any `Read<DataTuple>.cxx` macro, ensure the destination golden file is writable and that there is no conflicting `<Module>/<DataTuple>` directory inside it (or intentionally archive the old golden file). The script `generate_regression_data_dr.sh` already moves the old golden file to `old-regression-data/` to avoid this conflict when regenerating.
   - Before running any `Test<DataTuple>.cxx` macro, confirm that `macesw_regression_data.root` contains the expected `<Module>/<DataTuple>` directory and histograms. If the sample folder or the expected histograms are missing, the test macro will print an error and exit.
 
 - How histograms and binning are handled (consequences)
@@ -157,12 +157,12 @@ Important operational details and assumptions you must follow so the test script
   - Ensure `MACE` binary in the build directory is built and executable.
   - Ensure `ROOT` and `hadd` are usable from the shell.
   - Confirm `data/macesw_offline_data.sh` exists and is reachable from `build_dir`.
-  - If running regression_test.bash, make sure `build/test/macesw_regression_data.root` (the golden file) contains the Module/data-tuple you are testing.
+  - If running regression_test.sh, make sure `build/test/macesw_regression_data.root` (the golden file) contains the Module/data-tuple you are testing.
   - If regenerating golden data, back up existing `macesw_regression_data.root` or follow the script’s `old-regression-data/` move behavior.
   - Do not re-run a `Read*` macro for the same `<Module>/<DataTuple>` inside the same `macesw_regression_data.root` unless you first remove or archive the old entry.
 
 ## Edge Cases and Notes
 - Zero-integral histograms: the test macros handle zero-integral histograms by printing a warning and skipping scaling to avoid division-by-zero errors.
-- Missing golden file: regression_test.bash requires `macesw_regression_data.root` to exist in the script directory; if missing, tests that rely on it will fail when attempting to open the sample directory.
+- Missing golden file: regression_test.sh requires `macesw_regression_data.root` to exist in the script directory; if missing, tests that rely on it will fail when attempting to open the sample directory.
 - Binning/range mismatch: because ranges are computed when creating the golden sample, always regenerate golden data if upstream data schemas or distributions change (e.g., new columns or different units).
-- Determinism: regression_test.bash launches simulations with `--seed 0`, which instructs the simulation to auto-generate a random seed for each run (i.e., the seed is not fixed and will differ every time the test is executed). This means outputs are non-deterministic and will vary run-by-run, which helps to reduce statistical variance across repeated tests. If strict reproducibility is required, specify a fixed nonzero seed (e.g., `--seed 12345`). Note that even with randomized seeding, some runs may still exhibit statistical fluctuations — watch for `SUSPICIOUS` flags.
+- Determinism: regression_test.sh launches simulations with `--seed 0`, which instructs the simulation to auto-generate a random seed for each run (i.e., the seed is not fixed and will differ every time the test is executed). This means outputs are non-deterministic and will vary run-by-run, which helps to reduce statistical variance across repeated tests. If strict reproducibility is required, specify a fixed nonzero seed (e.g., `--seed 12345`). Note that even with randomized seeding, some runs may still exhibit statistical fluctuations — watch for `SUSPICIOUS` flags.
