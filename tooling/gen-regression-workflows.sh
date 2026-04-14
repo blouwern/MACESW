@@ -26,6 +26,7 @@ out_clang="${repo_root}/${out_clang_rel}"
 
 cat > "$out_gcc" <<EOF
 name: ${module_name} regression test (AMD64 GNU/Linux GCC)
+NOTE: This file is auto-generated
 
 on:
   push:
