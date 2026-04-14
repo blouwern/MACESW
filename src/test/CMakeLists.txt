@@ -20,8 +20,8 @@ set(SOURCE_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/source"
 )
 set(SOURCE_FILE
-    "${CMAKE_CURRENT_SOURCE_DIR}/generate_regression_data_dr.bash"
-    "${CMAKE_CURRENT_SOURCE_DIR}/regression_test_all.bash"
+    "${CMAKE_CURRENT_SOURCE_DIR}/generate_regression_data_dr.sh"
+    "${CMAKE_CURRENT_SOURCE_DIR}/regression_test_all.sh"
 )
 set(DEST_DIR "${CMAKE_BINARY_DIR}/test")
 
@@ -30,6 +30,6 @@ file(COPY ${SOURCE_DIR} ${SOURCE_FILE}
      FILES_MATCHING 
      REGEX ".*\\.template$" EXCLUDE
      REGEX ".*\\.cxx$" 
-     REGEX ".*\\.bash$" 
+     REGEX ".*\\.sh$" 
            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
 )
