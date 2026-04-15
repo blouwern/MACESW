@@ -29,7 +29,7 @@ permissions:
   contents: read
 
 jobs:
-  regression-test-with-clang-simmace:
+  simmace-regression-test-with-clang:
     name: SimMACE regression test (AMD64 GNU/Linux Clang)
     timeout-minutes: 180
     runs-on: ubuntu-latest
@@ -37,9 +37,9 @@ jobs:
       matrix:
         image:
           - url: ghcr.io/zhao-shihan/rgb-docker:mpich
-            artifact-name: Regression test report (SimMACE, AMD64 GNU-Linux Clang, MPICH)
+            artifact-name: SimMACE Regression test report (AMD64 GNU-Linux Clang, MPICH)
           - url: ghcr.io/zhao-shihan/rgb-docker:openmpi
-            artifact-name: Regression test report (SimMACE, AMD64 GNU-Linux Clang, OpenMPI)
+            artifact-name: SimMACE Regression test report (AMD64 GNU-Linux Clang, OpenMPI)
     container: ${{ matrix.image.url }}
     defaults:
       run:

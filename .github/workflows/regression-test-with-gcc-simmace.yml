@@ -1,4 +1,5 @@
 name: SimMACE regression test (AMD64 GNU/Linux GCC)
+NOTE: This file is auto-generated
 
 on:
   push:
@@ -29,7 +30,7 @@ permissions:
   contents: read
 
 jobs:
-  regression-test-with-gcc-simmace:
+  simmace-regression-test-with-gcc:
     name: SimMACE regression test (AMD64 GNU/Linux GCC)
     timeout-minutes: 180
     runs-on: ubuntu-latest
@@ -37,9 +38,9 @@ jobs:
       matrix:
         image:
           - url: ghcr.io/zhao-shihan/rgb-docker:mpich
-            artifact-name: Regression test report (SimMACE, AMD64 GNU-Linux GCC, MPICH)
+            artifact-name: SimMACE Regression test report (AMD64 GNU-Linux GCC, MPICH)
           - url: ghcr.io/zhao-shihan/rgb-docker:openmpi
-            artifact-name: Regression test report (SimMACE, AMD64 GNU-Linux GCC,OpenMPI)
+            artifact-name: SimMACE Regression test report (AMD64 GNU-Linux GCC,OpenMPI)
     container: ${{ matrix.image.url }}
     defaults:
       run:

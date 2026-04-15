@@ -57,7 +57,7 @@ permissions:
   contents: read
 
 jobs:
-  regression-test-with-gcc-${module_lower}:
+  ${module_lower}-regression-test-with-gcc:
     name: ${module_name} regression test (AMD64 GNU/Linux GCC)
     timeout-minutes: 180
     runs-on: ubuntu-latest
@@ -65,9 +65,9 @@ jobs:
       matrix:
         image:
           - url: ghcr.io/zhao-shihan/rgb-docker:mpich
-            artifact-name: Regression test report (${module_name}, AMD64 GNU-Linux GCC, MPICH)
+            artifact-name: ${module_name} Regression test report (AMD64 GNU-Linux GCC, MPICH)
           - url: ghcr.io/zhao-shihan/rgb-docker:openmpi
-            artifact-name: Regression test report (${module_name}, AMD64 GNU-Linux GCC,OpenMPI)
+            artifact-name: ${module_name} Regression test report (AMD64 GNU-Linux GCC,OpenMPI)
     container: \${{ matrix.image.url }}
     defaults:
       run:
@@ -135,7 +135,7 @@ permissions:
   contents: read
 
 jobs:
-  regression-test-with-clang-${module_lower}:
+  ${module_lower}-regression-test-with-clang:
     name: ${module_name} regression test (AMD64 GNU/Linux Clang)
     timeout-minutes: 180
     runs-on: ubuntu-latest
@@ -143,9 +143,9 @@ jobs:
       matrix:
         image:
           - url: ghcr.io/zhao-shihan/rgb-docker:mpich
-            artifact-name: Regression test report (${module_name}, AMD64 GNU-Linux Clang, MPICH)
+            artifact-name: ${module_name} Regression test report (AMD64 GNU-Linux Clang, MPICH)
           - url: ghcr.io/zhao-shihan/rgb-docker:openmpi
-            artifact-name: Regression test report (${module_name}, AMD64 GNU-Linux Clang, OpenMPI)
+            artifact-name: ${module_name} Regression test report (AMD64 GNU-Linux Clang, OpenMPI)
     container: \${{ matrix.image.url }}
     defaults:
       run:
