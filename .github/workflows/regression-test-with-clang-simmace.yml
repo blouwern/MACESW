@@ -1,4 +1,5 @@
 name: SimMACE regression test (AMD64 GNU/Linux Clang)
+# NOTE: This file is auto-generated
 
 on:
   push:
