@@ -36,6 +36,7 @@
 #include "pmp/surface_mesh.h"
 
 #include "muc/math"
+#include "muc/algorithm"
 
 #include "fmt/std.h"
 
@@ -274,10 +275,12 @@ auto ECAL::CalculateArrayInformation() const -> ArrayInformation {
         for (auto&& pmpFaceVertex : pmpMesh.vertices(pmpFace)) {
             for (auto&& pmpVertexFace : pmpMesh.faces(pmpFaceVertex)) {
                 if (pmpVertexFace != pmpFace and indexMap.contains(pmpVertexFace.idx())) {
-                    face.neighborModuleID.insert(indexMap.at(pmpVertexFace.idx()));
+                    face.neighborModuleID.emplace_back(indexMap.at(pmpVertexFace.idx()));
                 }
             }
         }
+        muc::timsort(face.neighborModuleID);
+        face.neighborModuleID.shrink_to_fit();
 
         for (auto&& v : pmpMesh.vertices(pmpFace)) {
             face.vertexIndex.emplace_back(v.idx());

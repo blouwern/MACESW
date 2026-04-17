@@ -16,6 +16,8 @@
 # MACESW. If not, see <https://www.gnu.org/licenses/>.
 
 cmake_minimum_required(VERSION 3.21)
+# export compile commands for language server
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Enable MSVC_RUNTIME_LIBRARY target property
 # See https://cmake.org/cmake/help/latest/policy/CMP0091.html

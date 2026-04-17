@@ -103,7 +103,7 @@ public:
     struct ArrayInformation {
         struct Module {
             int moduleID{};
-            std::unordered_set<int> neighborModuleID{};
+            std::vector<int> neighborModuleID{};
             int typeID{};
             Mustard::Point3D centroid{};
             Mustard::Vector3D normal{};
@@ -116,7 +116,8 @@ public:
 private:
     auto CalculateArrayInformation() const -> ArrayInformation;
 
-    auto ImportAllValue(const YAML::Node& node) -> void override;
+    auto ImportAllValue(const
+                        YAML::Node& node) -> void override;
     auto ExportAllValue(YAML::Node& node) const -> void override;
 
 private:
