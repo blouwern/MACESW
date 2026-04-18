@@ -21,17 +21,15 @@
 #include "MACE/ExportECALNeighbor/ExportECALNeighbor.h++"
 
 #include "Mustard/CLI/BasicCLI.h++"
-#include "Mustard/Detector/Description/DescriptionIO.h++"
 #include "Mustard/Env/BasicEnv.h++"
 #include "Mustard/IO/PrettyLog.h++"
-#include "Mustard/Utility/LiteralUnit.h++"
 
 #include "ROOT/RDataFrame.hxx"
 
-#include "fmt/std.h"
+#include "TFile.h"
+#include "TTree.h"
 
 #include <filesystem>
-#include <functional>
 #include <stdexcept>
 #include <string>
 
@@ -43,8 +41,9 @@ ExportECALNeighbor::ExportECALNeighbor() :
     Subprogram{"ExportECALNeighbor", "Export neighbor crystal indeces of each ECAL crystal index"} {}
 
 auto ExportECALNeighbor::Main(int argc, char* argv[]) const -> int {
+    using namespace Detector::Description;
     Mustard::CLI::BasicCLI<> cli;
-    cli->add_argument("-o", "--output").help("Set output directory path.").default_value("ecal_neighbor"s).required().nargs(1);
+    cli->add_argument("-o", "--output").help("Set output directory path.").default_value("ecal_neighbor_info"s).required().nargs(1);
     Mustard::Env::BasicEnv env(argc, argv, cli);
 
     const std::filesystem::path outputPath{cli->get("--output")};
@@ -53,14 +52,24 @@ auto ExportECALNeighbor::Main(int argc, char* argv[]) const -> int {
     }
     std::filesystem::create_directories(outputPath);
 
-    ////////////////////////////////////////////////////////////////
-    // Construct volumes
-    ////////////////////////////////////////////////////////////////
-
-    using namespace Detector::Description;
+    std::unique_ptr<TFile> f(TFile::Open(outputPath.generic_string().c_str(), "RECREATE"));
+    if (not f or f->IsZombie()) {
+        Mustard::Throw<std::runtime_error>(fmt::format("Failed to create file {}", outputPath));
+   }
 
     const auto& ecal{Detector::Description::ECAL::Instance()};
     const auto& moduleList{ecal.Array().moduleList};
+    TTree tree("ECALCrystalNeighbors", "Neighbor IDs per module");
+    std::vector<int> neighbors;
+    tree.Branch("neighbors", &neighbors);
+
+    for (const auto& mod : moduleList) {
+        neighbors = mod.neighborModuleID;
+        tree.Fill();
+    }
+
+    tree.Write();
+    f->Close();
 
 
     return EXIT_SUCCESS;
