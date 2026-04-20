@@ -35,7 +35,7 @@ MatrixElementBasedGeneratorCLIModule::MatrixElementBasedGeneratorCLIModule(gsl::
         .nargs(1)
         .scan<'g', double>();
     TheCLI()
-        ->add_argument("--integral-precision-goal")
+        ->add_argument("-c", "--integral-precision-goal")
         .help("Precision goal for phase-space integral.")
         .default_value(0.01)
         .required()
@@ -58,8 +58,8 @@ auto MatrixElementBasedGeneratorCLIModule::ContinueIntegration() const -> std::o
                                     "and it will generate the same event series. Try set exclusive seeds for each run, or simply --seed 0");
     }
     Mustard::MCIntegrationState state{};
-    state.sum[0] = cliState->at(0);
-    state.sum[1] = cliState->at(1);
+    state.sumF = cliState->at(0);
+    state.sumF2 = cliState->at(1);
     state.n = gsl::narrow_cast<decltype(state.n)>(cliState->at(2));
     return state;
 }

@@ -19,20 +19,14 @@
 
 #pragma once
 
-#include "MACE/Data/SensorHit.h++"
+#include "Mustard/Application/Subprogram.h++"
 
-#include "Mustard/Data/Tuple.h++"
-#include "Mustard/Geant4X/Memory/UseG4Allocator.h++"
+namespace MACE::PhaseI::CaliECAL {
 
-#include "G4THitsCollection.hh"
-#include "G4VHit.hh"
+class CaliECAL : public Mustard::Application::Subprogram {
+public:
+    CaliECAL();
+    auto Main(int argc, char* argv[]) const -> int override;
+};
 
-namespace MACE::inline Simulation::inline Hit {
-
-class TTCSiPMHit final : public Mustard::Geant4X::UseG4Allocator<TTCSiPMHit>,
-                         public G4VHit,
-                         public Mustard::Data::Tuple<Data::TTCSiPMHit> {};
-
-using TTCSiPMHitCollection = G4THitsCollection<TTCSiPMHit>;
-
-} // namespace MACE::inline Simulation::inline Hit
+} // namespace MACE::PhaseI::CaliECAL

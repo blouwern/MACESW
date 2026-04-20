@@ -17,18 +17,22 @@
 // You should have received a copy of the GNU General Public License along with
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-namespace MACE::Detector::Description {
+#pragma once
 
-inline auto ECAL::MeshManager::Get(const ECAL* ecal) -> const MeshInformation& {
-    if (fOutdated) {
-        fMesh = ecal->CalculateMeshInformation();
-        fOutdated = false;
-    }
-    return fMesh;
-}
+#include "MACE/Data/PhotosensorDataModel.h++"
 
-inline void ECAL::SetGeometryOutdated() const {
-    fMeshManager.SetOutdated();
-}
+#include "Mustard/Data/Tuple.h++"
+#include "Mustard/Geant4X/Memory/UseG4Allocator.h++"
 
-} // namespace MACE::Detector::Description
+#include "G4THitsCollection.hh"
+#include "G4VHit.hh"
+
+namespace MACE::inline Simulation::inline Hit {
+
+class PhotosensorHit final : public Mustard::Geant4X::UseG4Allocator<PhotosensorHit>,
+                             public G4VHit,
+                             public Mustard::Data::Tuple<Data::SimPhotosensorHitModel> {};
+
+using PhotosensorHitCollection = G4THitsCollection<PhotosensorHit>;
+
+} // namespace MACE::inline Simulation::inline Hit

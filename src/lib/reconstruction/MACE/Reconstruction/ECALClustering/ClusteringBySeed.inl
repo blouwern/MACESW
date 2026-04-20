@@ -17,22 +17,21 @@
 // You should have received a copy of the GNU General Public License along with
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// This file is deprecated and will be removed soon.
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+namespace MACE::inline Reconstruction::ECALClustering {
 
-#pragma once
+inline auto ClusteringBySeed(int seedID,
+                             const std::vector<MACE::Detector::Description::ECAL::ArrayInformation::Module>& moduleList) -> std::unordered_set<int> {
+    std::unordered_set<int> modulesInCluster;
 
-#include "Mustard/Data/TupleModel.h++"
-#include "Mustard/Data/Value.h++"
+    modulesInCluster.insert(seedID);
+    for (auto&& neighbor : moduleList.at(seedID).neighborModuleID) {
+        modulesInCluster.insert(neighbor);
+        modulesInCluster.insert(
+            moduleList.at(neighbor).neighborModuleID.begin(),
+            moduleList.at(neighbor).neighborModuleID.end());
+    }
 
-#include "muc/array"
+    return modulesInCluster;
+}
 
-namespace MACE::PhaseI::Data {
-
-using SciFiRawHit = Mustard::Data::TupleModel<
-    Mustard::Data::Value<short, "FiberID", "Fiber ID">,
-    Mustard::Data::Value<double, "t", "Hit time">,
-    Mustard::Data::Value<float, "Edep", "Energy deposition">>;
-
-} // namespace MACE::PhaseI::Data
+} // namespace MACE::inline Reconstruction::ECALClustering
