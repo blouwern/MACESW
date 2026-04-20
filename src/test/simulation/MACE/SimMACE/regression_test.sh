@@ -3,7 +3,7 @@
 
 module_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-source $module_dir/../../../source/init-source.sh 'SimMACE'
+source $module_dir/../../../source/init-source.sh 'SimMACE' "$@"
 
 echo "Start SimMACE"
 run_command parexec $build_dir/MACE SimMACE --seed 0 $build_dir/SimMACE/run_signal.mac

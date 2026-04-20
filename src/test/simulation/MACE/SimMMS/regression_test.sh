@@ -3,7 +3,7 @@
 
 module_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-source $module_dir/../../../source/init-source.sh 'SimMMS'
+source $module_dir/../../../source/init-source.sh 'SimMMS' "$@"
 
 echo "Start SimMMS"
 run_command parexec $build_dir/MACE SimMMS --seed 0 $build_dir/SimMMS/run_em_flat.mac

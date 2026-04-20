@@ -5,12 +5,13 @@ test_src_dir=$source_dir/..
 build_dir=$test_src_dir/..
 
 module_name=$1
+shift
 test_dir=$test_src_dir/test_${module_name}_$(date --utc +%Y%m%d-%H%M%S)
 mkdir "$test_dir" && cd "$test_dir"
 echo "Working directory: $(pwd)"
 
 source $source_dir/run_command-source.sh
-source $source_dir/parexec-source.sh
+source $source_dir/parexec-source.sh "$@"
 
 start_time=$(date +%s)
 
