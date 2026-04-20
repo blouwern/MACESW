@@ -26,6 +26,8 @@
 
 #include "ROOT/RDataFrame.hxx"
 
+#include "fmt/std.h"
+
 #include "TFile.h"
 #include "TTree.h"
 

@@ -17,6 +17,7 @@
 // You should have received a copy of the GNU General Public License along with
 // MACESW. If not, see <https://www.gnu.org/licenses/>.
 
+#include "MACE/ExportECALNeighbor/ExportECALNeighbor.h++"
 #include "MACE/GenBkgM2ENNE/GenBkgM2ENNE.h++"
 #include "MACE/GenM2ENNEE/GenM2ENNEE.h++"
 #include "MACE/GenM2ENNG/GenM2ENNG.h++"
@@ -38,6 +39,7 @@
 
 auto main(int argc, char* argv[]) -> int {
     Mustard::Application::SubprogramLauncher launcher;
+    launcher.AddSubprogram<MACE::ExportECALNeighbor::ExportECALNeighbor>();
     launcher.AddSubprogram<MACE::GenBkgM2ENNE::GenBkgM2ENNE>();
     launcher.AddSubprogram<MACE::GenM2ENNEE::GenM2ENNEE>();
     launcher.AddSubprogram<MACE::GenM2ENNG::GenM2ENNG>();
