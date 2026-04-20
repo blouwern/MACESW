@@ -63,8 +63,8 @@ Use the helper script to generate the GitHub Actions workflow files for both GCC
   - `ModuleName` (e.g. `SimMACE`, `SimTTC`, `SimMMS`)
   - `TestPath` in the format `/test/<Domain>/<Suite>/<ModuleName>` (example: `/test/simulation/MACE/SimMACE`)
 - Output files:
-  - `.github/workflows/regression-test-with-gcc-<module_lower_case>.yml`
-  - `.github/workflows/regression-test-with-clang-<module_lower_case>.yml`
+  - `.github/workflows/<module_lower_case>-regression-test-with-gcc.yml`
+  - `.github/workflows/<module_lower_case>-regression-test-with-clang.yml`
 
 
 ---
