@@ -17,6 +17,6 @@ run_command() {
         echo "# ❌ \"$command\" failed with exit code $exit_code"
         echo "################################################################################"
         final_exit_code=$exit_code
-        return $exit_code
+        exit $exit_code
     fi
 }

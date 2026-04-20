@@ -14,7 +14,7 @@ echo "# Total running time: ${hours}h ${minutes}m ${seconds}s"
 if [[ "${final_exit_code}" -eq 0 ]]; then
     echo "# ✅ All commands completed successfully!"
 else
-    echo "# ❌ Some commands failed!"
+    echo "# ❌ final_exit_code is changed somehow, check it"
 fi
 echo "# Details in $test_dir"
 echo "################################################################################"
